@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Yeat.SystemTests;
+package org.firstinspires.ftc.teamcode.Tests;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -17,17 +17,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @TeleOp
 @Config
-public class ServoTestOpMode extends LinearOpMode
+public class VerticalTestOpMode extends LinearOpMode
 {
     private Servo s1;
     private Servo s2;
 
-    private double s1pos = 0.5;
-    private double s2pos = 0.5;
+    public static double retractedPos = 1.0;
+    public static double extendedPos = 0.4;
+    private double currentPos = 1;
 
     private boolean lbTriggered = false, rbTriggered = false;
-
-    private final ElapsedTime eTime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -45,31 +44,21 @@ public class ServoTestOpMode extends LinearOpMode
         telemetry.addData("Mode", "running");
         telemetry.update();
 
-        eTime.reset();
-
         while (opModeIsActive()) {
-            s1.setPosition(s1pos);
-            s2.setPosition(s2pos);
-
-            telemetry.addData("s1 position", s1pos);
-            telemetry.addData("s2 position", s2pos);
-
             if (gamepad1.left_bumper && !lbTriggered) {
-                s1pos+=0.05;
-                s2pos-=0.05;
-            }
-
-            if (gamepad1.right_bumper && !rbTriggered) {
-                s1pos-=0.05;
-                s2pos+=0.05;
+                currentPos = extendedPos;
+            } else if (gamepad1.right_bumper && !rbTriggered) {
+                currentPos = retractedPos;
             }
 
             lbTriggered = gamepad1.left_bumper;
             rbTriggered = gamepad1.right_bumper;
 
-            telemetry.update();
+            s1.setPosition(currentPos);
 
-            eTime.reset();
+            telemetry.addData("s position", currentPos);
+
+            telemetry.update();
         }
     }
 }
