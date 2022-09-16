@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Yeat.SystemTests;
+package org.firstinspires.ftc.teamcode.Tests;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
