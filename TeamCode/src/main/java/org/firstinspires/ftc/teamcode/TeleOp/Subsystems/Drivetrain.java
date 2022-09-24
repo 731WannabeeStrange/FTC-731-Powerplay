@@ -29,8 +29,8 @@ public class Drivetrain {
     public static double I = 0;
     public static double D = 0;
 
-    public Drivetrain(HardwareMap hardwareMap, Telemetry multipletelemetry) {
-        telemetry = multipletelemetry;
+    public Drivetrain(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
+        telemetry = multipleTelemetry;
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
