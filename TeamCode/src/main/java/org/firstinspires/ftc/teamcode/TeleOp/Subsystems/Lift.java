@@ -93,19 +93,16 @@ public class Lift {
                 if (liftButtonHigh) {
                     depositTicks = liftHigh;
                     lift.setTargetPosition(depositTicks);
-
                     lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                     liftState = LiftState.LIFT;
                 } else if (liftButtonMid) {
                     depositTicks = liftMid;
                     lift.setTargetPosition(depositTicks);
-
                     lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                     liftState = LiftState.LIFT;
                 } else if (liftButtonLow) {
                     depositTicks = liftLow;
                     lift.setTargetPosition(depositTicks);
-
                     lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                     liftState = LiftState.LIFT;
                 }
