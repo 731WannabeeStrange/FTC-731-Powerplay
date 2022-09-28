@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous.Vision;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -128,6 +130,7 @@ public class AprilTagVisionPipeline
         }
     }
 
+    @SuppressLint("DefaultLocale")
     void tagToTelemetry(AprilTagDetection detection) {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
         telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
