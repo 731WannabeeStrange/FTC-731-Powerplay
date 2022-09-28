@@ -15,14 +15,14 @@ public class Lift {
     public static double h2Retracted = 0;
     public static double h1Extended = 0.3;
     public static double h2Extended = 0.7;
-    public static int liftLow = 600;
-    public static int liftMid = 1600;
-    public static int liftHigh = 2600;
+    public static int liftLow = 1600;
+    public static int liftMid = 2600;
+    public static int liftHigh = 3600;
     public static double grabPos = 1;
     public static double releasePos = 0.5;
     public static double waitTime = 0.5;
     public static double desiredLiftPower = 1;
-    public static double minHeightForExtension = 400;
+    public static double minHeightForExtension = 600;
 
     private enum LiftState {
         START,
