@@ -36,9 +36,9 @@ public class AprilTagVisionPipeline
     // UNITS ARE METERS
     double tagsize = 0.166;
 
-    final int left = 8;
-    final int middle = 9;
-    final int right = 10;
+    final int LEFT = 8;
+    final int MIDDLE = 9;
+    final int RIGHT = 10;
 
     AprilTagDetection tagOfInterest = null;
 
@@ -70,7 +70,7 @@ public class AprilTagVisionPipeline
             boolean tagFound = false;
 
             for (AprilTagDetection tag : currentDetections) {
-                if (tag.id == left || tag.id == middle || tag.id == right) {
+                if (tag.id == LEFT || tag.id == MIDDLE || tag.id == RIGHT) {
                     tagOfInterest = tag;
                     tagFound = true;
                     break;
@@ -121,11 +121,11 @@ public class AprilTagVisionPipeline
         }
 
         switch (tagOfInterest.id) {
-            case left: default:
+            case LEFT: default:
                 return Location.LEFT;
-            case middle:
+            case MIDDLE:
                 return Location.MIDDLE;
-            case right:
+            case RIGHT:
                 return Location.RIGHT;
         }
     }
