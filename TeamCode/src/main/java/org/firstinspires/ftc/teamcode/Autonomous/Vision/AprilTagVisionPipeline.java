@@ -36,9 +36,9 @@ public class AprilTagVisionPipeline
     // UNITS ARE METERS
     double tagsize = 0.166;
 
-    final int left = 1;
-    final int middle = 2;
-    final int right = 3;
+    final int left = 8;
+    final int middle = 9;
+    final int right = 10;
 
     AprilTagDetection tagOfInterest = null;
 
