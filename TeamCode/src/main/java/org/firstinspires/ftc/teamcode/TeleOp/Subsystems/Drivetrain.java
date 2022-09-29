@@ -126,4 +126,19 @@ public class Drivetrain {
         rl.setPower(RL_power);
         rr.setPower(RR_power);
     }
+
+    public void driveRobotSimple(double y, double x, double rx) {
+        y *= -1;
+
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double flPower = (y + x + rx) / denominator;
+        double frPower = (y - x + rx) / denominator;
+        double rlPower = (y - x - rx) / denominator;
+        double rrPower = (y + x - rx) / denominator;
+
+        fl.setPower(flPower);
+        fr.setPower(frPower);
+        rl.setPower(rlPower);
+        rr.setPower(rrPower);
+    }
 }
