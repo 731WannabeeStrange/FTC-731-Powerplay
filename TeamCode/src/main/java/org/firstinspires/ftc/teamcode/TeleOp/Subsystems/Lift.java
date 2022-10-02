@@ -18,8 +18,8 @@ public class Lift {
     public static int liftLow = 1600;
     public static int liftMid = 2600;
     public static int liftHigh = 3600;
-    public static double grabPos = 1;
-    public static double releasePos = 0.5;
+    public static double grabPos = 0.4;
+    public static double releasePos = 0.25;
     public static double waitTime = 0.5;
     public static double desiredLiftPower = 1;
     public static double minHeightForExtension = 600;
