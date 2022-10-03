@@ -14,7 +14,6 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 
-@TeleOp
 public class AprilTagVisionPipeline
 {
     OpenCvCamera camera;
