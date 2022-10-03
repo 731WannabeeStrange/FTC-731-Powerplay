@@ -25,25 +25,25 @@ public class ScrimmageAuto extends LinearOpMode {
         eTime.reset();
         switch (location) {
             case LEFT:
-                while (eTime.time() < 1) {
+                while (eTime.time() < 1 && opModeIsActive()) {
                     drivetrain.driveRobotSimple(1, 0, 0);
                 }
                 eTime.reset();
-                while (eTime.time() < 1) {
+                while (eTime.time() < 1 && opModeIsActive()) {
                     drivetrain.driveRobotSimple(0, -1, 0);
                 }
                 break;
             case MIDDLE:
-                while (eTime.time() < 1) {
+                while (eTime.time() < 1 && opModeIsActive()) {
                     drivetrain.driveRobotSimple(1, 0, 0);
                 }
                 break;
             case RIGHT:
-                while (eTime.time() < 1) {
+                while (eTime.time() < 1 && opModeIsActive()) {
                     drivetrain.driveRobotSimple(1, 0, 0);
                 }
                 eTime.reset();
-                while (eTime.time() < 1) {
+                while (eTime.time() < 1 && opModeIsActive()) {
                     drivetrain.driveRobotSimple(0, 1, 0);
                 }
                 break;
