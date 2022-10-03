@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.Autonomous.Vision;
 
 import android.annotation.SuppressLint;
 
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -113,11 +112,10 @@ public class AprilTagVisionPipeline
         if (tagOfInterest != null) {
             telemetry.addLine("Tag snapshot:\n");
             tagToTelemetry(tagOfInterest);
-            telemetry.update();
         } else {
             telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
-            telemetry.update();
         }
+        telemetry.update();
 
         switch (tagOfInterest.id) {
             case LEFT: default:
