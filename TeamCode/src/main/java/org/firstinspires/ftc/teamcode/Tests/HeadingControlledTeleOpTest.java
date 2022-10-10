@@ -87,7 +87,7 @@ public class HeadingControlledTeleOpTest extends LinearOpMode {
 
             previousError = error;
 
-            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx) + Math.abs(correction), 1);
             double flPower = (y + x + rx + correction) / denominator;
             double frPower = (y - x + rx + correction) / denominator;
             double blPower = (y - x - rx - correction) / denominator;
