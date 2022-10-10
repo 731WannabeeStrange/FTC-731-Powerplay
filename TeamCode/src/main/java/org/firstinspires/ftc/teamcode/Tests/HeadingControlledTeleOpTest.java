@@ -26,7 +26,7 @@ public class HeadingControlledTeleOpTest extends LinearOpMode {
     BNO055IMU imu;
     double desiredAngle = 0;
     double previousError;
-    double integral;
+    double integral, derivative;
     ElapsedTime eTime = new ElapsedTime();
 
     @Override
@@ -82,7 +82,7 @@ public class HeadingControlledTeleOpTest extends LinearOpMode {
             integral += error * time;
             eTime.reset();
 
-            double derivative = (error - previousError) / time;
+            derivative = (error - previousError) / time;
             double correction = P * error + I * integral + D * derivative;
 
             previousError = error;
