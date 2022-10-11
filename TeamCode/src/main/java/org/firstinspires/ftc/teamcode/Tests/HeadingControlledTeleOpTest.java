@@ -97,6 +97,11 @@ public class HeadingControlledTeleOpTest extends LinearOpMode {
             fr.setPower(frPower);
             bl.setPower(blPower);
             br.setPower(brPower);
+
+            telemetry.addData("Desired Angle", desiredAngle);
+            telemetry.addData("Current Angle", angles.firstAngle);
+            telemetry.addData("Error", error);
+            telemetry.addData("Correction", correction);
         }
     }
 }
