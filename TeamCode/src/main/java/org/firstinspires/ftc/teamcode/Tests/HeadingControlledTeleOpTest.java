@@ -70,14 +70,13 @@ public class HeadingControlledTeleOpTest extends LinearOpMode {
 
             desiredAngle += turnSpeed * rx;
 
-            double x1 = desiredAngle - angles.firstAngle;
-            double x2;
-            if (desiredAngle - angles.firstAngle < 0) {
-                x2 = desiredAngle - angles.firstAngle + 360;
-            } else {
-                x2 = desiredAngle - angles.firstAngle - 360;
+            double error = desiredAngle - angles.firstAngle;
+            while (error < -180) {
+                error += 360;
             }
-            double error = Math.abs(x1) < Math.abs(x2) ? x1 : x2;
+            while (error > 180) {
+                error -= 360;
+            }
 
             integral += error * time;
             eTime.reset();
