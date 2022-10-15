@@ -118,7 +118,7 @@ public class Lift {
             case EXTEND:
                 horizontal1.setPosition(h1Extended);
                 horizontal2.setPosition(h2Extended);
-                if (lift.getCurrentPosition() - depositTicks < 20) {
+                if (Math.abs(lift.getCurrentPosition() - depositTicks) < 20) {
                     if (depositButton) {
                         liftPower = 0;
                         eTime.reset();
