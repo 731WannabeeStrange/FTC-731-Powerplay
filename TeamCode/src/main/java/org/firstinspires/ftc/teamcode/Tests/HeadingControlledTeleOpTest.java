@@ -26,7 +26,7 @@ public class HeadingControlledTeleOpTest extends LinearOpMode {
     BNO055IMU imu;
     double desiredAngle = 0;
     double previousError;
-    double integral;
+    double integral, derivative;
     ElapsedTime eTime = new ElapsedTime();
 
     @Override
@@ -70,33 +70,37 @@ public class HeadingControlledTeleOpTest extends LinearOpMode {
 
             desiredAngle += turnSpeed * rx;
 
-            double x1 = desiredAngle - angles.firstAngle;
-            double x2;
-            if (desiredAngle - angles.firstAngle < 0) {
-                x2 = desiredAngle - angles.firstAngle + 360;
-            } else {
-                x2 = desiredAngle - angles.firstAngle - 360;
+            double error = desiredAngle - angles.firstAngle;
+            while (error < -180) {
+                error += 360;
             }
-            double error = Math.abs(x1) < Math.abs(x2) ? x1 : x2;
+            while (error > 180) {
+                error -= 360;
+            }
 
             integral += error * time;
             eTime.reset();
 
-            double derivative = (error - previousError) / time;
+            derivative = (error - previousError) / time;
             double correction = P * error + I * integral + D * derivative;
 
             previousError = error;
 
-            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-            double flPower = (y + x + rx + correction) / denominator;
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx) + Math.abs(correction), 1);
+            double flPower = (y + x + rx - correction) / denominator;
             double frPower = (y - x + rx + correction) / denominator;
             double blPower = (y - x - rx - correction) / denominator;
-            double brPower = (y + x - rx - correction) / denominator;
+            double brPower = (y + x - rx + correction) / denominator;
 
             fl.setPower(flPower);
             fr.setPower(frPower);
             bl.setPower(blPower);
             br.setPower(brPower);
+
+            telemetry.addData("Desired Angle", desiredAngle);
+            telemetry.addData("Current Angle", angles.firstAngle);
+            telemetry.addData("Error", error);
+            telemetry.addData("Correction", correction);
         }
     }
 }
