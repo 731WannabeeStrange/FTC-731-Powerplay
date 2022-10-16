@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -9,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -17,20 +20,25 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 @Config
 @TeleOp
 public class HeadingControlledTeleOpTest extends LinearOpMode {
-    public static double turnSpeed = 0.5;
-    public static double P = 1;
+    FtcDashboard dashboard;
+
+    public static double turnSpeed = 2;
+    public static double P = 0.04;
     public static double I = 0;
     public static double D = 0;
 
     DcMotorEx fl, fr, bl, br;
     BNO055IMU imu;
     double desiredAngle = 0;
-    double previousError;
+    double previousError, error;
     double integral, derivative;
     ElapsedTime eTime = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
+        dashboard = FtcDashboard.getInstance();
+        TelemetryPacket packet = new TelemetryPacket();
+
         fl = hardwareMap.get(DcMotorEx.class, "flMotor");
         fr = hardwareMap.get(DcMotorEx.class, "frMotor");
         bl = hardwareMap.get(DcMotorEx.class, "rlMotor");
@@ -70,26 +78,40 @@ public class HeadingControlledTeleOpTest extends LinearOpMode {
 
             desiredAngle += turnSpeed * rx;
 
-            double error = desiredAngle - angles.firstAngle;
-            while (error < -180) {
-                error += 360;
+            while (desiredAngle > 180) {
+                desiredAngle -= 360;
             }
-            while (error > 180) {
-                error -= 360;
+            while (desiredAngle < -180) {
+                desiredAngle += 360;
+            }
+
+            double errorMin;
+            if (desiredAngle - angles.firstAngle < 0) {
+                errorMin = Math.min(Math.abs(desiredAngle - angles.firstAngle), Math.abs(desiredAngle - angles.firstAngle + 360));
+            } else {
+                errorMin = Math.min(Math.abs(desiredAngle - angles.firstAngle), Math.abs(desiredAngle - angles.firstAngle - 360));
+            }
+
+            if (errorMin == Math.abs(desiredAngle - angles.firstAngle)) {
+                error = desiredAngle - angles.firstAngle;
+            } else if (errorMin == Math.abs(desiredAngle - angles.firstAngle - 360)) {
+                error = desiredAngle - angles.firstAngle - 360;
+            } else if (errorMin == Math.abs(desiredAngle - angles.firstAngle + 360)) {
+                error = desiredAngle - angles.firstAngle + 360;
             }
 
             integral += error * time;
             eTime.reset();
 
             derivative = (error - previousError) / time;
-            double correction = P * error + I * integral + D * derivative;
+            double correction = P * -error + I * integral + D * derivative;
 
             previousError = error;
 
             double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx) + Math.abs(correction), 1);
             double flPower = (y + x + rx - correction) / denominator;
-            double frPower = (y - x + rx + correction) / denominator;
-            double blPower = (y - x - rx - correction) / denominator;
+            double frPower = (y - x - rx + correction) / denominator;
+            double blPower = (y - x + rx - correction) / denominator;
             double brPower = (y + x - rx + correction) / denominator;
 
             fl.setPower(flPower);
@@ -101,6 +123,13 @@ public class HeadingControlledTeleOpTest extends LinearOpMode {
             telemetry.addData("Current Angle", angles.firstAngle);
             telemetry.addData("Error", error);
             telemetry.addData("Correction", correction);
+            telemetry.update();
+
+            packet.put("Desired Angle", desiredAngle);
+            packet.put("Current Angle", angles.firstAngle);
+            packet.put("Error", error);
+            packet.put("Correction", correction);
+            dashboard.sendTelemetryPacket(packet);
         }
     }
 }
