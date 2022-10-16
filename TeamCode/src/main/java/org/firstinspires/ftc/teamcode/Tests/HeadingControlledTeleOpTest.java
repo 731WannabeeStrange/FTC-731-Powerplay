@@ -31,10 +31,10 @@ public class HeadingControlledTeleOpTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        fl = hardwareMap.get(DcMotorEx.class, "fl");
-        fr = hardwareMap.get(DcMotorEx.class, "fr");
-        bl = hardwareMap.get(DcMotorEx.class, "bl");
-        br = hardwareMap.get(DcMotorEx.class, "br");
+        fl = hardwareMap.get(DcMotorEx.class, "flMotor");
+        fr = hardwareMap.get(DcMotorEx.class, "frMotor");
+        bl = hardwareMap.get(DcMotorEx.class, "rlMotor");
+        br = hardwareMap.get(DcMotorEx.class, "rrMotor");
 
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
