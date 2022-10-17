@@ -44,8 +44,9 @@ public class MecanumTestOpMode extends LinearOpMode
 
     public Orientation angles;
 
-    private double error;
-    private double desiredAngle = 0;
+    private double errorAutoTurn, errorHeadingControl;
+    private double desiredAngleAutoTurn = 0;
+    private double desiredAngleHeadingControl = 0;
     private String turnState = "auto";
 
     private enum driveMode {
@@ -128,50 +129,39 @@ public class MecanumTestOpMode extends LinearOpMode
         double time = eTime.time();
         getJoyValues();
 
-        double errorMin;
-        if (desiredAngle - angles.firstAngle < 0) {
-            errorMin = Math.min(Math.abs(desiredAngle - angles.firstAngle), Math.abs(desiredAngle - angles.firstAngle + 360));
-        } else {
-            errorMin = Math.min(Math.abs(desiredAngle - angles.firstAngle), Math.abs(desiredAngle - angles.firstAngle - 360));
-        }
+        boolean manualTurning = gamepad1.right_stick_x > 0;
 
-        if (errorMin == Math.abs(desiredAngle - angles.firstAngle)) {
-            error = desiredAngle - angles.firstAngle;
-        } else if (errorMin == Math.abs(desiredAngle - angles.firstAngle - 360)) {
-            error = desiredAngle - angles.firstAngle - 360;
-        } else if (errorMin == Math.abs(desiredAngle - angles.firstAngle + 360)) {
-            error = desiredAngle - angles.firstAngle + 360;
-        }
+        errorAutoTurn = angleWrap(desiredAngleAutoTurn - angles.firstAngle);
 
-        telemetry.addData("Turn Error", error);
+        telemetry.addData("Turn Error", errorAutoTurn);
 
-        integral += (error * time);
+        integral += (errorAutoTurn * time);
         eTime.reset();
 
-        double derivative = (error - previous_error) / time;
-        double rcw = P * -error + I * integral + D * derivative;
+        double derivative = (errorAutoTurn - previous_error) / time;
+        double rcw = P * -errorAutoTurn + I * integral + D * derivative;
 
-        previous_error = error;
+        previous_error = errorAutoTurn;
 
         telemetry.addData("Read angle", angles.firstAngle);
         telemetry.addData("RCW", rcw);
-        telemetry.addData("Desired Angle", desiredAngle);
+        telemetry.addData("Desired Angle", desiredAngleAutoTurn);
         telemetry.addData("rightStickX", rightStickX);
 
         switch (driveState) {
             case AUTO_CONTROL:
                 if (!gamepad1.right_bumper) {
                     if (gamepad1.dpad_up) {
-                        desiredAngle = 0;
+                        desiredAngleAutoTurn = 0;
                     }
                     if (gamepad1.dpad_right) {
-                        desiredAngle = 270;
+                        desiredAngleAutoTurn = 270;
                     }
                     if (gamepad1.dpad_down) {
-                        desiredAngle = 180;
+                        desiredAngleAutoTurn = 180;
                     }
                     if (gamepad1.dpad_left) {
-                        desiredAngle = 90;
+                        desiredAngleAutoTurn = 90;
                     }
                 }
                 if (rightStickX != 0) {
@@ -186,26 +176,37 @@ public class MecanumTestOpMode extends LinearOpMode
                 break;
             case DRIVER_CONTROLLED:
                 turnState = "driver";
-                denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rightStickX), 1);
-                FL_power = (-newForward + newStrafe + rightStickX) / denominator;
-                RL_power = (-newForward - newStrafe + rightStickX) / denominator;
-                FR_power = (-newForward - newStrafe - rightStickX) / denominator;
-                RR_power = (-newForward + newStrafe - rightStickX) / denominator;
+                if (manualTurning) {
+                    desiredAngleHeadingControl = angles.firstAngle;
+                    denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rightStickX), 1);
+                    FL_power = (-newForward + newStrafe + rightStickX) / denominator;
+                    RL_power = (-newForward - newStrafe + rightStickX) / denominator;
+                    FR_power = (-newForward - newStrafe - rightStickX) / denominator;
+                    RR_power = (-newForward + newStrafe - rightStickX) / denominator;
+                } else {
+                    errorHeadingControl = angleWrap(desiredAngleHeadingControl - angles.firstAngle);
+                    rcw = -errorHeadingControl * P;
+                    FL_power = (-newForward + newStrafe + rcw) / denominator;
+                    RL_power = (-newForward - newStrafe + rcw) / denominator;
+                    FR_power = (-newForward - newStrafe - rcw) / denominator;
+                    RR_power = (-newForward + newStrafe - rcw) / denominator;
+                }
+
                 if (!gamepad1.right_bumper) {
                     if (gamepad1.dpad_up) {
-                        desiredAngle = 0;
+                        desiredAngleAutoTurn = 0;
                         driveState = driveMode.AUTO_CONTROL;
                     }
                     if (gamepad1.dpad_right) {
-                        desiredAngle = 270;
+                        desiredAngleAutoTurn = 270;
                         driveState = driveMode.AUTO_CONTROL;
                     }
                     if (gamepad1.dpad_down) {
-                        desiredAngle = 180;
+                        desiredAngleAutoTurn = 180;
                         driveState = driveMode.AUTO_CONTROL;
                     }
                     if (gamepad1.dpad_left) {
-                        desiredAngle = 90;
+                        desiredAngleAutoTurn = 90;
                         driveState = driveMode.AUTO_CONTROL;
                     }
                 }
@@ -230,5 +231,15 @@ public class MecanumTestOpMode extends LinearOpMode
         fr.setPower(FR_power);
         rl.setPower(RL_power);
         rr.setPower(RR_power);
+    }
+
+    private double angleWrap(double angle) {
+        if (angle > 180) {
+            angle -= 360;
+        } else if (angle < -180) {
+            angle += 360;
+        }
+
+        return angle;
     }
 }
