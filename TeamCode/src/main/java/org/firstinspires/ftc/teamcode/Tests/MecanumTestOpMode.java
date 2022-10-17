@@ -130,6 +130,9 @@ public class MecanumTestOpMode extends LinearOpMode
         getJoyValues();
 
         boolean manualTurning = gamepad1.right_stick_x > 0;
+        if (manualTurning) {
+            desiredAngleHeadingControl = angles.firstAngle;
+        }
 
         errorAutoTurn = angleWrap(desiredAngleAutoTurn - angles.firstAngle);
 
@@ -177,7 +180,6 @@ public class MecanumTestOpMode extends LinearOpMode
             case DRIVER_CONTROLLED:
                 turnState = "driver";
                 if (manualTurning) {
-                    desiredAngleHeadingControl = angles.firstAngle;
                     denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rightStickX), 1);
                     FL_power = (-newForward + newStrafe + rightStickX) / denominator;
                     RL_power = (-newForward - newStrafe + rightStickX) / denominator;
@@ -186,6 +188,7 @@ public class MecanumTestOpMode extends LinearOpMode
                 } else {
                     errorHeadingControl = angleWrap(desiredAngleHeadingControl - angles.firstAngle);
                     rcw = -errorHeadingControl * P;
+                    denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rcw), 1);
                     FL_power = (-newForward + newStrafe + rcw) / denominator;
                     RL_power = (-newForward - newStrafe + rcw) / denominator;
                     FR_power = (-newForward - newStrafe - rcw) / denominator;
