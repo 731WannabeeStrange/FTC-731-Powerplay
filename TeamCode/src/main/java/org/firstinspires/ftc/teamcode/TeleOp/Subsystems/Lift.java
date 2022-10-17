@@ -35,24 +35,6 @@ public class Lift {
 
     private LiftState liftState = LiftState.START;
 
-    /*
-    private enum DepositLocation {
-        LOW(liftLow),
-        MID(liftMid),
-        HIGH(liftHigh);
-
-        private static final DepositLocation[] states = values();
-
-        public int ticks;
-
-        DepositLocation(int ticks) {
-            this.ticks = ticks;
-        }
-    }
-
-    private DepositLocation depositLocation = DepositLocation.HIGH;
-    */
-
     private final Telemetry telemetry;
 
     private final DcMotorEx lift;
