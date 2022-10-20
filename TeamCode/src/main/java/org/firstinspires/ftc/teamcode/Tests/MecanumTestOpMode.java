@@ -48,12 +48,12 @@ public class MecanumTestOpMode extends LinearOpMode
     private double desiredAngle = 0;
     private String turnState = "auto";
 
-    private enum driveMode {
+    private enum DriveMode {
         DRIVER_CONTROLLED,
         AUTO_CONTROL
     }
 
-    private driveMode driveState = driveMode.AUTO_CONTROL;
+    private DriveMode driveState = DriveMode.AUTO_CONTROL;
 
     private final ElapsedTime eTime = new ElapsedTime();
 
@@ -175,7 +175,7 @@ public class MecanumTestOpMode extends LinearOpMode
                     }
                 }
                 if (rightStickX != 0) {
-                    driveState = driveMode.DRIVER_CONTROLLED;
+                    driveState = DriveMode.DRIVER_CONTROLLED;
                 }
                 turnState = "auto";
                 //denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rcw), 1);
@@ -194,19 +194,19 @@ public class MecanumTestOpMode extends LinearOpMode
                 if (!gamepad1.right_bumper) {
                     if (gamepad1.dpad_up) {
                         desiredAngle = 0;
-                        driveState = driveMode.AUTO_CONTROL;
+                        driveState = DriveMode.AUTO_CONTROL;
                     }
                     if (gamepad1.dpad_right) {
                         desiredAngle = 270;
-                        driveState = driveMode.AUTO_CONTROL;
+                        driveState = DriveMode.AUTO_CONTROL;
                     }
                     if (gamepad1.dpad_down) {
                         desiredAngle = 180;
-                        driveState = driveMode.AUTO_CONTROL;
+                        driveState = DriveMode.AUTO_CONTROL;
                     }
                     if (gamepad1.dpad_left) {
                         desiredAngle = 90;
-                        driveState = driveMode.AUTO_CONTROL;
+                        driveState = DriveMode.AUTO_CONTROL;
                     }
                 }
                 break;
