@@ -72,10 +72,10 @@ public class Drivetrain {
 
         double x1 = desiredAngle - angles.firstAngle;
         double x2;
-        if (desiredAngle - angles.firstAngle < 0) {
-            x2 = desiredAngle - angles.firstAngle + 360;
+        if (x1 < 0) {
+            x2 = x1 + 360;
         } else {
-            x2 = desiredAngle - angles.firstAngle - 360;
+            x2 = x1 - 360;
         }
         double error = Math.abs(x1) < Math.abs(x2) ? x1 : x2;
 

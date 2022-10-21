@@ -32,8 +32,6 @@ public class MecanumTestOpMode extends LinearOpMode
 
     private double integral, previous_error = 0;
 
-    public double newForward;
-    public double newStrafe;
     public double denominator;
 
     private BNO055IMU imu;
@@ -109,39 +107,24 @@ public class MecanumTestOpMode extends LinearOpMode
         eTime.reset();
     }
 
-    public void getJoyValues() {
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
-        leftStickY = gamepad1.left_stick_y;
-        leftStickX = gamepad1.left_stick_x * 1.1;
-        rightStickX = gamepad1.right_stick_x;
-
-        float pi = 3.1415926f;
-
-        float gyro_degrees = angles.firstAngle;
-        float gyro_radians = gyro_degrees * pi/180;
-        newForward = leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
-        newStrafe = -leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
-    }
-
     public void holonomicFormula() {
         double time = eTime.time();
-        getJoyValues();
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-        double errorMin;
-        if (desiredAngle - angles.firstAngle < 0) {
-            errorMin = Math.min(Math.abs(desiredAngle - angles.firstAngle), Math.abs(desiredAngle - angles.firstAngle + 360));
+        leftStickX *= 1.1;
+
+        double gyro_radians = angles.firstAngle * Math.PI/180;
+        double newForward = leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
+        double newStrafe = -leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
+
+        double x1 = desiredAngle - angles.firstAngle;
+        double x2;
+        if (x1 < 0) {
+            x2 = x1 + 360;
         } else {
-            errorMin = Math.min(Math.abs(desiredAngle - angles.firstAngle), Math.abs(desiredAngle - angles.firstAngle - 360));
+            x2 = x1 - 360;
         }
-
-        if (errorMin == Math.abs(desiredAngle - angles.firstAngle)) {
-            error = desiredAngle - angles.firstAngle;
-        } else if (errorMin == Math.abs(desiredAngle - angles.firstAngle - 360)) {
-            error = desiredAngle - angles.firstAngle - 360;
-        } else if (errorMin == Math.abs(desiredAngle - angles.firstAngle + 360)) {
-            error = desiredAngle - angles.firstAngle + 360;
-        }
+        double error = Math.abs(x1) < Math.abs(x2) ? x1 : x2;
 
         telemetry.addData("Turn Error", error);
 
