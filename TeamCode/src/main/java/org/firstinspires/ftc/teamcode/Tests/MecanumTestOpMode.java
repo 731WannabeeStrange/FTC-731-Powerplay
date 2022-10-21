@@ -40,9 +40,6 @@ public class MecanumTestOpMode extends LinearOpMode
     private DcMotor fl;
     private DcMotor rl;
 
-    public Orientation angles;
-
-    private double error;
     private double desiredAngle = 0;
     private String turnState = "auto";
 
