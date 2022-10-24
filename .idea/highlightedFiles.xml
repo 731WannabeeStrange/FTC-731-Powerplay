@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ProjectTreeColorHighlighter">
-    <files/>
+    <files>
+      <node color="1" path="$PROJECT_DIR$" />
+      <node color="1" path="$PROJECT_DIR$/FtcRobotController" />
+      <node color="1" path="$PROJECT_DIR$/MeepMeep" />
+      <node color="1" path="$PROJECT_DIR$/TeamCode" />
+    </files>
     <colors>
-      <color id="1" value="#4f060d" name="Color 1" enabled="true" />
+      <color id="1" value="#00041c" name="Color 1" enabled="true" />
       <color id="2" value="#44220e" name="Color 2" enabled="true" />
       <color id="3" value="#3f371b" name="Color 3" enabled="true" />
       <color id="4" value="#162c16" name="Color 4" enabled="true" />

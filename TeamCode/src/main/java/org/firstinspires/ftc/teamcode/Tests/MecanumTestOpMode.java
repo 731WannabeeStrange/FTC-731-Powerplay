@@ -40,7 +40,12 @@ public class MecanumTestOpMode extends LinearOpMode
     private DcMotor fl;
     private DcMotor rl;
 
-    private double desiredAngle = 0;
+    public Orientation angles;
+
+    private double errorAutoTurn, errorHeadingControl;
+    private double desiredAngleAutoTurn = 0;
+    private double desiredAngleHeadingControl = 0;
+
     private String turnState = "auto";
 
     private enum DriveMode {
@@ -108,50 +113,42 @@ public class MecanumTestOpMode extends LinearOpMode
         double time = eTime.time();
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-        leftStickX *= 1.1;
-
-        double gyro_radians = angles.firstAngle * Math.PI/180;
-        double newForward = leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
-        double newStrafe = -leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
-
-        double x1 = desiredAngle - angles.firstAngle;
-        double x2;
-        if (x1 < 0) {
-            x2 = x1 + 360;
-        } else {
-            x2 = x1 - 360;
+        boolean manualTurning = gamepad1.right_stick_x > 0;
+        if (manualTurning) {
+            desiredAngleHeadingControl = angles.firstAngle;
         }
-        double error = Math.abs(x1) < Math.abs(x2) ? x1 : x2;
 
-        telemetry.addData("Turn Error", error);
+        errorAutoTurn = angleWrap(desiredAngleAutoTurn - angles.firstAngle);
 
-        integral += (error * time);
+        telemetry.addData("Turn Error", errorAutoTurn);
+
+        integral += (errorAutoTurn * time);
         eTime.reset();
 
-        double derivative = (error - previous_error) / time;
-        double rcw = P * -error + I * integral + D * derivative;
+        double derivative = (errorAutoTurn - previous_error) / time;
+        double rcw = P * -errorAutoTurn + I * integral + D * derivative;
 
-        previous_error = error;
+        previous_error = errorAutoTurn;
 
         telemetry.addData("Read angle", angles.firstAngle);
         telemetry.addData("RCW", rcw);
-        telemetry.addData("Desired Angle", desiredAngle);
+        telemetry.addData("Desired Angle", desiredAngleAutoTurn);
         telemetry.addData("rightStickX", rightStickX);
 
         switch (driveState) {
             case AUTO_CONTROL:
                 if (!gamepad1.right_bumper) {
                     if (gamepad1.dpad_up) {
-                        desiredAngle = 0;
+                        desiredAngleAutoTurn = 0;
                     }
                     if (gamepad1.dpad_right) {
-                        desiredAngle = 270;
+                        desiredAngleAutoTurn = 270;
                     }
                     if (gamepad1.dpad_down) {
-                        desiredAngle = 180;
+                        desiredAngleAutoTurn = 180;
                     }
                     if (gamepad1.dpad_left) {
-                        desiredAngle = 90;
+                        desiredAngleAutoTurn = 90;
                     }
                 }
                 if (rightStickX != 0) {
@@ -166,27 +163,38 @@ public class MecanumTestOpMode extends LinearOpMode
                 break;
             case DRIVER_CONTROLLED:
                 turnState = "driver";
-                denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rightStickX), 1);
-                FL_power = (-newForward + newStrafe + rightStickX) / denominator;
-                RL_power = (-newForward - newStrafe + rightStickX) / denominator;
-                FR_power = (-newForward - newStrafe - rightStickX) / denominator;
-                RR_power = (-newForward + newStrafe - rightStickX) / denominator;
+                if (manualTurning) {
+                    denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rightStickX), 1);
+                    FL_power = (-newForward + newStrafe + rightStickX) / denominator;
+                    RL_power = (-newForward - newStrafe + rightStickX) / denominator;
+                    FR_power = (-newForward - newStrafe - rightStickX) / denominator;
+                    RR_power = (-newForward + newStrafe - rightStickX) / denominator;
+                } else {
+                    errorHeadingControl = angleWrap(desiredAngleHeadingControl - angles.firstAngle);
+                    rcw = -errorHeadingControl * P;
+                    denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rcw), 1);
+                    FL_power = (-newForward + newStrafe + rcw) / denominator;
+                    RL_power = (-newForward - newStrafe + rcw) / denominator;
+                    FR_power = (-newForward - newStrafe - rcw) / denominator;
+                    RR_power = (-newForward + newStrafe - rcw) / denominator;
+                }
+
                 if (!gamepad1.right_bumper) {
                     if (gamepad1.dpad_up) {
-                        desiredAngle = 0;
-                        driveState = DriveMode.AUTO_CONTROL;
+                        desiredAngleAutoTurn = 0;
+                        driveState = driveMode.AUTO_CONTROL;
                     }
                     if (gamepad1.dpad_right) {
-                        desiredAngle = 270;
-                        driveState = DriveMode.AUTO_CONTROL;
+                        desiredAngleAutoTurn = 270;
+                        driveState = driveMode.AUTO_CONTROL;
                     }
                     if (gamepad1.dpad_down) {
-                        desiredAngle = 180;
-                        driveState = DriveMode.AUTO_CONTROL;
+                        desiredAngleAutoTurn = 180;
+                        driveState = driveMode.AUTO_CONTROL;
                     }
                     if (gamepad1.dpad_left) {
-                        desiredAngle = 90;
-                        driveState = DriveMode.AUTO_CONTROL;
+                        desiredAngleAutoTurn = 90;
+                        driveState = driveMode.AUTO_CONTROL;
                     }
                 }
                 break;
@@ -210,5 +218,15 @@ public class MecanumTestOpMode extends LinearOpMode
         fr.setPower(FR_power);
         rl.setPower(RL_power);
         rr.setPower(RR_power);
+    }
+
+    private double angleWrap(double angle) {
+        if (angle > 180) {
+            angle -= 360;
+        } else if (angle < -180) {
+            angle += 360;
+        }
+
+        return angle;
     }
 }
