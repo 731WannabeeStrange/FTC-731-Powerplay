@@ -113,6 +113,12 @@ public class MecanumTestOpMode extends LinearOpMode
         double time = eTime.time();
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
+        leftStickX *= 1.1;
+
+        double gyro_radians = angles.firstAngle * Math.PI/180;
+        double newForward = leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
+        double newStrafe = -leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
+
         boolean manualTurning = gamepad1.right_stick_x > 0;
         if (manualTurning) {
             desiredAngleHeadingControl = angles.firstAngle;
@@ -182,19 +188,19 @@ public class MecanumTestOpMode extends LinearOpMode
                 if (!gamepad1.right_bumper) {
                     if (gamepad1.dpad_up) {
                         desiredAngleAutoTurn = 0;
-                        driveState = driveMode.AUTO_CONTROL;
+                        driveState = DriveMode.AUTO_CONTROL;
                     }
                     if (gamepad1.dpad_right) {
                         desiredAngleAutoTurn = 270;
-                        driveState = driveMode.AUTO_CONTROL;
+                        driveState = DriveMode.AUTO_CONTROL;
                     }
                     if (gamepad1.dpad_down) {
                         desiredAngleAutoTurn = 180;
-                        driveState = driveMode.AUTO_CONTROL;
+                        driveState = DriveMode.AUTO_CONTROL;
                     }
                     if (gamepad1.dpad_left) {
                         desiredAngleAutoTurn = 90;
-                        driveState = driveMode.AUTO_CONTROL;
+                        driveState = DriveMode.AUTO_CONTROL;
                     }
                 }
                 break;
