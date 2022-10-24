@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.Tests.MecanumTestOpMode;
 
 @Config
 public class Drivetrain {
@@ -22,12 +23,31 @@ public class Drivetrain {
     private final DcMotor fl;
     private final DcMotor rl;
 
+    public double FL_power;
+    public double FR_power;
+    public double RL_power;
+    public double RR_power;
+
     private final ElapsedTime eTime = new ElapsedTime();
 
     private double previous_error, integral = 0;
     public static double P = 0.04;
     public static double I = 0;
     public static double D = 0;
+
+    private double errorAutoTurn, errorHeadingControl;
+    private double desiredAngleAutoTurn = 0;
+    private double desiredAngleHeadingControl = 0;
+
+    private String turnState = "auto";
+
+    public double denominator;
+
+    private enum DriveMode {
+        DRIVER_CONTROLLED,
+        AUTO_CONTROL
+    }
+    private DriveMode driveState = DriveMode.AUTO_CONTROL;
 
     public Drivetrain(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
@@ -60,7 +80,9 @@ public class Drivetrain {
         telemetry.update();
     }
 
-    public void driveRobot(double leftStickY, double leftStickX, double rightStickX, boolean leftBumper, boolean autoTurn, double desiredAngle) {
+    public void driveRobot(double leftStickY, double leftStickX, double rightStickX, boolean slowMode,
+                           boolean rightBumper, boolean autoTurn0, boolean autoTurn90, boolean autoTurn180,
+                           boolean autoTurn270) {
         double time = eTime.time();
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
@@ -70,46 +92,96 @@ public class Drivetrain {
         double newForward = leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
         double newStrafe = -leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
 
-        double x1 = desiredAngle - angles.firstAngle;
-        double x2;
-        if (x1 < 0) {
-            x2 = x1 + 360;
-        } else {
-            x2 = x1 - 360;
+        boolean manualTurning = rightStickX > 0;
+        if (manualTurning) {
+            desiredAngleHeadingControl = angles.firstAngle;
         }
-        double error = Math.abs(x1) < Math.abs(x2) ? x1 : x2;
 
-        telemetry.addData("Turn Error", error);
+        errorAutoTurn = angleWrap(desiredAngleAutoTurn - angles.firstAngle);
 
-        integral += (error * time);
+        telemetry.addData("Turn Error", errorAutoTurn);
+
+        integral += (errorAutoTurn * time);
         eTime.reset();
 
-        double derivative = (error - previous_error) / time;
-        double rcw = P * -error + I * integral + D * derivative;
+        double derivative = (errorAutoTurn - previous_error) / time;
+        double rcw = P * -errorAutoTurn + I * integral + D * derivative;
 
-        previous_error = error;
+        previous_error = errorAutoTurn;
 
         telemetry.addData("Read angle", angles.firstAngle);
         telemetry.addData("RCW", rcw);
-        telemetry.addData("Desired Angle", desiredAngle);
+        telemetry.addData("Desired Angle", desiredAngleAutoTurn);
+        telemetry.addData("rightStickX", rightStickX);
 
-        double FL_power, RL_power, FR_power, RR_power;
+        switch (driveState) {
+            case AUTO_CONTROL:
+                if (!rightBumper) {
+                    if (autoTurn0) {
+                        desiredAngleAutoTurn = 0;
+                    }
+                    if (autoTurn270) {
+                        desiredAngleAutoTurn = 270;
+                    }
+                    if (autoTurn180) {
+                        desiredAngleAutoTurn = 180;
+                    }
+                    if (autoTurn90) {
+                        desiredAngleAutoTurn = 90;
+                    }
+                }
+                if (rightStickX != 0) {
+                    driveState = DriveMode.DRIVER_CONTROLLED;
+                }
+                turnState = "auto";
+                //denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rcw), 1);
+                FL_power = (-newForward + newStrafe + rcw);// / denominator;
+                RL_power = (-newForward - newStrafe + rcw);// / denominator;
+                FR_power = (-newForward - newStrafe - rcw);// / denominator;
+                RR_power = (-newForward + newStrafe - rcw);// / denominator;
+                break;
+            case DRIVER_CONTROLLED:
+                turnState = "driver";
+                if (manualTurning) {
+                    denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rightStickX), 1);
+                    FL_power = (-newForward + newStrafe + rightStickX) / denominator;
+                    RL_power = (-newForward - newStrafe + rightStickX) / denominator;
+                    FR_power = (-newForward - newStrafe - rightStickX) / denominator;
+                    RR_power = (-newForward + newStrafe - rightStickX) / denominator;
+                } else {
+                    errorHeadingControl = angleWrap(desiredAngleHeadingControl - angles.firstAngle);
+                    rcw = -errorHeadingControl * P;
+                    denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rcw), 1);
+                    FL_power = (-newForward + newStrafe + rcw) / denominator;
+                    RL_power = (-newForward - newStrafe + rcw) / denominator;
+                    FR_power = (-newForward - newStrafe - rcw) / denominator;
+                    RR_power = (-newForward + newStrafe - rcw) / denominator;
+                }
 
-        if (autoTurn) {
-            //denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rcw), 1);
-            FL_power = (-newForward + newStrafe + rcw);// / denominator;
-            RL_power = (-newForward - newStrafe + rcw);// / denominator;
-            FR_power = (-newForward - newStrafe - rcw);// / denominator;
-            RR_power = (-newForward + newStrafe - rcw);// / denominator;
-        } else {
-            double denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rightStickX), 1);
-            FL_power = (-newForward + newStrafe + rightStickX) / denominator;
-            RL_power = (-newForward - newStrafe + rightStickX) / denominator;
-            FR_power = (-newForward - newStrafe - rightStickX) / denominator;
-            RR_power = (-newForward + newStrafe - rightStickX) / denominator;
+                if (!rightBumper) {
+                    if (autoTurn0) {
+                        desiredAngleAutoTurn = 0;
+                        driveState = DriveMode.AUTO_CONTROL;
+                    }
+                    if (autoTurn270) {
+                        desiredAngleAutoTurn = 270;
+                        driveState = DriveMode.AUTO_CONTROL;
+                    }
+                    if (autoTurn180) {
+                        desiredAngleAutoTurn = 180;
+                        driveState = DriveMode.AUTO_CONTROL;
+                    }
+                    if (autoTurn90) {
+                        desiredAngleAutoTurn = 90;
+                        driveState = DriveMode.AUTO_CONTROL;
+                    }
+                }
+                break;
         }
 
-        if (leftBumper) {
+        telemetry.addData("turnState", turnState);
+
+        if (slowMode) {
             FL_power /= 4;
             FR_power /= 4;
             RL_power /= 4;
@@ -140,5 +212,15 @@ public class Drivetrain {
         fr.setPower(frPower);
         rl.setPower(rlPower);
         rr.setPower(rrPower);
+    }
+
+    private double angleWrap(double angle) {
+        if (angle > 180) {
+            angle -= 360;
+        } else if (angle < -180) {
+            angle += 360;
+        }
+
+        return angle;
     }
 }
