@@ -32,8 +32,6 @@ public class MecanumTestOpMode extends LinearOpMode
 
     private double integral, previous_error = 0;
 
-    public double newForward;
-    public double newStrafe;
     public double denominator;
 
     private BNO055IMU imu;
@@ -47,14 +45,15 @@ public class MecanumTestOpMode extends LinearOpMode
     private double errorAutoTurn, errorHeadingControl;
     private double desiredAngleAutoTurn = 0;
     private double desiredAngleHeadingControl = 0;
+
     private String turnState = "auto";
 
-    private enum driveMode {
+    private enum DriveMode {
         DRIVER_CONTROLLED,
         AUTO_CONTROL
     }
 
-    private driveMode driveState = driveMode.AUTO_CONTROL;
+    private DriveMode driveState = DriveMode.AUTO_CONTROL;
 
     private final ElapsedTime eTime = new ElapsedTime();
 
@@ -110,24 +109,9 @@ public class MecanumTestOpMode extends LinearOpMode
         eTime.reset();
     }
 
-    public void getJoyValues() {
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
-        leftStickY = gamepad1.left_stick_y;
-        leftStickX = gamepad1.left_stick_x * 1.1;
-        rightStickX = gamepad1.right_stick_x;
-
-        float pi = 3.1415926f;
-
-        float gyro_degrees = angles.firstAngle;
-        float gyro_radians = gyro_degrees * pi/180;
-        newForward = leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
-        newStrafe = -leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
-    }
-
     public void holonomicFormula() {
         double time = eTime.time();
-        getJoyValues();
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         boolean manualTurning = gamepad1.right_stick_x > 0;
         if (manualTurning) {
@@ -168,7 +152,7 @@ public class MecanumTestOpMode extends LinearOpMode
                     }
                 }
                 if (rightStickX != 0) {
-                    driveState = driveMode.DRIVER_CONTROLLED;
+                    driveState = DriveMode.DRIVER_CONTROLLED;
                 }
                 turnState = "auto";
                 //denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rcw), 1);
