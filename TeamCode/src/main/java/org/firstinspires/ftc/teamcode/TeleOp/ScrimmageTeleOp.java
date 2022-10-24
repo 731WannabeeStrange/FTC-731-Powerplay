@@ -29,7 +29,8 @@ public class ScrimmageTeleOp extends LinearOpMode {
                     gamepad1.dpad_right
             );
 
-            lift.lift(gamepad1.y,
+            lift.lift(
+                    gamepad1.y,
                     gamepad1.b,
                     gamepad1.a,
                     gamepad1.x,
