@@ -23,16 +23,51 @@ public class MeepMeepTesting {
 
         DefaultBotBuilder blueBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 13)
+                .setConstraints(30, 30, Math.toRadians(180), Math.toRadians(180), 13)
                 .setDimensions(16, 16);
 
-        RoadRunnerBotEntity blueEntity = blueBot.followTrajectorySequence(sixCycleBlue(blueBot.build().getDrive()));
+        RoadRunnerBotEntity blueEntity = blueBot.followTrajectorySequence(scrimmageAuto(blueBot.build().getDrive()));
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
                 .addEntity(blueEntity)
                 .start();
+    }
+
+    private static TrajectorySequence scrimmageAuto(DriveShim drive) {
+        return drive.trajectorySequenceBuilder(new Pose2d(-34, 64, Math.toRadians(90)))
+                .back(54)
+                .waitSeconds(0.5)
+                .turn(Math.toRadians(45))
+                .waitSeconds(1)
+                .forward(3)
+                .waitSeconds(0.5)
+                .turn(Math.toRadians(45))
+                .forward(24)
+                .waitSeconds(1)
+                .back(24)
+                .waitSeconds(0.5)
+                .turn(Math.toRadians(-45))
+                .waitSeconds(0.5)
+                .back(3)
+                .waitSeconds(1)
+                .forward(3)
+                .waitSeconds(0.5)
+                .turn(Math.toRadians(45))
+                .forward(24)
+                .waitSeconds(1)
+                .back(24)
+                .turn(Math.toRadians(-45))
+                .waitSeconds(0.5)
+                .back(3)
+                .waitSeconds(1)
+                .forward(3)
+                .waitSeconds(0.5)
+                .turn(Math.toRadians(45))
+                .waitSeconds(0.5)
+                .back(24)
+                .build();
     }
 
     private static TrajectorySequence sixCycleBlue(DriveShim drive) {
