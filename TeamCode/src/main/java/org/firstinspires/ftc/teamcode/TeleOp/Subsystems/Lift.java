@@ -23,6 +23,8 @@ public class Lift {
     public static double waitTime = 0.5;
     public static double desiredLiftPower = 1;
     public static double minHeightForExtension = 600;
+    public static int liftCollectPos = 300;
+    public static int liftGrabPos = 0;
 
     public enum LiftState {
         START,
@@ -91,7 +93,7 @@ public class Lift {
                 break;
 
             case LIFT:
-                liftPower = desiredLiftPower;
+                lift.setPower(desiredLiftPower);
                 if (lift.getCurrentPosition() > minHeightForExtension) {
                     liftState = LiftState.EXTEND;
                 }
@@ -118,9 +120,9 @@ public class Lift {
                 break;
 
             case RETRACT:
-                lift.setTargetPosition(0);
+                lift.setTargetPosition(liftCollectPos);
                 liftPower = desiredLiftPower;
-                if (lift.getCurrentPosition() < 10) {
+                if (Math.abs(liftCollectPos - lift.getCurrentPosition()) < 10) {
                     liftState = LiftState.STOP;
                 }
                 break;
@@ -134,5 +136,54 @@ public class Lift {
         if (cancelAutomation) {
             liftState = LiftState.STOP;
         }
+    }
+
+    public void extendHigh() {
+        lift.setTargetPosition(liftHigh);
+        lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift.setPower(liftPower);
+        horizontal1.setPosition(h1Extended);
+        horizontal2.setPosition(h2Extended);
+    }
+
+    public void extendMid() {
+        lift.setTargetPosition(liftMid);
+        lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift.setPower(liftPower);
+        horizontal1.setPosition(h1Extended);
+        horizontal2.setPosition(h2Extended);
+    }
+
+    public void extendLow() {
+        lift.setTargetPosition(liftLow);
+        lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift.setPower(liftPower);
+        horizontal1.setPosition(h1Extended);
+        horizontal2.setPosition(h2Extended);
+    }
+
+    public void deposit() {
+        grabber.setPosition(releasePos);
+    }
+
+    public void retract() {
+        grabber.setPosition(grabPos);
+        horizontal1.setPosition(h1Retracted);
+        horizontal2.setPosition(h2Retracted);
+        lift.setTargetPosition(liftCollectPos);
+        lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift.setPower(liftPower);
+    }
+
+    public void grab() {
+        lift.setTargetPosition(liftGrabPos);
+        lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift.setPower(liftPower);
+    }
+
+    public void liftOffGround() {
+        lift.setTargetPosition(liftCollectPos);
+        lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift.setPower(liftPower);
     }
 }
