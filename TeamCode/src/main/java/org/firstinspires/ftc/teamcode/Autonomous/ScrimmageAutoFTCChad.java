@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -12,9 +13,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.Autonomous.Vision.AprilTagVisionPipeline;
+import org.firstinspires.ftc.teamcode.Autonomous.Vision.Location;
+import org.firstinspires.ftc.teamcode.TeleOp.Subsystems.Lift;
 
+@Config
 @Autonomous(name="Scrimmage Auto FTC Chad", group="chad")
 public class ScrimmageAutoFTCChad extends LinearOpMode {
+    public static double speed = 0.5;
+    public static int cycles = 2;
+    public static int depositWaitTime = 500;
+    public static int intakeWaitTime = 500;
+
     //
     DcMotor frontleft;
     DcMotor frontright;
@@ -36,7 +46,10 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
     Orientation angles;
     Acceleration gravity;
     //
-    public void runOpMode(){
+    Lift lift;
+    AprilTagVisionPipeline pipeline;
+    Location location = Location.LEFT;
+    public void runOpMode() throws InterruptedException {
         //
         initGyro();
         //
@@ -45,31 +58,53 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         backleft = hardwareMap.dcMotor.get("backleft");
         backright = hardwareMap.dcMotor.get("backright");
 
-        frontright.setDirection(DcMotorSimple.Direction.REVERSE);
-        backright.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontleft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backleft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        lift = new Lift(hardwareMap, telemetry);
+        pipeline = new AprilTagVisionPipeline();
+        pipeline.init(hardwareMap, telemetry);
         //
-        waitForStartify();
-        //
-        moveToPosition(-54, 0.5);
-        //
-        turnWithGyro(45, -0.5);
-        //
-        moveToPosition(3, 0.5);
-        //
-        turnWithGyro(45, -0.5);
-        //
-        moveToPosition(24, 0.5);
-        //
-        moveToPosition(-24, 0.5);
-        //
-        turnWithGyro(45, 0.5);
-        //
-        moveToPosition(-3, 0.5);
-        //
-        moveToPosition(3, 0.5);
-        //
-        turnWithGyro(45, -0.5);
-        //
+        while (!opModeIsActive() && !isStopRequested()) {
+            location = pipeline.visionLoop(telemetry);
+        }
+        lift.extendHigh();
+        moveToPosition(-54, speed);
+        turnWithGyro(45, -speed);
+        lift.deposit();
+        wait(depositWaitTime);
+        moveToPosition(3, speed);
+        lift.retract();
+        turnWithGyro(45, -speed);
+
+        for (int i = 0; i < cycles; i++) {
+            cycle();
+        }
+
+        switch (location) {
+            case LEFT:
+                moveToPosition(-24, speed);
+                break;
+            case MIDDLE:
+                break;
+            case RIGHT:
+                moveToPosition(20, speed);
+                break;
+        }
+    }
+
+    public void cycle() throws InterruptedException {
+        moveToPosition(24, speed);
+        lift.grab();
+        wait(intakeWaitTime);
+        lift.extendHigh();
+        moveToPosition(-24, speed);
+        turnWithGyro(45, speed);
+        moveToPosition(-3, speed);
+        lift.deposit();
+        wait(depositWaitTime);
+        moveToPosition(3, speed);
+        turnWithGyro(45, -speed);
     }
     //
     /*
