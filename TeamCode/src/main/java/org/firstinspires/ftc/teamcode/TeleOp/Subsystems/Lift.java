@@ -24,7 +24,7 @@ public class Lift {
     public static double desiredLiftPower = 1;
     public static double minHeightForExtension = 600;
 
-    private enum LiftState {
+    public enum LiftState {
         START,
         LIFT,
         EXTEND,
@@ -33,19 +33,19 @@ public class Lift {
         STOP
     }
 
-    private LiftState liftState = LiftState.START;
+    public LiftState liftState = LiftState.START;
 
-    private final Telemetry telemetry;
+    public final Telemetry telemetry;
 
-    private final DcMotorEx lift;
-    private final ServoImplEx horizontal1;
-    private final ServoImplEx horizontal2;
-    private final ServoImplEx grabber;
+    public final DcMotorEx lift;
+    public final ServoImplEx horizontal1;
+    public final ServoImplEx horizontal2;
+    public final ServoImplEx grabber;
 
-    private final ElapsedTime eTime = new ElapsedTime();
+    public final ElapsedTime eTime = new ElapsedTime();
 
-    private double liftPower;
-    private int depositTicks;
+    public double liftPower;
+    public int depositTicks;
 
     public Lift(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
