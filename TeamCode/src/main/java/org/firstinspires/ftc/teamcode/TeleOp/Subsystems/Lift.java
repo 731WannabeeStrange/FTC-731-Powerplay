@@ -66,10 +66,11 @@ public class Lift {
     }
 
     public void lift(boolean liftButtonHigh, boolean liftButtonMid, boolean liftButtonLow,
-                     boolean depositButton, boolean cancelAutomation) {
+                     boolean grabButton, boolean depositButton, boolean cancelAutomation) {
         telemetry.addData("Lift State", liftState);
         telemetry.addData("Lift Power", liftPower);
         telemetry.addData("Lift Encoder Value", lift.getCurrentPosition());
+        telemetry.addData("Lift Target Position", lift.getTargetPosition());
         telemetry.update();
 
         switch (liftState) {
@@ -89,7 +90,12 @@ public class Lift {
                     lift.setTargetPosition(depositTicks);
                     lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                     liftState = LiftState.LIFT;
+                } else if (grabButton) {
+                    depositTicks = liftGrabPos;
+                    lift.setTargetPosition(depositTicks);
+                    lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                 }
+
                 break;
 
             case LIFT:
@@ -128,9 +134,10 @@ public class Lift {
                 break;
 
             case STOP:
-                liftPower = 0;
+                depositTicks = liftCollectPos;
+                lift.setTargetPosition(depositTicks);
+                lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                 liftState = LiftState.START;
-                break;
         }
 
         if (cancelAutomation) {

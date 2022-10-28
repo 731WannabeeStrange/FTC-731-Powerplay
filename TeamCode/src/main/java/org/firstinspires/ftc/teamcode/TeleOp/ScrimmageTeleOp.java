@@ -34,6 +34,7 @@ public class ScrimmageTeleOp extends LinearOpMode {
                     gamepad1.b,
                     gamepad1.a,
                     gamepad1.x,
+                    gamepad1.x,
                     gamepad1.left_trigger > 0 && gamepad1.right_trigger > 0
             );
         }
