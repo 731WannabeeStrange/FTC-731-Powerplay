@@ -39,7 +39,8 @@ public class Lift {
 
     public final Telemetry telemetry;
 
-    public final DcMotorEx lift;
+    public final DcMotorEx lift1;
+    public final DcMotorEx lift2;
     public final ServoImplEx horizontal1;
     public final ServoImplEx horizontal2;
     public final ServoImplEx grabber;
@@ -52,14 +53,18 @@ public class Lift {
     public Lift(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
 
-        lift = hardwareMap.get(DcMotorEx.class, "lift");
+        lift1 = hardwareMap.get(DcMotorEx.class, "lift");
+        lift2 = hardwareMap.get(DcMotorEx.class, "lift");
         horizontal1 = hardwareMap.get(ServoImplEx.class, "h1");
         horizontal2 = hardwareMap.get(ServoImplEx.class, "h2");
         grabber = hardwareMap.get(ServoImplEx.class, "grab");
 
-        lift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        lift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        lift.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        lift1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        lift1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        lift1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        lift2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        lift2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        lift2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         horizontal1.setPosition(h1Retracted);
         horizontal2.setPosition(h2Retracted);
@@ -69,26 +74,32 @@ public class Lift {
                      boolean grabButton, boolean depositButton, boolean cancelAutomation) {
         telemetry.addData("Lift State", liftState);
         telemetry.addData("Lift Power", liftPower);
-        telemetry.addData("Lift Encoder Value", lift.getCurrentPosition());
-        telemetry.addData("Lift Target Position", lift.getTargetPosition());
+        telemetry.addData("Lift Encoder Value", lift1.getCurrentPosition());
+        telemetry.addData("Lift Target Position", lift1.getTargetPosition());
         telemetry.update();
 
         switch (liftState) {
             case START:
                 if (liftButtonHigh) {
                     depositTicks = liftHigh;
-                    lift.setTargetPosition(depositTicks);
-                    lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                    lift1.setTargetPosition(depositTicks);
+                    lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                    lift2.setTargetPosition(depositTicks);
+                    lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                     liftState = LiftState.LIFT;
                 } else if (liftButtonMid) {
                     depositTicks = liftMid;
-                    lift.setTargetPosition(depositTicks);
-                    lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                    lift1.setTargetPosition(depositTicks);
+                    lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                    lift2.setTargetPosition(depositTicks);
+                    lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                     liftState = LiftState.LIFT;
                 } else if (liftButtonLow) {
                     depositTicks = liftLow;
-                    lift.setTargetPosition(depositTicks);
-                    lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                    lift1.setTargetPosition(depositTicks);
+                    lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                    lift2.setTargetPosition(depositTicks);
+                    lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                     liftState = LiftState.LIFT;
                 } else if (grabButton) {
                     if (depositTicks == liftGrabPos) {
@@ -96,14 +107,17 @@ public class Lift {
                     } else {
                         depositTicks = liftGrabPos;
                     }
-                    lift.setTargetPosition(depositTicks);
-                    lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                    lift1.setTargetPosition(depositTicks);
+                    lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                    lift2.setTargetPosition(depositTicks);
+                    lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                 }
                 break;
 
             case LIFT:
-                lift.setPower(desiredLiftPower);
-                if (lift.getCurrentPosition() > minHeightForExtension) {
+                lift1.setPower(desiredLiftPower);
+                lift2.setPower(desiredLiftPower);
+                if (lift1.getCurrentPosition() > minHeightForExtension) {
                     liftState = LiftState.EXTEND;
                 }
                 break;
@@ -111,7 +125,7 @@ public class Lift {
             case EXTEND:
                 horizontal1.setPosition(h1Extended);
                 horizontal2.setPosition(h2Extended);
-                if (Math.abs(lift.getCurrentPosition() - depositTicks) < 20) {
+                if (Math.abs(lift1.getCurrentPosition() - depositTicks) < 20) {
                     if (depositButton) {
                         liftPower = 0;
                         eTime.reset();
@@ -129,17 +143,20 @@ public class Lift {
                 break;
 
             case RETRACT:
-                lift.setTargetPosition(liftCollectPos);
+                lift1.setTargetPosition(liftCollectPos);
+                lift2.setTargetPosition(liftCollectPos);
                 liftPower = desiredLiftPower;
-                if (Math.abs(liftCollectPos - lift.getCurrentPosition()) < 10) {
+                if (Math.abs(liftCollectPos - lift1.getCurrentPosition()) < 10) {
                     liftState = LiftState.STOP;
                 }
                 break;
 
             case STOP:
                 depositTicks = liftCollectPos;
-                lift.setTargetPosition(depositTicks);
-                lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                lift1.setTargetPosition(depositTicks);
+                lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                lift2.setTargetPosition(depositTicks);
+                lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                 liftState = LiftState.START;
         }
 
@@ -149,25 +166,34 @@ public class Lift {
     }
 
     public void extendHigh() {
-        lift.setTargetPosition(liftHigh);
-        lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift.setPower(liftPower);
+        lift1.setTargetPosition(liftHigh);
+        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift1.setPower(liftPower);
+        lift2.setTargetPosition(liftHigh);
+        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift2.setPower(liftPower);
         horizontal1.setPosition(h1Extended);
         horizontal2.setPosition(h2Extended);
     }
 
     public void extendMid() {
-        lift.setTargetPosition(liftMid);
-        lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift.setPower(liftPower);
+        lift1.setTargetPosition(liftMid);
+        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift1.setPower(liftPower);
+        lift2.setTargetPosition(liftMid);
+        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift2.setPower(liftPower);
         horizontal1.setPosition(h1Extended);
         horizontal2.setPosition(h2Extended);
     }
 
     public void extendLow() {
-        lift.setTargetPosition(liftLow);
-        lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift.setPower(liftPower);
+        lift1.setTargetPosition(liftLow);
+        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift1.setPower(liftPower);
+        lift2.setTargetPosition(liftLow);
+        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift2.setPower(liftPower);
         horizontal1.setPosition(h1Extended);
         horizontal2.setPosition(h2Extended);
     }
@@ -180,14 +206,20 @@ public class Lift {
         grabber.setPosition(grabPos);
         horizontal1.setPosition(h1Retracted);
         horizontal2.setPosition(h2Retracted);
-        lift.setTargetPosition(liftCollectPos);
-        lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift.setPower(liftPower);
+        lift1.setTargetPosition(liftCollectPos);
+        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift1.setPower(liftPower);
+        lift2.setTargetPosition(liftCollectPos);
+        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift2.setPower(liftPower);
     }
 
     public void grab() {
-        lift.setTargetPosition(liftGrabPos);
-        lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift.setPower(liftPower);
+        lift1.setTargetPosition(liftGrabPos);
+        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift1.setPower(liftPower);
+        lift2.setTargetPosition(liftGrabPos);
+        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift2.setPower(liftPower);
     }
 }
