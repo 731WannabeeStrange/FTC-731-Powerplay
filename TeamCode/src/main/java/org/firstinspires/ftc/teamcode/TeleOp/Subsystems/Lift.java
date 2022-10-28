@@ -91,11 +91,14 @@ public class Lift {
                     lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                     liftState = LiftState.LIFT;
                 } else if (grabButton) {
-                    depositTicks = liftGrabPos;
+                    if (depositTicks == liftGrabPos) {
+                        depositTicks = liftCollectPos;
+                    } else {
+                        depositTicks = liftGrabPos;
+                    }
                     lift.setTargetPosition(depositTicks);
                     lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                 }
-
                 break;
 
             case LIFT:
