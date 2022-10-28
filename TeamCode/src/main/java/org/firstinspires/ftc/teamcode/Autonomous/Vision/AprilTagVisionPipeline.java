@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Autonomous.Vision;
 
 import android.annotation.SuppressLint;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -19,6 +20,7 @@ public class AprilTagVisionPipeline
     AprilTagDetector aprilTagDetectionPipeline;
 
     Telemetry telemetry;
+    Location location;
 
     static final double FEET_PER_METER = 3.28084;
 
@@ -38,7 +40,7 @@ public class AprilTagVisionPipeline
     final int MIDDLE = 9;
     final int RIGHT = 10;
 
-    AprilTagDetection tagOfInterest = null;
+    AprilTagDetection tagOfInterest;
 
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -57,6 +59,8 @@ public class AprilTagVisionPipeline
 
             }
         });
+
+        FtcDashboard.getInstance().startCameraStream(camera, 0);
 
         telemetry.setMsTransmissionInterval(50);
     }
@@ -115,16 +119,22 @@ public class AprilTagVisionPipeline
         } else {
             telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
         }
-        telemetry.update();
 
-        switch (tagOfInterest.id) {
-            case LEFT: default:
-                return Location.LEFT;
-            case MIDDLE:
-                return Location.MIDDLE;
-            case RIGHT:
-                return Location.RIGHT;
+        try {
+            switch (tagOfInterest.id) {
+                case LEFT:
+                default:
+                    location = Location.LEFT;
+                case MIDDLE:
+                    location = Location.MIDDLE;
+                case RIGHT:
+                    location = Location.RIGHT;
+            }
+        } catch (Exception e) {
+            telemetry.addLine(e.getMessage());
+            telemetry.update();
         }
+        return location;
     }
 
     @SuppressLint("DefaultLocale")
