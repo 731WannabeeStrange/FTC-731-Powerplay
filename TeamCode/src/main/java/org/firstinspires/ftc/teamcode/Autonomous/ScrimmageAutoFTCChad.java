@@ -53,10 +53,10 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         //
         initGyro();
         //
-        frontleft = hardwareMap.dcMotor.get("frontleft");
-        frontright = hardwareMap.dcMotor.get("frontright");
-        backleft = hardwareMap.dcMotor.get("backleft");
-        backright = hardwareMap.dcMotor.get("backright");
+        frontleft = hardwareMap.dcMotor.get("flMotor");
+        frontright = hardwareMap.dcMotor.get("frMotor");
+        backleft = hardwareMap.dcMotor.get("rlMotor");
+        backright = hardwareMap.dcMotor.get("rrMotor");
 
         frontleft.setDirection(DcMotorSimple.Direction.REVERSE);
         backleft.setDirection(DcMotorSimple.Direction.REVERSE);
