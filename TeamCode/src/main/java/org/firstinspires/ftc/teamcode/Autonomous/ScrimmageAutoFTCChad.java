@@ -69,13 +69,13 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
             location = pipeline.visionLoop(telemetry);
         }
         lift.extendHigh();
-        moveToPosition(-54, speed);
+        moveToPosition(54, speed);
         turnWithGyro(45, -speed);
         lift.deposit();
         wait(depositWaitTime);
-        moveToPosition(3, speed);
+        moveToPosition(-3, speed);
         lift.retract();
-        turnWithGyro(45, -speed);
+        turnWithGyro(135, speed);
 
         for (int i = 0; i < cycles; i++) {
             cycle();
@@ -99,12 +99,12 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         wait(intakeWaitTime);
         lift.extendHigh();
         moveToPosition(-24, speed);
-        turnWithGyro(45, speed);
-        moveToPosition(-3, speed);
+        turnWithGyro(135, -speed);
+        moveToPosition(3, speed);
         lift.deposit();
         wait(depositWaitTime);
         moveToPosition(3, speed);
-        turnWithGyro(45, -speed);
+        turnWithGyro(135, speed);
     }
     //
     /*
