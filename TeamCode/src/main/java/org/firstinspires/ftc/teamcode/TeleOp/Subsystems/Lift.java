@@ -53,8 +53,8 @@ public class Lift {
     public Lift(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
 
-        lift1 = hardwareMap.get(DcMotorEx.class, "lift");
-        lift2 = hardwareMap.get(DcMotorEx.class, "lift");
+        lift1 = hardwareMap.get(DcMotorEx.class, "lift1");
+        lift2 = hardwareMap.get(DcMotorEx.class, "lift2");
         horizontal1 = hardwareMap.get(ServoImplEx.class, "h1");
         horizontal2 = hardwareMap.get(ServoImplEx.class, "h2");
         grabber = hardwareMap.get(ServoImplEx.class, "grab");
