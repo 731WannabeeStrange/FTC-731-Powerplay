@@ -180,10 +180,4 @@ public class Lift {
         lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         lift.setPower(liftPower);
     }
-
-    public void liftOffGround() {
-        lift.setTargetPosition(liftCollectPos);
-        lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift.setPower(liftPower);
-    }
 }
