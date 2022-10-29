@@ -72,6 +72,7 @@ public class AprilTagVisionPipeline
             boolean tagFound = false;
 
             for (AprilTagDetection tag : currentDetections) {
+                telemetry.addLine("Detection found! ID is " + tag.id);
                 if (tag.id == LEFT || tag.id == MIDDLE || tag.id == RIGHT) {
                     tagOfInterest = tag;
                     tagFound = true;
@@ -81,7 +82,7 @@ public class AprilTagVisionPipeline
 
             if (tagFound) {
                 telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-                tagToTelemetry(tagOfInterest);
+                //tagToTelemetry(tagOfInterest);
             } else {
                 telemetry.addLine("Don't see tag of interest :(");
 
@@ -89,7 +90,7 @@ public class AprilTagVisionPipeline
                     telemetry.addLine("(The tag has never been seen)");
                 } else {
                     telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                    tagToTelemetry(tagOfInterest);
+                    //tagToTelemetry(tagOfInterest);
                 }
             }
 
@@ -100,7 +101,7 @@ public class AprilTagVisionPipeline
                 telemetry.addLine("(The tag has never been seen)");
             } else {
                 telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-                tagToTelemetry(tagOfInterest);
+                //tagToTelemetry(tagOfInterest);
             }
 
         }
@@ -115,7 +116,7 @@ public class AprilTagVisionPipeline
         /* Update the telemetry */
         if (tagOfInterest != null) {
             telemetry.addLine("Tag snapshot:\n");
-            tagToTelemetry(tagOfInterest);
+            //tagToTelemetry(tagOfInterest);
         } else {
             telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
         }
@@ -130,9 +131,8 @@ public class AprilTagVisionPipeline
                 case RIGHT:
                     location = Location.RIGHT;
             }
-        } catch (Exception e) {
-            telemetry.addLine(e.getMessage());
-            telemetry.update();
+        } catch(Exception ignored) {
+
         }
         return location;
     }

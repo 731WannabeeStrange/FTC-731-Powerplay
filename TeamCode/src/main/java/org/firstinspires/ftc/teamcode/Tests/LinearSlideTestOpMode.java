@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 @Config
 public class LinearSlideTestOpMode extends LinearOpMode
 {
-    private DcMotorEx slide;
+    private DcMotorEx lift1, lift2;
     
     private double slidePower = 0;
 
@@ -20,11 +20,15 @@ public class LinearSlideTestOpMode extends LinearOpMode
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        slide = hardwareMap.get(DcMotorEx.class, "slide");
+        lift1 = hardwareMap.get(DcMotorEx.class, "lift1");
+        lift2 = hardwareMap.get(DcMotorEx.class, "lift2");
 
-        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lift1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lift1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lift2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         telemetry.addData("Mode", "waiting for start");
         telemetry.update();
@@ -37,9 +41,11 @@ public class LinearSlideTestOpMode extends LinearOpMode
 
         while (opModeIsActive()) {
             slidePower = gamepad1.right_trigger - gamepad1.left_trigger;
-            slide.setPower(slidePower);
+            lift1.setPower(slidePower);
+            lift2.setPower(slidePower);
 
-            telemetry.addData("slide position", slide.getCurrentPosition());
+            telemetry.addData("lift1 position", lift1.getCurrentPosition());
+            telemetry.addData("lift2 position", lift2.getCurrentPosition());
             telemetry.update();
         }
     }

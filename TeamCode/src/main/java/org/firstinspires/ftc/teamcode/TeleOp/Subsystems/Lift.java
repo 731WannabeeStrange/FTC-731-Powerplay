@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.TeleOp.Subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -15,14 +16,14 @@ public class Lift {
     public static double h2Retracted = 0;
     public static double h1Extended = 0.3;
     public static double h2Extended = 0.7;
-    public static int liftLow = 1600;
-    public static int liftMid = 2600;
-    public static int liftHigh = 3600;
+    public static int liftLow = 330;
+    public static int liftMid = 515;
+    public static int liftHigh = 700;
     public static double grabPos = 0.4;
     public static double releasePos = 0.25;
     public static double waitTime = 0.5;
-    public static double desiredLiftPower = 1;
-    public static double minHeightForExtension = 600;
+    public static double desiredLiftPower = 0.25;
+    public static double minHeightForExtension = 1000;
     public static int liftCollectPos = 300;
     public static int liftGrabPos = 0;
 
@@ -45,10 +46,12 @@ public class Lift {
     public final ServoImplEx horizontal2;
     public final ServoImplEx grabber;
 
-    public final ElapsedTime eTime = new ElapsedTime();
+    public final ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
     public double liftPower;
     public int depositTicks;
+
+    public boolean grabbing = false;
 
     public Lift(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
@@ -102,10 +105,12 @@ public class Lift {
                     lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                     liftState = LiftState.LIFT;
                 } else if (grabButton) {
-                    if (depositTicks == liftGrabPos) {
+                    if (grabbing) {
                         depositTicks = liftCollectPos;
+                        grabbing = false;
                     } else {
                         depositTicks = liftGrabPos;
+                        grabbing = true;
                     }
                     lift1.setTargetPosition(depositTicks);
                     lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
@@ -157,6 +162,7 @@ public class Lift {
                 lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                 lift2.setTargetPosition(depositTicks);
                 lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                grabbing = false;
                 liftState = LiftState.START;
         }
 
