@@ -12,19 +12,19 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
 public class Lift {
     // Config parameters
-    public static double h1Retracted = 1;
+    public static double h1Retracted = 0.65;
     public static double h2Retracted = 0;
     public static double h1Extended = 0.3;
     public static double h2Extended = 0.7;
     public static int liftLow = 330;
     public static int liftMid = 515;
-    public static int liftHigh = 700;
-    public static double grabPos = 0.4;
-    public static double releasePos = 0.25;
-    public static double waitTime = 0.5;
-    public static double desiredLiftPower = 0.25;
-    public static double minHeightForExtension = 1000;
-    public static int liftCollectPos = 300;
+    public static int liftHigh = 710;
+    public static double grabPos = 0.5;
+    public static double releasePos = 0.9;
+    public static double waitTime = 1.5;
+    public static double desiredLiftPower = 0.5;
+    public static double minHeightForExtension = 250;
+    public static int liftCollectPos = 150;
     public static int liftGrabPos = 0;
 
     public enum LiftState {
@@ -52,6 +52,7 @@ public class Lift {
     public int depositTicks;
 
     public boolean grabbing = false;
+    public boolean previousGrabButton = false;
 
     public Lift(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
@@ -71,6 +72,8 @@ public class Lift {
 
         horizontal1.setPosition(h1Retracted);
         horizontal2.setPosition(h2Retracted);
+
+        grabber.setPosition(grabPos);
     }
 
     public void lift(boolean liftButtonHigh, boolean liftButtonMid, boolean liftButtonLow,
@@ -79,6 +82,8 @@ public class Lift {
         telemetry.addData("Lift Power", liftPower);
         telemetry.addData("Lift Encoder Value", lift1.getCurrentPosition());
         telemetry.addData("Lift Target Position", lift1.getTargetPosition());
+        telemetry.addData("Grab Servo Pos", grabber.getPosition());
+        telemetry.addData("Timer", eTime.time());
         telemetry.update();
 
         switch (liftState) {
@@ -104,7 +109,7 @@ public class Lift {
                     lift2.setTargetPosition(depositTicks);
                     lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                     liftState = LiftState.LIFT;
-                } else if (grabButton) {
+                } else if (grabButton && !previousGrabButton) {
                     if (grabbing) {
                         depositTicks = liftCollectPos;
                         grabbing = false;
@@ -116,12 +121,15 @@ public class Lift {
                     lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                     lift2.setTargetPosition(depositTicks);
                     lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+
                 }
+                previousGrabButton = grabButton;
                 break;
 
             case LIFT:
                 lift1.setPower(desiredLiftPower);
                 lift2.setPower(desiredLiftPower);
+                grabber.setPosition(grabPos);
                 if (lift1.getCurrentPosition() > minHeightForExtension) {
                     liftState = LiftState.EXTEND;
                 }
@@ -130,6 +138,7 @@ public class Lift {
             case EXTEND:
                 horizontal1.setPosition(h1Extended);
                 horizontal2.setPosition(h2Extended);
+                grabber.setPosition(grabPos);
                 if (Math.abs(lift1.getCurrentPosition() - depositTicks) < 20) {
                     if (depositButton) {
                         liftPower = 0;
@@ -151,6 +160,8 @@ public class Lift {
                 lift1.setTargetPosition(liftCollectPos);
                 lift2.setTargetPosition(liftCollectPos);
                 liftPower = desiredLiftPower;
+                horizontal1.setPosition(h1Retracted);
+                horizontal2.setPosition(h2Retracted);
                 if (Math.abs(liftCollectPos - lift1.getCurrentPosition()) < 10) {
                     liftState = LiftState.STOP;
                 }

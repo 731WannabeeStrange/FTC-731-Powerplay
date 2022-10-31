@@ -15,39 +15,39 @@ import org.firstinspires.ftc.teamcode.Tests.MecanumTestOpMode;
 
 @Config
 public class Drivetrain {
-    private final Telemetry telemetry;
+    public final Telemetry telemetry;
 
-    private final BNO055IMU imu;
-    private final DcMotor fr;
-    private final DcMotor rr;
-    private final DcMotor fl;
-    private final DcMotor rl;
+    public final BNO055IMU imu;
+    public final DcMotor fr;
+    public final DcMotor rr;
+    public final DcMotor fl;
+    public final DcMotor rl;
 
     public double FL_power;
     public double FR_power;
     public double RL_power;
     public double RR_power;
 
-    private final ElapsedTime eTime = new ElapsedTime();
+    public final ElapsedTime eTime = new ElapsedTime();
 
-    private double previous_error, integral = 0;
+    public double previous_error, integral = 0;
     public static double P = 0.04;
     public static double I = 0;
     public static double D = 0;
 
-    private double errorAutoTurn, errorHeadingControl;
-    private double desiredAngleAutoTurn = 0;
-    private double desiredAngleHeadingControl = 0;
+    public double errorAutoTurn, errorHeadingControl;
+    public double desiredAngleAutoTurn = 0;
+    public double desiredAngleHeadingControl = 0;
 
-    private String turnState = "auto";
+    public String turnState = "auto";
 
     public double denominator;
 
-    private enum DriveMode {
+    public enum DriveMode {
         DRIVER_CONTROLLED,
         AUTO_CONTROL
     }
-    private DriveMode driveState = DriveMode.AUTO_CONTROL;
+    public DriveMode driveState = DriveMode.AUTO_CONTROL;
 
     public Drivetrain(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
@@ -89,10 +89,13 @@ public class Drivetrain {
         leftStickX *= 1.1;
 
         double gyro_radians = angles.firstAngle * Math.PI/180;
-        double newForward = leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
-        double newStrafe = -leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
+        double newForward = leftStickY;
+                //leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
+        double newStrafe = leftStickX;
+                //-leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
 
-        boolean manualTurning = rightStickX > 0;
+        boolean manualTurning = true;
+                //Math.abs(rightStickX) > 0;
         if (manualTurning) {
             desiredAngleHeadingControl = angles.firstAngle;
         }
@@ -214,7 +217,7 @@ public class Drivetrain {
         rr.setPower(rrPower);
     }
 
-    private double angleWrap(double angle) {
+    public double angleWrap(double angle) {
         if (angle > 180) {
             angle -= 360;
         } else if (angle < -180) {
