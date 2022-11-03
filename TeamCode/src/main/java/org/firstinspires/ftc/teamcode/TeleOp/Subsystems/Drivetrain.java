@@ -92,9 +92,8 @@ public class Drivetrain {
         double newForward = leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
         double newStrafe = -leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
 
-        boolean manualTurning = true;
-                //Math.abs(rightStickX) > 0;
-        if (manualTurning) {
+        boolean automaticTurning = (Math.abs(leftStickY) > 0 || Math.abs(leftStickX) > 0) && Math.abs(rightStickX) == 0;
+        if (!automaticTurning) {
             desiredAngleHeadingControl = angles.firstAngle;
         }
 
@@ -143,7 +142,7 @@ public class Drivetrain {
                 break;
             case DRIVER_CONTROLLED:
                 turnState = "driver";
-                if (manualTurning) {
+                if (!automaticTurning) {
                     denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rightStickX), 1);
                     FL_power = (-newForward + newStrafe + rightStickX) / denominator;
                     RL_power = (-newForward - newStrafe + rightStickX) / denominator;
