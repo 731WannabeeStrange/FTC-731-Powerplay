@@ -89,10 +89,8 @@ public class Drivetrain {
         leftStickX *= 1.1;
 
         double gyro_radians = angles.firstAngle * Math.PI/180;
-        double newForward = leftStickY;
-                //leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
-        double newStrafe = leftStickX;
-                //-leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
+        double newForward = leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
+        double newStrafe = -leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
 
         boolean manualTurning = true;
                 //Math.abs(rightStickX) > 0;
