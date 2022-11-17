@@ -24,7 +24,7 @@ public class BeamBreakerTest extends LinearOpMode {
             if (beamBreaker.getState()) {
                 telemetry.addData("Beam Breaker getState()", "<p style=\"color:rgb(255,0,0);\">TRUE</p>");
             } else {
-                telemetry.addData("Beam Breaker getState()", "<p style=\"color:rgb(255,0,0);\">TRUE</p>");
+                telemetry.addData("Beam Breaker getState()", "<p style=\"color:rgb(255,0,0);\">FALSE</p>");
             }
 
             telemetry.update();
