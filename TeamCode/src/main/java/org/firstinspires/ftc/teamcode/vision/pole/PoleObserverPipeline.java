@@ -45,7 +45,7 @@ public class PoleObserverPipeline extends OpenCvPipeline {
         Imgproc.Canny(finalMask,edges, 100, 200);
 
         // Release everything
-        hsvMat.copyTo(input);
+        edges.copyTo(input);
         scaledThresh.release();
         scaledMask.release();
         hsvMat.release();
