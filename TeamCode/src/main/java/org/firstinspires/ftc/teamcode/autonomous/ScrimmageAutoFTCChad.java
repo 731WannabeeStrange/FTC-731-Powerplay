@@ -15,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.vision.signal.AprilTagVisionPipeline;
 import org.firstinspires.ftc.teamcode.vision.signal.Location;
-import org.firstinspires.ftc.teamcode.teleop.Subsystems.Lift;
+import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 
 @Config
 @Autonomous(name="Scrimmage Auto FTC Chad", group="chad")

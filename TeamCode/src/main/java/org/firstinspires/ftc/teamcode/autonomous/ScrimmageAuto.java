@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.vision.signal.AprilTagVisionPipeline;
 import org.firstinspires.ftc.teamcode.vision.signal.Location;
-import org.firstinspires.ftc.teamcode.teleop.Subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
 
 @TeleOp
 public class ScrimmageAuto extends LinearOpMode {

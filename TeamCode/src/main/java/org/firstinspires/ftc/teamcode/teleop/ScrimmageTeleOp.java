@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.teleop.Subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.teleop.Subsystems.Lift;
+import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 
 @TeleOp
 public class ScrimmageTeleOp extends LinearOpMode {
