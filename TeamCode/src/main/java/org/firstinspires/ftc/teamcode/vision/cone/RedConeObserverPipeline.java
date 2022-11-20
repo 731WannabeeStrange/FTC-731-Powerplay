@@ -17,8 +17,8 @@ public class RedConeObserverPipeline extends OpenCvPipeline {
             return input;
         }
 
-        Scalar lowHSV = new Scalar(160, 70, 80);
-        Scalar highHSV = new Scalar(195, 255, 255);
+        Scalar lowHSV = new Scalar(145, 70, 80);
+        Scalar highHSV = new Scalar(200, 255, 255);
 
         Mat thresh = new Mat();
 
@@ -32,7 +32,7 @@ public class RedConeObserverPipeline extends OpenCvPipeline {
         Mat scaledMask = new Mat();
         masked.convertTo(scaledMask, -1, 150/average.val[1], 0);
 
-        Scalar strictLowHSV = new Scalar(0, 150, 100);
+        Scalar strictLowHSV = new Scalar(0, 75, 25);
         Scalar strictHighHSV = new Scalar(255, 255, 255);
 
         Mat scaledThresh = new Mat();
@@ -42,10 +42,10 @@ public class RedConeObserverPipeline extends OpenCvPipeline {
         Core.bitwise_and(hsvMat, hsvMat, finalMask, scaledThresh);
 
         Mat edges = new Mat();
-        Imgproc.Canny(finalMask,edges, 100, 200);
+        Imgproc.Canny(finalMask,edges, 0, 255);
 
         // Release everything
-        thresh.copyTo(input);
+        edges.copyTo(input);
         scaledThresh.release();
         scaledMask.release();
         hsvMat.release();
