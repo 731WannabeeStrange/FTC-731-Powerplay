@@ -2,20 +2,11 @@ package com.example.meepmeep;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.DriveShim;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequence;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.net.URL;
-
-import javax.imageio.ImageIO;
 
 public class MeepMeepTesting {
     public static void main(String[] args) {
@@ -23,10 +14,10 @@ public class MeepMeepTesting {
 
         DefaultBotBuilder blueBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(30, 30, Math.toRadians(180), Math.toRadians(180), 13)
+                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 13)
                 .setDimensions(16, 16);
 
-        RoadRunnerBotEntity blueEntity = blueBot.followTrajectorySequence(scrimmageAuto(blueBot.build().getDrive()));
+        RoadRunnerBotEntity blueEntity = blueBot.followTrajectorySequence(onePlusTen(blueBot.build().getDrive()));
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
                 .setDarkMode(true)
@@ -113,47 +104,16 @@ public class MeepMeepTesting {
                 .build();
     }
 
-    private static TrajectorySequence sixCycleBlueLittleMovement(DriveShim drive) {
+    private static TrajectorySequence onePlusTen(DriveShim drive) {
         return drive.trajectorySequenceBuilder(new Pose2d(-34, 64, Math.toRadians(90)))
-                .setReversed(true)
                 .back(30)
-                .splineTo(new Vector2d(-33, 12), Math.toRadians(-45))
-                .setReversed(false)
-                .waitSeconds(1)
-                .splineToLinearHeading(new Pose2d(-36, 12, Math.toRadians(180)), Math.toRadians(180))
+                .splineToSplineHeading(new Pose2d(-30, 12, Math.toRadians(180)), Math.toRadians(0))
                 .back(18)
-                .waitSeconds(2)
-                .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-12, 15, Math.toRadians(210)), Math.toRadians(30))
-                .waitSeconds(1)
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(-18, 12, Math.toRadians(180)), Math.toRadians(180))
-                .waitSeconds(2)
-                .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-12, 15, Math.toRadians(210)), Math.toRadians(30))
-                .waitSeconds(1)
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(-18, 12, Math.toRadians(180)), Math.toRadians(180))
-                .waitSeconds(2)
-                .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-12, 15, Math.toRadians(210)), Math.toRadians(30))
-                .waitSeconds(1)
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(-18, 12, Math.toRadians(180)), Math.toRadians(180))
-                .waitSeconds(2)
-                .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-12, 15, Math.toRadians(210)), Math.toRadians(30))
-                .waitSeconds(1)
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(-18, 12, Math.toRadians(180)), Math.toRadians(180))
-                .waitSeconds(2)
-                .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-12, 15, Math.toRadians(210)), Math.toRadians(30))
-                .waitSeconds(1)
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(-12, 12, Math.toRadians(-90)), Math.toRadians(-90))
-                .back(24)
-                .strafeRight(48)
+                .waitSeconds(12)
+                .turn(Math.toRadians(180))
+                .forward(24)
+                .waitSeconds(10)
+                .forward(46)
                 .build();
     }
 
