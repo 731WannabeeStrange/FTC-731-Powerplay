@@ -35,14 +35,14 @@ import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveCo
 @Autonomous(group = "drive")
 public class AutomaticFeedforwardTuner extends LinearOpMode {
     public static double MAX_POWER = 0.7;
-    public static double DISTANCE = 100; // in
+    public static double DISTANCE = 66; // in
 
     @Override
     public void runOpMode() throws InterruptedException {
-        if (RUN_USING_ENCODER) {
-            RobotLog.setGlobalErrorMsg("Feedforward constants usually don't need to be tuned " +
-                    "when using the built-in drive motor velocity PID.");
-        }
+        //if (RUN_USING_ENCODER) {
+        //    RobotLog.setGlobalErrorMsg("Feedforward constants usually don't need to be tuned " +
+        //            "when using the built-in drive motor velocity PID.");
+       // }
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
@@ -211,6 +211,10 @@ public class AutomaticFeedforwardTuner extends LinearOpMode {
             telemetry.addLine(Misc.formatInvariant("kA = %.5f (R^2 = %.2f)",
                     accelResult.kA, accelResult.rSquare));
             telemetry.update();
+
+            for (int i = 0; i < timeSamples.size(); ++i) {
+                System.out.println("" + timeSamples.get(i) + "," + positionSamples.get(i) + "," + powerSamples.get(i));
+            }
         }
 
         while (!isStopRequested()) {
