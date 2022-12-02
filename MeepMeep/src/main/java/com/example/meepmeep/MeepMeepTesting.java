@@ -106,7 +106,7 @@ public class MeepMeepTesting {
 
     private static TrajectorySequence onePlusTen(DriveShim drive) {
         return drive.trajectorySequenceBuilder(new Pose2d(-34, 64, Math.toRadians(90)))
-                .back(30)
+                .back(36)
                 .splineToSplineHeading(new Pose2d(-30, 12, Math.toRadians(180)), Math.toRadians(0))
                 .back(18)
                 .waitSeconds(12)
