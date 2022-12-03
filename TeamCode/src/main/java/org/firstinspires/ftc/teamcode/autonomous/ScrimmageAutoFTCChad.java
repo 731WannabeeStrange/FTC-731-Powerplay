@@ -1,3 +1,4 @@
+/*
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -107,10 +108,12 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         turnWithGyro(135, speed);
     }
     //
-    /*
+    */
+/*
     This function's purpose is simply to drive forward or backward.
     To drive backward, simply make the inches input negative.
-     */
+     *//*
+
     public void moveToPosition(double inches, double speed){
         //
         int move = (int)(Math.round(inches*conversion));
@@ -146,10 +149,12 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         return;
     }
     //
-    /*
+    */
+/*
     This function uses the Expansion Hub IMU Integrated Gyro to turn a precise number of degrees (+/- 5).
     Degrees should always be positive, make speedDirection negative to turn left.
-     */
+     *//*
+
     public void turnWithGyro(double degrees, double speedDirection){
         //<editor-fold desc="Initialize">
         angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -258,10 +263,12 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         backright.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
     //
-    /*
+    */
+/*
     This function uses the encoders to strafe left or right.
     Negative input for inches results in left strafing.
-     */
+     *//*
+
     public void strafeToPosition(double inches, double speed){
         //
         int move = (int)(Math.round(inches * cpi * meccyBias));
@@ -289,18 +296,22 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         return;
     }
     //
-    /*
+    */
+/*
     A tradition within the Thunder Pengwins code, we always start programs with waitForStartify,
     our way of adding personality to our programs.
-     */
+     *//*
+
     public void waitForStartify(){
         waitForStart();
     }
     //
-    /*
+    */
+/*
     These functions are used in the turnWithGyro function to ensure inputs
     are interpreted properly.
-     */
+     *//*
+
     public double devertify(double degrees){
         if (degrees < 0){
             degrees = degrees + 360;
@@ -318,10 +329,12 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         return degrees;
     }
     //
-    /*
+    */
+/*
     This function is called at the beginning of the program to activate
     the IMU Integrated Gyro.
-     */
+     *//*
+
     public void initGyro(){
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
@@ -335,10 +348,12 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         imu.initialize(parameters);
     }
     //
-    /*
+    */
+/*
     This function is used in the turnWithGyro function to set the
     encoder mode and turn.
-     */
+     *//*
+
     public void turnWithEncoder(double input){
         frontleft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backleft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -352,3 +367,4 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
     }
     //
 }
+*/
