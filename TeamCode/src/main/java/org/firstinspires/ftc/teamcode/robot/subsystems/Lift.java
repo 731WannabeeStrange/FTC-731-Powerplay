@@ -1,3 +1,4 @@
+/*
 package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -238,4 +239,4 @@ public class Lift {
         lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         lift2.setPower(liftPower);
     }
-}
+}*/
