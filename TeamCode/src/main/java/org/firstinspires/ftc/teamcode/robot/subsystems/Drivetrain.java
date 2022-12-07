@@ -80,7 +80,7 @@ public class Drivetrain {
     }
 
     public void driveRobot(double leftStickY, double leftStickX, double rightStickX, boolean slowMode,
-                           boolean rightBumper, boolean autoTurn0, boolean autoTurn90, boolean autoTurn180,
+                           boolean autoTurn0, boolean autoTurn90, boolean autoTurn180,
                            boolean autoTurn270) {
         double time = eTime.time();
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -115,20 +115,19 @@ public class Drivetrain {
 
         switch (driveState) {
             case AUTO_CONTROL:
-                if (!rightBumper) {
-                    if (autoTurn0) {
-                        desiredAngleAutoTurn = 0;
-                    }
-                    if (autoTurn270) {
-                        desiredAngleAutoTurn = 270;
-                    }
-                    if (autoTurn180) {
-                        desiredAngleAutoTurn = 180;
-                    }
-                    if (autoTurn90) {
-                        desiredAngleAutoTurn = 90;
-                    }
+                if (autoTurn0) {
+                    desiredAngleAutoTurn = 0;
                 }
+                if (autoTurn270) {
+                    desiredAngleAutoTurn = 270;
+                }
+                if (autoTurn180) {
+                    desiredAngleAutoTurn = 180;
+                }
+                if (autoTurn90) {
+                    desiredAngleAutoTurn = 90;
+                }
+
                 if (rightStickX != 0) {
                     driveState = DriveMode.DRIVER_CONTROLLED;
                 }
@@ -156,24 +155,21 @@ public class Drivetrain {
                     FR_power = (-newForward - newStrafe - rcw) / denominator;
                     RR_power = (-newForward + newStrafe - rcw) / denominator;
                 }
-
-                if (!rightBumper) {
-                    if (autoTurn0) {
-                        desiredAngleAutoTurn = 0;
-                        driveState = DriveMode.AUTO_CONTROL;
-                    }
-                    if (autoTurn270) {
-                        desiredAngleAutoTurn = 270;
-                        driveState = DriveMode.AUTO_CONTROL;
-                    }
-                    if (autoTurn180) {
-                        desiredAngleAutoTurn = 180;
-                        driveState = DriveMode.AUTO_CONTROL;
-                    }
-                    if (autoTurn90) {
-                        desiredAngleAutoTurn = 90;
-                        driveState = DriveMode.AUTO_CONTROL;
-                    }
+                if (autoTurn0) {
+                    desiredAngleAutoTurn = 0;
+                    driveState = DriveMode.AUTO_CONTROL;
+                }
+                if (autoTurn270) {
+                    desiredAngleAutoTurn = 270;
+                    driveState = DriveMode.AUTO_CONTROL;
+                }
+                if (autoTurn180) {
+                    desiredAngleAutoTurn = 180;
+                    driveState = DriveMode.AUTO_CONTROL;
+                }
+                if (autoTurn90) {
+                    desiredAngleAutoTurn = 90;
+                    driveState = DriveMode.AUTO_CONTROL;
                 }
                 break;
         }
