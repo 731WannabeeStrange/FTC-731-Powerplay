@@ -77,69 +77,32 @@ public class Intake {
         beamBreaker.setMode(DigitalChannel.Mode.INPUT);
     }
 
-    public void intake(boolean intakeExtendButton, boolean grabButton, boolean cancelAutomation) {
-        telemetry.addData("Intake State", intakeState);
-        telemetry.addData("Intake Encoder Value", slide1.getCurrentPosition());
-        telemetry.addData("Intake Target Position", slide1.getTargetPosition());
-        telemetry.addData("Claw Servo Pos", claw.getPosition());
-        telemetry.addData("Timer", eTime.time());
-        telemetry.update();
+    public void extend(double intakeExtension, double intakeRetraction) {
+        release();
+        slide1.setPower(intakeExtension - intakeRetraction);
+        slide2.setPower(intakeExtension - intakeRetraction);
+        v4b1.setPosition(v4b1ExtendedPos);
+        v4b2.setPosition(v4b2ExtendedPos);
+    }
 
-        switch (intakeState) {
-            case RETRACTED:
-                slide1.setTargetPosition(0);
-                slide2.setTargetPosition(0);
-                v4b1.setPosition(v4b1RetractedPos);
-                v4b2.setPosition(v4b2RetractedPos);
-                claw.setPosition(clawOpenPos);
-                if (intakeExtendButton) {
-                    slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    intakeState = IntakeState.EXTENDING;
-                }
-                break;
+    public void retractFully() {
+        slide1.setTargetPosition(0);
+        slide2.setTargetPosition(0);
+        slide1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slide2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        v4b1.setPosition(v4b1RetractedPos);
+        v4b2.setPosition(v4b2RetractedPos);
+    }
 
-            case EXTENDING:
-                slide1.setPower(desiredSlidePower);
-                slide2.setPower(desiredSlidePower);
-                v4b1.setPosition(v4b1ExtendedPos);
-                v4b2.setPosition(v4b2ExtendedPos);
-                if (slide1.getCurrentPosition() > maxExtension || beamBreaker.getState()) {
-                    intakeState = IntakeState.EXTENDED;
-                }
-                break;
+    public void grab() {
+        claw.setPosition(clawClosedPos);
+    }
 
-            case EXTENDED:
-                slide1.setPower(0);
-                slide2.setPower(0);
-                if (grabButton) {
-                    eTime.reset();
-                    intakeState = IntakeState.GRABBING;
-                }
-                break;
+    public void release() {
+        claw.setPosition(clawOpenPos);
+    }
 
-            case GRABBING:
-                claw.setPosition(clawClosedPos);
-                if (eTime.time() > grabTime) {
-                    intakeState = IntakeState.RETRACTING;
-                }
-                break;
-
-            case RETRACTING:
-                slide1.setTargetPosition(0);
-                slide2.setTargetPosition(0);
-                slide1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slide2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                v4b1.setPosition(v4b1RetractedPos);
-                v4b2.setPosition(v4b2RetractedPos);
-                if (Math.abs(slide1.getCurrentPosition()) < 20) {
-                    intakeState = IntakeState.RETRACTED;
-                }
-                break;
-        }
-
-        if (cancelAutomation) {
-            intakeState = IntakeState.RETRACTED;
-        }
+    public int getSlidePosition() {
+        return slide1.getCurrentPosition();
     }
 }
