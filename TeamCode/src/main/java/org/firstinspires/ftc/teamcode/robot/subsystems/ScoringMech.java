@@ -36,18 +36,16 @@ public class ScoringMech {
 
     public final ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
-    public boolean grabbing = false;
     public boolean previousIntakeGrabButton = false;
-    public boolean previousTransferButton = false;
 
     public ScoringMech(HardwareMap hardwareMap, MultipleTelemetry multipleTelemetry) {
-
+        lift = new Lift(hardwareMap, multipleTelemetry);
+        intake = new Intake(hardwareMap, multipleTelemetry);
     }
 
     public void score(double intakeExtension, double intakeRetraction, boolean intakeGrabButton, boolean automaticIntakeRetraction,
                       boolean liftButtonHigh, boolean liftButtonMid, boolean liftButtonLow,
-                      boolean transferButton, boolean depositButton, double yawArmY, double yawArmX,
-                      boolean cancelAutomation) {
+                      boolean depositButton, double yawArmY, double yawArmX, boolean cancelAutomation) {
         telemetry.addData("Timer", eTime.time());
         telemetry.update();
 
