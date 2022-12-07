@@ -45,7 +45,11 @@ public class ScrimmageTeleOp extends LinearOpMode {
                     gamepad1.x,
                     gamepad2.right_stick_y,
                     gamepad2.right_stick_x,
-                    gamepad1.back
+                    gamepad1.back,
+                    gamepad2.dpad_down,
+                    gamepad2.dpad_right,
+                    gamepad2.dpad_up,
+                    gamepad2.dpad_left
             );
         }
     }

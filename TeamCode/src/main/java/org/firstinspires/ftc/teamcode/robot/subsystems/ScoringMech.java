@@ -45,7 +45,8 @@ public class ScoringMech {
 
     public void score(double intakeExtension, double intakeRetraction, boolean intakeGrabButton, boolean automaticIntakeRetraction,
                       boolean liftButtonHigh, boolean liftButtonMid, boolean liftButtonLow,
-                      boolean depositButton, double yawArmY, double yawArmX, boolean cancelAutomation) {
+                      boolean depositButton, double yawArmY, double yawArmX, boolean cancelAutomation,
+                      boolean yawArm0, boolean yawArm90, boolean yawArm180, boolean yawArm270) {
         telemetry.addData("Timer", eTime.time());
         telemetry.update();
 
@@ -111,6 +112,16 @@ public class ScoringMech {
 
             case CONTROLLING_ARM:
                 lift.setYawArmAngle(Math.atan2(yawArmY, yawArmX));
+                if (yawArm0) {
+                    lift.setYawArmAngle(0);
+                } else if (yawArm90) {
+                    lift.setYawArmAngle(90);
+                } else if (yawArm180) {
+                    lift.setYawArmAngle(180);
+                } else if (yawArm270) {
+                    lift.setYawArmAngle(270);
+                }
+
                 if (Math.abs(lift.getSlidePosition() - lift.getTargetPosition()) < 5) {
                     if (depositButton) {
                         eTime.reset();
