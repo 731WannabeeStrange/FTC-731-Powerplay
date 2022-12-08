@@ -23,15 +23,6 @@ public class Intake {
     public static double maxExtension = 1500;
     public static double grabTime = 1;
 
-    public enum IntakeState {
-        RETRACTED,
-        EXTENDING,
-        EXTENDED,
-        GRABBING,
-        RETRACTING,
-        TRANSFERRING
-    }
-
     public IntakeState intakeState = IntakeState.RETRACTED;
 
     public final Telemetry telemetry;

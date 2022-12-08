@@ -22,6 +22,7 @@ public class Lift {
     public static int minHeightForArmRotation = 200;
     public static double yawArm1Default = 0;
     public static double yawArm2Default = 1;
+    public static double liftPower = 0.3;
 
     public final Telemetry telemetry;
 
@@ -30,14 +31,6 @@ public class Lift {
     public final ServoImplEx yawArm1;
     public final ServoImplEx yawArm2;
     public final ServoImplEx grabber;
-
-    public final ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
-
-    public double liftPower;
-    public int depositTicks;
-
-    public boolean grabbing = false;
-    public boolean previousGrabButton = false;
 
     public Lift(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
