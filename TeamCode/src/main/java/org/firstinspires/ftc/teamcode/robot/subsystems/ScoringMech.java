@@ -111,7 +111,9 @@ public class ScoringMech {
                 break;
 
             case CONTROLLING_ARM:
-                lift.setYawArmAngle(Math.atan2(yawArmY, yawArmX));
+                if (yawArmY != 0 || yawArmX != 0) {
+                    lift.setYawArmAngle(Math.atan2(yawArmY, yawArmX));
+                }
                 if (yawArm0) {
                     lift.setYawArmAngle(0);
                 } else if (yawArm90) {
