@@ -105,13 +105,20 @@ public class Lift {
     }
 
     public void setYawArmAngle(double angle) {
-        while (angle < -90) {
+        while (angle < -180) {
             angle += 360;
         }
-        while (angle > 270) {
+        while (angle > 180) {
             angle -= 360;
         }
-        double pos = (-angle + 180) / 270;
+        if (angle > 90) {
+            if (angle < 135) {
+                angle = 90;
+            } else {
+                angle = 180;
+            }
+        }
+        double pos = (-angle + 90) / 270;
         yawArm1.setPosition(pos);
         yawArm2.setPosition(1 - pos);
     }
