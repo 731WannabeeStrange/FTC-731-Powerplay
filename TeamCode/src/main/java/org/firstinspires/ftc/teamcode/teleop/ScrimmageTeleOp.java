@@ -20,37 +20,77 @@ public class ScrimmageTeleOp extends LinearOpMode {
         dt = new Drivetrain(hardwareMap, telemetry);
         scoring = new ScoringMech(hardwareMap, multipleTelemetry);
 
+        boolean previous2a = false;
+        boolean oneGamepad = true;
+
         waitForStart();
 
         while (opModeIsActive() && !isStopRequested()) {
-            dt.driveRobot(
-                    gamepad1.left_stick_y,
-                    gamepad1.left_stick_x,
-                    gamepad1.right_stick_x,
-                    gamepad1.left_bumper,
-                    gamepad1.dpad_up,
-                    gamepad1.dpad_left,
-                    gamepad1.dpad_down,
-                    gamepad1.dpad_right
-            );
+            if (gamepad2.a && !previous2a) {
+                oneGamepad = !oneGamepad;
+            }
 
-            scoring.score(
-                    gamepad1.right_trigger,
-                    gamepad1.left_trigger,
-                    gamepad1.right_bumper,
-                    gamepad1.left_bumper,
-                    gamepad1.y,
-                    gamepad1.b,
-                    gamepad1.a,
-                    gamepad1.x,
-                    gamepad2.right_stick_y,
-                    gamepad2.right_stick_x,
-                    gamepad1.back,
-                    gamepad2.dpad_down,
-                    gamepad2.dpad_right,
-                    gamepad2.dpad_up,
-                    gamepad2.dpad_left
-            );
+            if (oneGamepad) {
+                dt.driveRobot(
+                        gamepad1.left_stick_y,
+                        gamepad1.left_stick_x,
+                        0,
+                        gamepad1.left_bumper,
+                        gamepad1.dpad_up,
+                        gamepad1.dpad_left,
+                        gamepad1.dpad_down,
+                        gamepad1.dpad_right
+                );
+
+                scoring.score(
+                        gamepad1.right_trigger,
+                        gamepad1.left_trigger,
+                        gamepad1.right_bumper,
+                        gamepad1.left_bumper,
+                        gamepad1.y,
+                        gamepad1.b,
+                        gamepad1.a,
+                        gamepad1.x,
+                        gamepad1.right_stick_y,
+                        gamepad1.right_stick_x,
+                        gamepad1.back,
+                        false,
+                        false,
+                        false,
+                        false
+                );
+            } else {
+                dt.driveRobot(
+                        gamepad1.left_stick_y,
+                        gamepad1.left_stick_x,
+                        gamepad1.right_stick_x,
+                        gamepad1.left_bumper,
+                        gamepad1.dpad_up,
+                        gamepad1.dpad_left,
+                        gamepad1.dpad_down,
+                        gamepad1.dpad_right
+                );
+
+                scoring.score(
+                        gamepad1.right_trigger,
+                        gamepad1.left_trigger,
+                        gamepad1.right_bumper,
+                        gamepad1.left_bumper,
+                        gamepad1.y,
+                        gamepad1.b,
+                        gamepad1.a,
+                        gamepad1.x,
+                        gamepad2.right_stick_y,
+                        gamepad2.right_stick_x,
+                        gamepad1.back,
+                        gamepad2.dpad_down,
+                        gamepad2.dpad_right,
+                        gamepad2.dpad_up,
+                        gamepad2.dpad_left
+                );
+            }
+
+            previous2a = gamepad2.a;
         }
     }
 }
