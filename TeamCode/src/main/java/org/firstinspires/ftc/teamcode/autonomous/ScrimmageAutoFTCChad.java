@@ -1,4 +1,3 @@
-/*
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -14,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.vision.signal.AprilTagVisionPipeline;
 import org.firstinspires.ftc.teamcode.vision.signal.Location;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
@@ -23,8 +23,11 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 public class ScrimmageAutoFTCChad extends LinearOpMode {
     public static double speed = 0.5;
     public static int cycles = 2;
-    public static int depositWaitTime = 500;
+    public static int yawArmWaitTime = 500;
+    public static int depositWaitTime = 200;
     public static int intakeWaitTime = 500;
+    public static int waitBetweenMovements = 500;
+    public static int liftWaitTime = 250;
 
     //
     DcMotor frontleft;
@@ -47,6 +50,7 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
     Orientation angles;
     Acceleration gravity;
     //
+    Intake intake;
     Lift lift;
     AprilTagVisionPipeline pipeline;
     Location location = Location.LEFT;
@@ -62,6 +66,7 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         frontleft.setDirection(DcMotorSimple.Direction.REVERSE);
         backleft.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        intake = new Intake(hardwareMap, telemetry);
         lift = new Lift(hardwareMap, telemetry);
         pipeline = new AprilTagVisionPipeline();
         pipeline.init(hardwareMap, telemetry);
@@ -69,17 +74,22 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         while (!opModeIsActive() && !isStopRequested()) {
             location = pipeline.visionLoop(telemetry);
         }
+
         lift.extendHigh();
-        moveToPosition(54, speed);
-        turnWithGyro(45, -speed);
+        lift.setYawArmAngle(180);
+        moveToPosition(40, speed);
+        wait(yawArmWaitTime);
         lift.deposit();
         wait(depositWaitTime);
-        moveToPosition(-3, speed);
+        lift.setYawArmAngle(90);
+        wait(yawArmWaitTime);
         lift.retract();
-        turnWithGyro(135, speed);
+        moveToPosition(12, speed);
+        wait(waitBetweenMovements);
+        turnWithGyro(90, speed);
 
         for (int i = 0; i < cycles; i++) {
-            cycle();
+            cycle(i);
         }
 
         switch (location) {
@@ -94,25 +104,28 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         }
     }
 
-    public void cycle() throws InterruptedException {
+    public void cycle(int i) throws InterruptedException {
+        intake.setV4BPositions(Intake.stackPositions[i][0], Intake.stackPositions[i][1]);
         moveToPosition(24, speed);
-        lift.grab();
+        wait(waitBetweenMovements);
+        intake.grab();
         wait(intakeWaitTime);
+        intake.retractV4B();
+        wait(intakeWaitTime);
+        lift.grab();
+        wait(liftWaitTime);
+        intake.release();
         lift.extendHigh();
-        moveToPosition(-24, speed);
-        turnWithGyro(135, -speed);
-        moveToPosition(3, speed);
+        moveToPosition(-36, speed);
+        lift.setYawArmAngle(0);
+        wait(yawArmWaitTime);
         lift.deposit();
         wait(depositWaitTime);
-        moveToPosition(3, speed);
-        turnWithGyro(135, speed);
+        lift.setYawArmAngle(90);
+        wait(yawArmWaitTime);
+        lift.retract();
+        moveToPosition(12, speed);
     }
-    //
-    */
-/*
-    This function's purpose is simply to drive forward or backward.
-    To drive backward, simply make the inches input negative.
-     *//*
 
     public void moveToPosition(double inches, double speed){
         //
@@ -148,12 +161,6 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         backleft.setPower(0);
         return;
     }
-    //
-    */
-/*
-    This function uses the Expansion Hub IMU Integrated Gyro to turn a precise number of degrees (+/- 5).
-    Degrees should always be positive, make speedDirection negative to turn left.
-     *//*
 
     public void turnWithGyro(double degrees, double speedDirection){
         //<editor-fold desc="Initialize">
@@ -262,12 +269,6 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         backleft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         backright.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
-    //
-    */
-/*
-    This function uses the encoders to strafe left or right.
-    Negative input for inches results in left strafing.
-     *//*
 
     public void strafeToPosition(double inches, double speed){
         //
@@ -295,22 +296,10 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         backleft.setPower(0);
         return;
     }
-    //
-    */
-/*
-    A tradition within the Thunder Pengwins code, we always start programs with waitForStartify,
-    our way of adding personality to our programs.
-     *//*
 
     public void waitForStartify(){
         waitForStart();
     }
-    //
-    */
-/*
-    These functions are used in the turnWithGyro function to ensure inputs
-    are interpreted properly.
-     *//*
 
     public double devertify(double degrees){
         if (degrees < 0){
@@ -328,31 +317,21 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         }
         return degrees;
     }
-    //
-    */
-/*
-    This function is called at the beginning of the program to activate
-    the IMU Integrated Gyro.
-     *//*
 
-    public void initGyro(){
+
+    public void initGyro() {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         //parameters.calibrationDataFile = "GyroCal.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         //
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
     }
-    //
-    */
-/*
-    This function is used in the turnWithGyro function to set the
-    encoder mode and turn.
-     *//*
+
 
     public void turnWithEncoder(double input){
         frontleft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -367,4 +346,4 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
     }
     //
 }
-*/
+
