@@ -43,14 +43,13 @@ public class ScrimmageTeleOp extends LinearOpMode {
                 );
 
                 scoring.score(
-                        gamepad1.right_trigger,
-                        gamepad1.left_trigger,
-                        gamepad1.right_bumper,
+                        gamepad1.left_trigger > 0,
                         gamepad1.left_bumper,
+                        gamepad1.right_trigger > 0,
                         gamepad1.y,
                         gamepad1.b,
                         gamepad1.a,
-                        gamepad1.x,
+                        gamepad1.right_bumper,
                         gamepad1.right_stick_y,
                         gamepad1.right_stick_x,
                         gamepad1.back,
@@ -72,16 +71,15 @@ public class ScrimmageTeleOp extends LinearOpMode {
                 );
 
                 scoring.score(
-                        gamepad1.right_trigger,
-                        gamepad1.left_trigger,
-                        gamepad1.right_bumper,
+                        gamepad1.left_trigger > 0,
                         gamepad1.left_bumper,
+                        gamepad1.right_trigger > 0,
                         gamepad1.y,
                         gamepad1.b,
                         gamepad1.a,
-                        gamepad1.x,
-                        gamepad2.right_stick_y,
-                        gamepad2.right_stick_x,
+                        gamepad1.right_bumper,
+                        gamepad1.right_stick_y,
+                        gamepad1.right_stick_x,
                         gamepad1.back,
                         gamepad2.dpad_down,
                         gamepad2.dpad_right,

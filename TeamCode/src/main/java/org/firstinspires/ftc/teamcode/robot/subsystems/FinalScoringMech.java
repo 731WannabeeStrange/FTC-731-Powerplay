@@ -1,3 +1,4 @@
+/*
 package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -43,7 +44,7 @@ public class ScoringMech {
         intake = new Intake(hardwareMap, multipleTelemetry);
     }
 
-    public void score(boolean intakeExtension, boolean intakeRetraction, boolean intakeGrabButton,
+    public void score(double intakeExtension, double intakeRetraction, boolean intakeGrabButton, boolean automaticIntakeRetraction,
                       boolean liftButtonHigh, boolean liftButtonMid, boolean liftButtonLow,
                       boolean depositButton, double yawArmY, double yawArmX, boolean cancelAutomation,
                       boolean yawArm0, boolean yawArm90, boolean yawArm180, boolean yawArm270) {
@@ -52,15 +53,16 @@ public class ScoringMech {
 
         switch (scoringState) {
             case RETRACTED:
-                intake.retractV4B();
-                if (intakeExtension) {
+                intake.retractFully();
+                if (intakeExtension > 0) {
+                    intake.slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    intake.slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     scoringState = ScoringState.EXTENDING;
                 }
                 break;
 
             case EXTENDING:
-                intake.extendV4B();
-                intake.release();
+                intake.extend(intakeExtension, intakeRetraction);
                 if (intakeGrabButton) {
                     scoringState = ScoringState.GRABBING;
                 }
@@ -68,8 +70,7 @@ public class ScoringMech {
 
             case GRABBING:
                 intake.grab();
-                if (intakeRetraction) {
-                    eTime.reset();
+                if (automaticIntakeRetraction) {
                     scoringState = ScoringState.RETRACTING;
                 }
                 if (intakeGrabButton && !previousIntakeGrabButton) {
@@ -78,8 +79,8 @@ public class ScoringMech {
                 break;
 
             case RETRACTING:
-                intake.retractV4B();
-                if (eTime.time() < Intake.retractTime) {
+                intake.retractFully();
+                if (Math.abs(intake.getSlidePosition()) < 5) {
                     scoringState = ScoringState.TRANSFERRING;
                 }
                 break;
@@ -148,9 +149,8 @@ public class ScoringMech {
                 break;
 
             case RESET:
-                intake.release();
+                intake.retractFully();
                 lift.retract();
-                scoringState = ScoringState.RETRACTED;
                 break;
         }
 
@@ -160,4 +160,4 @@ public class ScoringMech {
 
         previousIntakeGrabButton = intakeGrabButton;
     }
-}
+}*/
