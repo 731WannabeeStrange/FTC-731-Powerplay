@@ -46,6 +46,12 @@ public class ScrimmageTeleOpNoEncoders extends LinearOpMode {
             } else if (gamepad2.dpad_down) {
                 lift.setYawArmAngle(-90);
             }
+
+            if (gamepad1.right_bumper) {
+                lift.deposit();
+            } else if (gamepad1.left_bumper) {
+                lift.grab();
+            }
         }
     }
 }
