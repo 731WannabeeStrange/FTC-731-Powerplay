@@ -13,7 +13,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.vision.signal.AprilTagVisionPipeline;
 import org.firstinspires.ftc.teamcode.vision.signal.Location;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
@@ -21,7 +20,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 @Config
 @Autonomous(name="Scrimmage Auto FTC Chad", group="chad")
 public class ScrimmageAutoFTCChad extends LinearOpMode {
-    public static double speed = 0.5;
+    public static double speed = 0.35;
     public static int cycles = 2;
     public static int yawArmWaitTime = 500;
     public static int depositWaitTime = 200;
@@ -50,7 +49,6 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
     Orientation angles;
     Acceleration gravity;
     //
-    Intake intake;
     Lift lift;
     AprilTagVisionPipeline pipeline;
     Location location = Location.LEFT;
@@ -66,7 +64,6 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         frontleft.setDirection(DcMotorSimple.Direction.REVERSE);
         backleft.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        intake = new Intake(hardwareMap, telemetry);
         lift = new Lift(hardwareMap, telemetry);
         pipeline = new AprilTagVisionPipeline();
         pipeline.init(hardwareMap, telemetry);
@@ -76,14 +73,14 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         }
 
         lift.extendHigh();
-        lift.setYawArmAngle(180);
+        lift.setYawArmAngle(-180);
         moveToPosition(40, speed);
         wait(yawArmWaitTime);
         lift.deposit();
         wait(depositWaitTime);
         lift.setYawArmAngle(90);
         wait(yawArmWaitTime);
-        lift.retract();
+        lift.retract(250);
         moveToPosition(12, speed);
         wait(waitBetweenMovements);
         turnWithGyro(90, speed);
@@ -105,25 +102,21 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
     }
 
     public void cycle(int i) throws InterruptedException {
-        intake.setV4BPositions(Intake.stackPositions[i][0], Intake.stackPositions[i][1]);
-        moveToPosition(24, speed);
+        moveToPosition(30, speed);
         wait(waitBetweenMovements);
-        intake.grab();
         wait(intakeWaitTime);
-        intake.retractV4B();
         wait(intakeWaitTime);
         lift.grab();
         wait(liftWaitTime);
-        intake.release();
         lift.extendHigh();
-        moveToPosition(-36, speed);
+        moveToPosition(-42, speed);
         lift.setYawArmAngle(0);
         wait(yawArmWaitTime);
         lift.deposit();
         wait(depositWaitTime);
         lift.setYawArmAngle(90);
         wait(yawArmWaitTime);
-        lift.retract();
+        lift.retract(300);
         moveToPosition(12, speed);
     }
 

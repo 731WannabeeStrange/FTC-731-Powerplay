@@ -16,8 +16,7 @@ public class YawArmTest extends LinearOpMode
     private ServoImplEx s1;
     private ServoImplEx s2;
 
-    private double s1pos = 0.5;
-    private double s2pos = 0.5;
+    private double pos = 0;
 
     private boolean lbTriggered = false, rbTriggered = false;
 
@@ -41,26 +40,35 @@ public class YawArmTest extends LinearOpMode
         telemetry.update();
 
         while (opModeIsActive()) {
-            s1.setPosition(s1pos);
-            s2.setPosition(s2pos);
+            double yawArmY = gamepad1.left_stick_y;
+            double yawArmX = gamepad1.left_stick_x;
+            if (yawArmY != 0 || yawArmX != 0) {
+                double angle = Math.toDegrees(Math.atan2(yawArmY, yawArmX));
 
-            telemetry.addData("s1 position", s1pos);
-            telemetry.addData("s2 position", s2pos);
+                if (angle < -180) {
+                    angle += 360;
+                }
+                if (angle > 180) {
+                    angle -= 360;
+                }
+                if (angle > 90) {
+                    if (angle < 135) {
+                        angle = 180;
+                    } else {
+                        angle = -90;
+                    }
+                }
+                pos = (-angle + 90) / 270;
 
-            if (gamepad1.left_bumper) {
-                s1pos=0;
-                s2pos=1;
+
+                s1.setPosition(pos);
+                s2.setPosition(1 - pos);
+
+                telemetry.addData("Servo 1 pos", pos);
+                telemetry.addData("Servo 2 pos", 1 - pos);
+                telemetry.addData("Angle", angle);
+                telemetry.update();
             }
-
-            if (gamepad1.right_bumper) {
-                s1pos=1;
-                s2pos=0;
-            }
-
-            lbTriggered = gamepad1.left_bumper;
-            rbTriggered = gamepad1.right_bumper;
-
-            telemetry.update();
         }
     }
 }

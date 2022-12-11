@@ -4,21 +4,20 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
 public class Lift {
     // Config parameters
-    public static int liftLow = 330;
-    public static int liftMid = 515;
-    public static int liftHigh = 710;
+    public static int liftLow = 1221;
+    public static int liftMid = 1905;
+    public static int liftHigh = 2627;
     public static double grabPos = 0.5;
     public static double releasePos = 0.9;
     public static double waitTime = 1.5;
-    public static int liftCollectPos = 150;
-    public static int liftGrabPos = 0;
+    public static int liftHoverPos = 150;
+    public static int liftCollectPos = 0;
     public static int minHeightForArmRotation = 200;
     public static double yawArm1Default = 0;
     public static double yawArm2Default = 1;
@@ -81,8 +80,26 @@ public class Lift {
     }
 
     public void retract() {
-        setYawArmAngle(0);
         grabber.setPosition(grabPos);
+        lift1.setTargetPosition(liftHoverPos);
+        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift1.setPower(liftPower);
+        lift2.setTargetPosition(liftHoverPos);
+        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift2.setPower(liftPower);
+    }
+
+    public void retract(int pos) {
+        grabber.setPosition(grabPos);
+        lift1.setTargetPosition(pos);
+        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift1.setPower(liftPower);
+        lift2.setTargetPosition(pos);
+        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        lift2.setPower(liftPower);
+    }
+
+    public void collect() {
         lift1.setTargetPosition(liftCollectPos);
         lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         lift1.setPower(liftPower);
@@ -92,12 +109,7 @@ public class Lift {
     }
 
     public void grab() {
-        lift1.setTargetPosition(liftGrabPos);
-        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift1.setPower(liftPower);
-        lift2.setTargetPosition(liftGrabPos);
-        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift2.setPower(liftPower);
+        grabber.setPosition(grabPos);
     }
 
     public void deposit() {
@@ -113,9 +125,9 @@ public class Lift {
         }
         if (angle > 90) {
             if (angle < 135) {
-                angle = 90;
+                angle = -180;
             } else {
-                angle = 180;
+                angle = 90;
             }
         }
         double pos = (-angle + 90) / 270;

@@ -13,37 +13,27 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
 public class ScoringMech {
     public enum ScoringState {
-        RETRACTED,
-        EXTENDING,
-        EXTENDED,
-        GRABBING,
-        RETRACTING,
-        TRANSFERRING,
         LOWERED,
+        COLLECTING,
         LIFTING,
         CONTROLLING_ARM,
         DEPOSITING,
         LOWERING,
-        RESET
     }
 
     public ScoringState scoringState;
 
     Lift lift;
-    Intake intake;
 
     MultipleTelemetry telemetry;
 
     public final ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
-    public boolean previousIntakeGrabButton = false;
-
     public ScoringMech(HardwareMap hardwareMap, MultipleTelemetry multipleTelemetry) {
         lift = new Lift(hardwareMap, multipleTelemetry);
-        intake = new Intake(hardwareMap, multipleTelemetry);
     }
 
-    public void score(boolean intakeExtension, boolean intakeRetraction, boolean intakeGrabButton,
+    public void score(boolean intakeExtension, boolean intakeRetraction, boolean liftGrabButton,
                       boolean liftButtonHigh, boolean liftButtonMid, boolean liftButtonLow,
                       boolean depositButton, double yawArmY, double yawArmX, boolean cancelAutomation,
                       boolean yawArm0, boolean yawArm90, boolean yawArm180, boolean yawArm270) {
@@ -51,45 +41,6 @@ public class ScoringMech {
         telemetry.update();
 
         switch (scoringState) {
-            case RETRACTED:
-                intake.retractV4B();
-                if (intakeExtension) {
-                    scoringState = ScoringState.EXTENDING;
-                }
-                break;
-
-            case EXTENDING:
-                intake.extendV4B();
-                intake.release();
-                if (intakeGrabButton) {
-                    scoringState = ScoringState.GRABBING;
-                }
-                break;
-
-            case GRABBING:
-                intake.grab();
-                if (intakeRetraction) {
-                    eTime.reset();
-                    scoringState = ScoringState.RETRACTING;
-                }
-                if (intakeGrabButton && !previousIntakeGrabButton) {
-                    scoringState = ScoringState.EXTENDING;
-                }
-                break;
-
-            case RETRACTING:
-                intake.retractV4B();
-                if (eTime.time() < Intake.retractTime) {
-                    scoringState = ScoringState.TRANSFERRING;
-                }
-                break;
-            case TRANSFERRING:
-                lift.grab();
-                if (Math.abs(lift.getSlidePosition() - Lift.liftGrabPos) < 5){
-                    intake.release();
-                    scoringState = ScoringState.LOWERED;
-                }
-                break;
             case LOWERED:
                 if (liftButtonHigh) {
                     lift.extendHigh();
@@ -100,6 +51,24 @@ public class ScoringMech {
                 } else if (liftButtonLow) {
                     lift.extendLow();
                     scoringState = ScoringState.LIFTING;
+                } else if (liftGrabButton) {
+                    lift.collect();
+                    scoringState = ScoringState.COLLECTING;
+                }
+                break;
+            case COLLECTING:
+                if (liftButtonHigh) {
+                    lift.extendHigh();
+                    scoringState = ScoringState.LIFTING;
+                } else if (liftButtonMid) {
+                    lift.extendMid();
+                    scoringState = ScoringState.LIFTING;
+                } else if (liftButtonLow) {
+                    lift.extendLow();
+                    scoringState = ScoringState.LIFTING;
+                } else if (liftGrabButton) {
+                    lift.retract();
+                    scoringState = ScoringState.LOWERED;
                 }
                 break;
 
@@ -143,21 +112,13 @@ public class ScoringMech {
             case LOWERING:
                 lift.retract();
                 if (Math.abs(lift.getSlidePosition() - lift.getTargetPosition()) < 5) {
-                    scoringState = ScoringState.RETRACTED;
+                    scoringState = ScoringState.LOWERED;
                 }
-                break;
-
-            case RESET:
-                intake.release();
-                lift.retract();
-                scoringState = ScoringState.RETRACTED;
                 break;
         }
 
         if (cancelAutomation) {
-            scoringState = ScoringState.RESET;
+            scoringState = ScoringState.LOWERING;
         }
-
-        previousIntakeGrabButton = intakeGrabButton;
     }
 }
