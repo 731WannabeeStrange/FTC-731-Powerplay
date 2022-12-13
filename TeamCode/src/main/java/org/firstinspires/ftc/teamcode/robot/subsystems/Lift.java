@@ -11,17 +11,17 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
 public class Lift {
     // Config parameters
-    public static int liftLow = 1221;
-    public static int liftMid = 1905;
-    public static int liftHigh = 2627;
+    public static int liftLow = 330;
+    public static int liftMid = 515;
+    public static int liftHigh = 710;
     public static double grabPos = 0.5;
     public static double releasePos = 0.9;
     public static double waitTime = 1.5;
     public static int liftHoverPos = 150;
     public static int liftCollectPos = 0;
     public static int minHeightForArmRotation = 200;
-    public static double yawArm1Default = 0;
-    public static double yawArm2Default = 1;
+    public static double yawArm1Default = 0.7;
+    public static double yawArm2Default = 0.3;
     public static double liftPower = 0.3;
 
     public final Telemetry telemetry;

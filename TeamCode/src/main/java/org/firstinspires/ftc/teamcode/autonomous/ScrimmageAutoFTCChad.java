@@ -67,11 +67,16 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         lift = new Lift(hardwareMap, telemetry);
         pipeline = new AprilTagVisionPipeline();
         pipeline.init(hardwareMap, telemetry);
+
+        lift.grab();
         //
         while (!opModeIsActive() && !isStopRequested()) {
             location = pipeline.visionLoop(telemetry);
         }
+        telemetry.addData("Location", location);
+        telemetry.update();
 
+        /*
         lift.extendHigh();
         lift.setYawArmAngle(-180);
         moveToPosition(40, speed);
@@ -88,15 +93,28 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         for (int i = 0; i < cycles; i++) {
             cycle(i);
         }
+         */
 
+        lift.grab();
+        sleep(1000);
+        lift.extendMid();
+        moveToPosition(36, speed);
+        sleep(2000);
+        strafeToPosition(-12, speed);
+        sleep(2000);
+        lift.deposit();
+        sleep(2000);
+        strafeToPosition(12, speed);
+
+        sleep(2000);
         switch (location) {
             case LEFT:
-                moveToPosition(-24, speed);
-                break;
-            case MIDDLE:
+                strafeToPosition(-36, speed);
                 break;
             case RIGHT:
-                moveToPosition(20, speed);
+                strafeToPosition(36, speed);
+                break;
+            default:
                 break;
         }
     }

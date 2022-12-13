@@ -4,14 +4,24 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 
 @TeleOp
 public class ScrimmageTeleOpNoEncoders extends LinearOpMode {
+    public enum DepositState {
+        RELEASING,
+        WAITING,
+        GRABBING
+    }
+    public DepositState depositState = DepositState.GRABBING;
+
     Drivetrain dt;
     Lift lift;
+
+    ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -33,18 +43,37 @@ public class ScrimmageTeleOpNoEncoders extends LinearOpMode {
                     gamepad1.dpad_right
             );
 
-            lift.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+            lift.setPower((gamepad1.right_trigger - gamepad1.left_trigger) / 2);
             if (gamepad2.right_stick_y != 0 || gamepad2.right_stick_x != 0) {
                 lift.setYawArmAngle(Math.atan2(gamepad2.right_stick_y, gamepad2.right_stick_x));
             }
             if (gamepad2.dpad_right) {
                 lift.setYawArmAngle(0);
             } else if (gamepad2.dpad_up) {
-                lift.setYawArmAngle(90);
-            } else if (gamepad2.dpad_left) {
-                lift.setYawArmAngle(180);
-            } else if (gamepad2.dpad_down) {
                 lift.setYawArmAngle(-90);
+            } else if (gamepad2.dpad_left) {
+                lift.setYawArmAngle(-180);
+            } else if (gamepad2.dpad_down) {
+                lift.setYawArmAngle(90);
+            }
+
+            switch (depositState) {
+                case RELEASING:
+                    lift.grab();
+                    eTime.reset();
+                    depositState = DepositState.WAITING;
+                    break;
+                case WAITING:
+                    if (eTime.time() > 0.75) {
+                        depositState = DepositState.GRABBING;
+                    }
+                    break;
+                case GRABBING:
+                    lift.deposit();
+                    if (gamepad1.left_bumper) {
+                        depositState = DepositState.RELEASING;
+                    }
+                    break;
             }
 
             if (gamepad1.right_bumper) {

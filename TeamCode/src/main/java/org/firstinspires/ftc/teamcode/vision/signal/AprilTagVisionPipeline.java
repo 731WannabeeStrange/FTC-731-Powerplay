@@ -126,10 +126,13 @@ public class AprilTagVisionPipeline
                 case LEFT:
                 default:
                     location = Location.LEFT;
+                    break;
                 case MIDDLE:
                     location = Location.MIDDLE;
+                    break;
                 case RIGHT:
                     location = Location.RIGHT;
+                    break;
             }
         } catch(Exception ignored) {
 
