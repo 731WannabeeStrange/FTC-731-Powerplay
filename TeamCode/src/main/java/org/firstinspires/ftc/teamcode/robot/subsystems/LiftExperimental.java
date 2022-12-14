@@ -21,6 +21,7 @@ public class LiftExperimental {
     public static int liftCollectPos = 0;
     public static double yawArm1Default = 0.7;
     public static double yawArm2Default = 0.3;
+    public static int errorTolerance = 25;
 
     public final Telemetry telemetry;
 
@@ -31,6 +32,8 @@ public class LiftExperimental {
     public final ServoImplEx grabber;
 
     private int targetPosition = 0;
+    private int error1 = 0;
+    private int error2 = 0;
 
     private enum LiftState {
         HIGH,
@@ -101,43 +104,54 @@ public class LiftExperimental {
         yawArm2.setPosition(1 - pos);
     }
 
-    public int getSlidePosition() {
-        return lift1.getCurrentPosition();
-    }
+    public int getSlidePosition() { return lift1.getCurrentPosition(); }
 
     public int getTargetPosition() { return targetPosition; }
+
+    public boolean isBusy() { return Math.abs(error1) >= errorTolerance || Math.abs(error2) >= errorTolerance; }
 
     public void update() {
         switch (liftState) {
             case HIGH:
                 targetPosition = liftHigh;
-                lift1.setPower(P * (liftHigh - lift1.getCurrentPosition()));
-                lift2.setPower(P * (liftHigh - lift2.getCurrentPosition()));
+                error1 = targetPosition - lift1.getCurrentPosition();
+                error2 = targetPosition - lift2.getCurrentPosition();
+                lift1.setPower(P * error1);
+                lift2.setPower(P * error2);
 
                 break;
             case MID:
                 targetPosition = liftMid;
-                lift1.setPower(P * (liftMid - lift1.getCurrentPosition()));
-                lift2.setPower(P * (liftMid - lift2.getCurrentPosition()));
+                error1 = targetPosition - lift1.getCurrentPosition();
+                error2 = targetPosition - lift2.getCurrentPosition();
+                lift1.setPower(P * error1);
+                lift2.setPower(P * error2);
 
                 break;
             case LOW:
                 targetPosition = liftLow;
-                lift1.setPower(P * (liftLow - lift1.getCurrentPosition()));
-                lift2.setPower(P * (liftLow - lift2.getCurrentPosition()));
+                error1 = targetPosition - lift1.getCurrentPosition();
+                error2 = targetPosition - lift2.getCurrentPosition();
+                lift1.setPower(P * error1);
+                lift2.setPower(P * error2);
 
                 break;
             case RETRACT:
-                targetPosition = liftHoverPos;
                 grabber.setPosition(grabPos);
-                lift1.setPower(P * (liftHoverPos - lift1.getCurrentPosition()));
-                lift2.setPower(P * (liftHoverPos - lift2.getCurrentPosition()));
+
+                targetPosition = liftHoverPos;
+                error1 = targetPosition - lift1.getCurrentPosition();
+                error2 = targetPosition - lift2.getCurrentPosition();
+                lift1.setPower(P * error1);
+                lift2.setPower(P * error2);
 
                 break;
             case COLLECT:
                 targetPosition = liftCollectPos;
-                lift1.setPower(P * (liftCollectPos - lift1.getCurrentPosition()));
-                lift2.setPower(P * (liftCollectPos - lift2.getCurrentPosition()));
+                error1 = targetPosition - lift1.getCurrentPosition();
+                error2 = targetPosition - lift2.getCurrentPosition();
+                lift1.setPower(P * error1);
+                lift2.setPower(P * error2);
 
                 break;
         }
