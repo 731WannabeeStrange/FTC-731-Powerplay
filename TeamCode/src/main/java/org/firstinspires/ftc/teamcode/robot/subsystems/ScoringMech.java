@@ -23,7 +23,8 @@ public class ScoringMech {
         LIFTING,
         CONTROLLING_ARM,
         DEPOSITING,
-        LOWERING,
+        LOWERING_PARTIALLY,
+        LOWERING_FULLY,
         RESET
     }
 
@@ -134,13 +135,21 @@ public class ScoringMech {
 
             case DEPOSITING:
                 lift.deposit();
-                if (eTime.time() > Lift.waitTime) {
+                if (!lift.grabber.isBusy()) {
                     lift.grab();
-                    scoringState = ScoringState.LOWERING;
+                    lift.setYawArmAngle(0);
+                    scoringState = ScoringState.LOWERING_PARTIALLY;
                 }
                 break;
 
-            case LOWERING:
+            case LOWERING_PARTIALLY:
+                lift.retract(Lift.minHeightForArmRotation);
+                if (!lift.yawArm.isBusy()) {
+                    scoringState = ScoringState.LOWERING_FULLY;
+                }
+                break;
+
+            case LOWERING_FULLY:
                 lift.retract();
                 if (Math.abs(lift.getSlidePosition() - lift.getTargetPosition()) < 5) {
                     scoringState = ScoringState.RETRACTED;

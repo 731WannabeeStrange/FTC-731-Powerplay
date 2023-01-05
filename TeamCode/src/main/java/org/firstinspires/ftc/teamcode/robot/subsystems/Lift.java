@@ -7,6 +7,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServo;
+import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServoPair;
+import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 
 @Config
 public class Lift {
@@ -20,26 +23,23 @@ public class Lift {
     public static int hoverPos = 150;
     public static int collectPos = 0;
     public static int minHeightForArmRotation = 200;
-    public static double yawArm1Default = 0.7;
-    public static double yawArm2Default = 0.3;
+    public static double yawArmDefaultPos = 0.7;
     public static double liftPower = 0.3;
 
     public final Telemetry telemetry;
 
     public final DcMotorEx lift1;
     public final DcMotorEx lift2;
-    public final ServoImplEx yawArm1;
-    public final ServoImplEx yawArm2;
-    public final ServoImplEx grabber;
+    public ProfiledServoPair yawArm;
+    public ProfiledServo grabber;
 
     public Lift(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
 
         lift1 = hardwareMap.get(DcMotorEx.class, "lift1");
         lift2 = hardwareMap.get(DcMotorEx.class, "lift2");
-        yawArm1 = hardwareMap.get(ServoImplEx.class, "yaw1");
-        yawArm2 = hardwareMap.get(ServoImplEx.class, "yaw2");
-        grabber = hardwareMap.get(ServoImplEx.class, "grab");
+        yawArm = new ProfiledServoPair(hardwareMap, "yaw1", "yaw2", new MotionConstraint(1, 1, 1), yawArmDefaultPos);
+        grabber = new ProfiledServo(hardwareMap, "grab", new MotionConstraint(1, 1, 1), grabPos);
 
         lift1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         lift1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -47,10 +47,6 @@ public class Lift {
         lift2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         lift2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         lift2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-        yawArm1.setPosition(yawArm1Default);
-        yawArm2.setPosition(yawArm2Default);
-        grabber.setPosition(grabPos);
     }
 
     public void extendHigh() {
@@ -132,8 +128,7 @@ public class Lift {
             }
         }
         double pos = (-angle + 90) / 270;
-        yawArm1.setPosition(pos);
-        yawArm2.setPosition(1 - pos);
+        yawArm.setPosition(pos);
     }
 
     public int getSlidePosition() {

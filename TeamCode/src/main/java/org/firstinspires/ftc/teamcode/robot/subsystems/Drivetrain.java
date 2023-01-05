@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @Config
-public class Drivetrain {
+public class Drivetrain extends Subsystem {
     public final Telemetry telemetry;
 
     public final BNO055IMU imu;
@@ -217,5 +217,10 @@ public class Drivetrain {
         }
 
         return angle;
+    }
+
+    @Override
+    public void periodic() {
+
     }
 }
