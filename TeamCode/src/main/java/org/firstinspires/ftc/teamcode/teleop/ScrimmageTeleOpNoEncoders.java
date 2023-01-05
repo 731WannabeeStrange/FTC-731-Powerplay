@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
+import org.firstinspires.ftc.teamcode.robot.subsystems.LiftExperimental;
 
 @TeleOp
 public class ScrimmageTeleOpNoEncoders extends LinearOpMode {
@@ -19,7 +20,7 @@ public class ScrimmageTeleOpNoEncoders extends LinearOpMode {
     public DepositState depositState = DepositState.GRABBING;
 
     Drivetrain dt;
-    Lift lift;
+    LiftExperimental lift;
 
     ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
@@ -27,7 +28,7 @@ public class ScrimmageTeleOpNoEncoders extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         MultipleTelemetry multipleTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         dt = new Drivetrain(hardwareMap, telemetry);
-        lift = new Lift(hardwareMap, telemetry);
+        lift = new LiftExperimental(hardwareMap, telemetry);
 
         waitForStart();
 
@@ -43,7 +44,16 @@ public class ScrimmageTeleOpNoEncoders extends LinearOpMode {
                     gamepad1.dpad_right
             );
 
-            lift.setPower((gamepad1.right_trigger - gamepad1.left_trigger) / 2);
+            //lift.setPower((gamepad1.right_trigger - gamepad1.left_trigger) / 2);
+            if (gamepad1.y) {
+                lift.extendHigh();
+            } else if (gamepad1.b) {
+                lift.extendMid();
+            } else if (gamepad1.a) {
+                lift.extendLow();
+            } else if (gamepad1.x) {
+                lift.collect();
+            }
             if (gamepad2.right_stick_y != 0 || gamepad2.right_stick_x != 0) {
                 lift.setYawArmAngle(Math.atan2(gamepad2.right_stick_y, gamepad2.right_stick_x));
             }
@@ -81,6 +91,8 @@ public class ScrimmageTeleOpNoEncoders extends LinearOpMode {
             } else if (gamepad1.left_bumper) {
                 lift.grab();
             }
+
+            lift.update();
         }
     }
 }

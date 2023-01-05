@@ -5,16 +5,17 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
 public class LiftExperimental {
     // Config parameters
-    public static double P = 0.005;
-    public static int liftLow = 330;
-    public static int liftMid = 515;
-    public static int liftHigh = 710;
+    public static double P = 0.006;
+    public static int liftLow = 390;
+    public static int liftMid = 600;
+    public static int liftHigh = 850;
     public static double grabPos = 0.5;
     public static double releasePos = 0.9;
     public static int liftHoverPos = 150;
@@ -22,7 +23,7 @@ public class LiftExperimental {
     public static double yawArm1Default = 0.7;
     public static double yawArm2Default = 0.3;
     public static int errorTolerance = 25;
-
+    public static double grabTime = 0.75;
     public final Telemetry telemetry;
 
     public final DcMotorEx lift1;
@@ -44,6 +45,16 @@ public class LiftExperimental {
     }
 
     private LiftState liftState = LiftState.RETRACT;
+
+    private enum GrabberState {
+        HOLD,
+        RELEASE,
+        DEPOSITING
+    }
+
+    private GrabberState grabberState = GrabberState.HOLD;
+
+    private ElapsedTime grabTimer = new ElapsedTime();
 
     public LiftExperimental(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
@@ -77,12 +88,10 @@ public class LiftExperimental {
 
     public void collect() { liftState = LiftState.COLLECT; }
 
-    public void grab() {
-        grabber.setPosition(grabPos);
-    }
+    public void grab() { grabberState = GrabberState.HOLD; }
 
     public void deposit() {
-        grabber.setPosition(releasePos);
+        grabberState = GrabberState.RELEASE;
     }
 
     public void setYawArmAngle(double angle) {
@@ -153,6 +162,22 @@ public class LiftExperimental {
                 lift1.setPower(P * error1);
                 lift2.setPower(P * error2);
 
+                break;
+        }
+
+        switch (grabberState) {
+            case HOLD:
+                grabber.setPosition(grabPos);
+                break;
+            case RELEASE:
+                grabber.setPosition(releasePos);
+                grabberState = GrabberState.DEPOSITING;
+                grabTimer.reset();
+                break;
+            case DEPOSITING:
+                if (grabTimer.time() > grabTime) {
+                    grabberState = GrabberState.HOLD;
+                }
                 break;
         }
     }
