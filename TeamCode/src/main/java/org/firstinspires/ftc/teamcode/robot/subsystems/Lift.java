@@ -17,8 +17,8 @@ public class Lift {
     public static double grabPos = 0.5;
     public static double releasePos = 0.9;
     public static double waitTime = 1.5;
-    public static int liftHoverPos = 150;
-    public static int liftCollectPos = 0;
+    public static int hoverPos = 150;
+    public static int collectPos = 0;
     public static int minHeightForArmRotation = 200;
     public static double yawArm1Default = 0.7;
     public static double yawArm2Default = 0.3;
@@ -82,10 +82,10 @@ public class Lift {
 
     public void retract() {
         grabber.setPosition(grabPos);
-        lift1.setTargetPosition(liftHoverPos);
+        lift1.setTargetPosition(hoverPos);
         lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         lift1.setPower(liftPower);
-        lift2.setTargetPosition(liftHoverPos);
+        lift2.setTargetPosition(hoverPos);
         lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         lift2.setPower(liftPower);
     }
@@ -101,10 +101,10 @@ public class Lift {
     }
 
     public void collect() {
-        lift1.setTargetPosition(liftCollectPos);
+        lift1.setTargetPosition(collectPos);
         lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         lift1.setPower(liftPower);
-        lift2.setTargetPosition(liftCollectPos);
+        lift2.setTargetPosition(collectPos);
         lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         lift2.setPower(liftPower);
     }

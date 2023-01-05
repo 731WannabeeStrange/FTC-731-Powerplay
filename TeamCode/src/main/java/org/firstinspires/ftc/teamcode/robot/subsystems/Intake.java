@@ -1,4 +1,3 @@
-/*
 package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -115,4 +114,4 @@ public class Intake {
     public int getSlidePosition() {
         return slide1.getCurrentPosition();
     }
-}*/
+}
