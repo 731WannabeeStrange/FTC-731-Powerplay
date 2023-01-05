@@ -51,4 +51,8 @@ public class ProfiledServoPair {
         servo1.setPosition(1 - pos);
         servo2.setPosition(pos);
     }
+
+    public void setPosition(double endPosition) {
+        this.endPosition = endPosition;
+    }
 }
