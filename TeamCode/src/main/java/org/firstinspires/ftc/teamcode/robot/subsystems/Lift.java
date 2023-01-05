@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServoPair;
 import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 
 @Config
-public class Lift {
+public class Lift extends Subsystem {
     // Config parameters
     public static int liftLow = 330;
     public static int liftMid = 515;
@@ -144,5 +144,11 @@ public class Lift {
         lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lift1.setPower(power);
         lift2.setPower(power);
+    }
+
+    @Override
+    public void periodic() {
+        yawArm.periodic();
+        grabber.periodic();
     }
 }
