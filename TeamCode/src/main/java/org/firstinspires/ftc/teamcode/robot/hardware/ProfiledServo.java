@@ -21,7 +21,7 @@ public class ProfiledServo {
 
     public ProfiledServo(HardwareMap hwMap, String name, MotionConstraint constraints, double initialPosition) {
         servo = hwMap.get(Servo.class, name);
-        this.name = name;
+        this.name = name + " ";
         this.endPosition = initialPosition;
         this.currentPosition = initialPosition;
         this.previousEndPosition = initialPosition + 100;
