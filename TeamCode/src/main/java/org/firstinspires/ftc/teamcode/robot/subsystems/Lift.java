@@ -5,15 +5,16 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
 public class Lift {
     // Config parameters
-    public static int liftLow = 330;
-    public static int liftMid = 515;
-    public static int liftHigh = 710;
+    public static int liftLow = 390;
+    public static int liftMid = 600;
+    public static int liftHigh = 850;
     public static double grabPos = 0.5;
     public static double releasePos = 0.9;
     public static double waitTime = 1.5;
@@ -22,7 +23,10 @@ public class Lift {
     public static int minHeightForArmRotation = 200;
     public static double yawArm1Default = 0.7;
     public static double yawArm2Default = 0.3;
-    public static double liftPower = 0.3;
+
+    public static double P = 0.006;
+    public static int errorTolerance = 25;
+    public static double grabTime = 0.75;
 
     public final Telemetry telemetry;
 
@@ -31,6 +35,30 @@ public class Lift {
     public final ServoImplEx yawArm1;
     public final ServoImplEx yawArm2;
     public final ServoImplEx grabber;
+
+    private int targetPosition = 0;
+    private int error1 = 0;
+    private int error2 = 0;
+
+    private enum LiftState {
+        HIGH,
+        MID,
+        LOW,
+        RETRACT,
+        COLLECT
+    }
+
+    private LiftState liftState = LiftState.RETRACT;
+
+    private enum GrabberState {
+        HOLD,
+        RELEASE,
+        DEPOSITING
+    }
+
+    private GrabberState grabberState = GrabberState.HOLD;
+
+    private final ElapsedTime grabTimer = new ElapsedTime();
 
     public Lift(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
@@ -53,68 +81,22 @@ public class Lift {
         grabber.setPosition(grabPos);
     }
 
-    public void extendHigh() {
-        lift1.setTargetPosition(liftHigh);
-        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift1.setPower(liftPower);
-        lift2.setTargetPosition(liftHigh);
-        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift2.setPower(liftPower);
-    }
+    public void extendHigh() { liftState = LiftState.HIGH; }
 
-    public void extendMid() {
-        lift1.setTargetPosition(liftMid);
-        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift1.setPower(liftPower);
-        lift2.setTargetPosition(liftMid);
-        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift2.setPower(liftPower);
-    }
+    public void extendMid() { liftState = LiftState.MID; }
 
-    public void extendLow() {
-        lift1.setTargetPosition(liftLow);
-        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift1.setPower(liftPower);
-        lift2.setTargetPosition(liftLow);
-        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift2.setPower(liftPower);
-    }
+    public void extendLow() { liftState = LiftState.LOW; }
 
-    public void retract() {
-        grabber.setPosition(grabPos);
-        lift1.setTargetPosition(hoverPos);
-        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift1.setPower(liftPower);
-        lift2.setTargetPosition(hoverPos);
-        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift2.setPower(liftPower);
-    }
+    public void retract() { liftState = LiftState.RETRACT; }
+    public void retract(int pos) { liftState = LiftState.RETRACT; } // ignores pos argument for now,
+                                                                    // can change in the future
 
-    public void retract(int pos) {
-        grabber.setPosition(grabPos);
-        lift1.setTargetPosition(pos);
-        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift1.setPower(liftPower);
-        lift2.setTargetPosition(pos);
-        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift2.setPower(liftPower);
-    }
+    public void collect() { liftState = LiftState.COLLECT; }
 
-    public void collect() {
-        lift1.setTargetPosition(collectPos);
-        lift1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift1.setPower(liftPower);
-        lift2.setTargetPosition(collectPos);
-        lift2.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift2.setPower(liftPower);
-    }
-
-    public void grab() {
-        grabber.setPosition(grabPos);
-    }
+    public void grab() { grabberState = GrabberState.HOLD; }
 
     public void deposit() {
-        grabber.setPosition(releasePos);
+        grabberState = GrabberState.RELEASE;
     }
 
     public void setYawArmAngle(double angle) {
@@ -136,18 +118,51 @@ public class Lift {
         yawArm2.setPosition(1 - pos);
     }
 
-    public int getSlidePosition() {
-        return lift1.getCurrentPosition();
-    }
+    public int getSlidePosition() { return lift1.getCurrentPosition(); }
 
-    public int getTargetPosition() {
-        return lift2.getTargetPosition();
-    }
+    public int getTargetPosition() { return targetPosition; }
 
-    public void setPower(double power) {
-        lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        lift1.setPower(power);
-        lift2.setPower(power);
+    public boolean isBusy() { return Math.abs(error1) >= errorTolerance || Math.abs(error2) >= errorTolerance; }
+
+    public void update() {
+        switch (liftState) {
+            case HIGH:
+                targetPosition = liftHigh;
+                break;
+            case MID:
+                targetPosition = liftMid;
+                break;
+            case LOW:
+                targetPosition = liftLow;
+                break;
+            case RETRACT:
+                grabber.setPosition(grabPos);
+                targetPosition = hoverPos;
+                break;
+            case COLLECT:
+                targetPosition = collectPos;
+                break;
+        }
+        error1 = targetPosition - lift1.getCurrentPosition();
+        error2 = targetPosition - lift2.getCurrentPosition();
+
+        lift1.setPower(P * error1);
+        lift2.setPower(P * error2);
+
+        switch (grabberState) {
+            case HOLD:
+                grabber.setPosition(grabPos);
+                break;
+            case RELEASE:
+                grabber.setPosition(releasePos);
+                grabberState = GrabberState.DEPOSITING;
+                grabTimer.reset();
+                break;
+            case DEPOSITING:
+                if (grabTimer.time() > grabTime) {
+                    grabberState = GrabberState.HOLD;
+                }
+                break;
+        }
     }
 }

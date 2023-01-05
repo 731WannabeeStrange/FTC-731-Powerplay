@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
-import org.firstinspires.ftc.teamcode.robot.subsystems.LiftExperimental;
 
 @TeleOp
 public class ScrimmageTeleOpNoEncoders extends LinearOpMode {
@@ -20,7 +19,7 @@ public class ScrimmageTeleOpNoEncoders extends LinearOpMode {
     public DepositState depositState = DepositState.GRABBING;
 
     Drivetrain dt;
-    LiftExperimental lift;
+    Lift lift;
 
     ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
@@ -28,7 +27,7 @@ public class ScrimmageTeleOpNoEncoders extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         MultipleTelemetry multipleTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         dt = new Drivetrain(hardwareMap, telemetry);
-        lift = new LiftExperimental(hardwareMap, telemetry);
+        lift = new Lift(hardwareMap, telemetry);
 
         waitForStart();
 
