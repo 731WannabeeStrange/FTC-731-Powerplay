@@ -12,8 +12,9 @@ public class ProfiledServo {
     public Servo servo;
     protected double endPosition;
     protected double previousEndPosition;
-    protected double currentPosition;
+    public double currentPosition;
     protected String name;
+    public double initialPosition;
 
     public AsymmetricMotionProfile profile;
     public MotionConstraint constraints;
@@ -26,11 +27,13 @@ public class ProfiledServo {
         this.currentPosition = initialPosition;
         this.previousEndPosition = initialPosition + 100;
         this.constraints = constraints;
+        this.profile = new AsymmetricMotionProfile(initialPosition, initialPosition, constraints);
         setPosition(initialPosition);
     }
 
     protected void regenerate_profile() {
         profile = new AsymmetricMotionProfile(this.currentPosition, this.endPosition, constraints);
+        initialPosition = this.currentPosition;
         timer.reset();
     }
 
@@ -39,9 +42,10 @@ public class ProfiledServo {
             regenerate_profile();
         }
         previousEndPosition = endPosition;
-        double current_target = profile.getState(timer.seconds()).getX();
-        setPosition(current_target);
-        Dashboard.packet.put(name + "position: ", current_target);
+        int multiplier = initialPosition > endPosition ? -1 : 1;
+        currentPosition = multiplier * profile.getState(timer.seconds()).getX() + initialPosition;
+        servo.setPosition(currentPosition);
+        Dashboard.packet.put(name + "position", currentPosition);
     }
 
     public boolean isBusy() {

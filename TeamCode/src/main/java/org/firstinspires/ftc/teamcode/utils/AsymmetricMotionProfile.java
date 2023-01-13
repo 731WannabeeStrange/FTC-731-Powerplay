@@ -7,10 +7,10 @@ public class AsymmetricMotionProfile {
     public final double initialPosition;
     public final double finalPosition;
     public final MotionConstraint constraints;
-    protected double accelTime;
-    protected double coastTime;
-    protected double decelTime;
-    protected double profileDuration;
+    public double accelTime;
+    public double coastTime;
+    public double decelTime;
+    protected double profileDuration = 0;
     protected double distance;
 
     public AsymmetricMotionProfile(double initialPosition, double finalPosition, MotionConstraint constraints) {
@@ -26,8 +26,7 @@ public class AsymmetricMotionProfile {
         this.accelTime = Math.abs(constraints.maxVelo) / Math.abs(constraints.maxAccel);
         this.decelTime = Math.abs(constraints.maxVelo) / Math.abs(constraints.maxDecel);
 
-        double averageDt = (this.accelTime + this.decelTime) / 2;
-        this.coastTime = Math.abs(distance) / Math.abs(constraints.maxVelo) - averageDt;
+        this.coastTime = Math.abs(distance) / Math.abs(constraints.maxVelo) - (accelTime + decelTime) / 2;
 
         if (this.coastTime < 0) {
             this.coastTime = 0;
@@ -38,8 +37,8 @@ public class AsymmetricMotionProfile {
                 constraints.maxDecel = Math.abs(constraints.maxAccel);
             }
 
-            this.accelTime = Math.sqrt(Math.abs(distance)/Math.abs(constraints.maxAccel));
-            this.decelTime = Math.sqrt(Math.abs(distance)/Math.abs(constraints.maxDecel));
+            this.accelTime = Math.sqrt(Math.abs(distance) / Math.abs(constraints.maxAccel));
+            this.decelTime = Math.sqrt(Math.abs(distance) / Math.abs(constraints.maxDecel));
         }
 
         this.profileDuration = this.accelTime + this.coastTime + this.decelTime;
@@ -56,24 +55,24 @@ public class AsymmetricMotionProfile {
             position = 0.5 * acceleration * Math.pow(seconds, 2);
         } else if (seconds <= this.accelTime + this.coastTime) {
             acceleration = 0;
-            velocity = Math.abs(getState(this.accelTime).getV());
-            position = Math.abs(getState(this.accelTime).getX()) + constraints.maxVelo * (seconds - this.accelTime);
+            velocity = getState(this.accelTime).getV();
+            position = getState(this.accelTime).getX() + constraints.maxVelo * (seconds - this.accelTime);
         } else if (seconds <= this.accelTime + this.coastTime + this.decelTime) {
             acceleration = Math.abs(constraints.maxDecel);
             double coastVelocity = Math.abs(getState(this.accelTime).getV());
             velocity = coastVelocity - (seconds - this.accelTime - this.coastTime) * acceleration;
             double endOfCoastTime = this.accelTime + this.coastTime;
-            double endOfCoastPosition = Math.abs(getState(endOfCoastTime).getX());
+            double endOfCoastPosition = getState(endOfCoastTime).getX();
             position = endOfCoastPosition + coastVelocity * (seconds - endOfCoastTime) - 0.5 * acceleration * Math.pow(seconds - endOfCoastTime, 2);
             acceleration *= -1;
         } else {
             acceleration = 0;
             velocity = 0;
-            position = distance;
+            return new MotionState(Math.abs(distance),
+                    velocity * Math.signum(distance), acceleration * Math.signum(distance));
         }
 
-        return new MotionState(this.initialPosition + position * Math.signum(distance),
-                velocity * Math.signum(distance), acceleration * Math.signum(distance));
+        return new MotionState(position, velocity, acceleration);
     }
 
     public double getProfileDuration() {

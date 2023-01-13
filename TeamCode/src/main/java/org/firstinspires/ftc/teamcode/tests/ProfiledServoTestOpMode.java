@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServo;
+import org.firstinspires.ftc.teamcode.utils.Dashboard;
 import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 
 @TeleOp
@@ -16,8 +17,8 @@ public class ProfiledServoTestOpMode extends LinearOpMode
 {
     private ProfiledServo servo;
 
-    private double initialPos = 1;
-    private double finalPos = 0;
+    public static double initialPos = 0.45;
+    public static double finalPos = 0.7;
 
     private double position = initialPos;
 
@@ -27,7 +28,7 @@ public class ProfiledServoTestOpMode extends LinearOpMode
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        servo = new ProfiledServo(hardwareMap, "s1", new MotionConstraint(0.5, 0.5, 0.5), initialPos);
+        servo = new ProfiledServo(hardwareMap, "s1", new MotionConstraint(1, 4, 4), initialPos);
 
         telemetry.addData("Mode", "waiting for start");
         telemetry.update();
@@ -44,6 +45,13 @@ public class ProfiledServoTestOpMode extends LinearOpMode
             telemetry.addData("servo position", position);
             telemetry.addData("is busy", servo.isBusy());
             telemetry.addData("constraints", servo.constraints);
+            telemetry.addData("timer", servo.timer.time());
+            telemetry.addData("profile duration", servo.profile.getProfileDuration());
+            telemetry.addData("set position", servo.currentPosition);
+            telemetry.addData("accel time", servo.profile.accelTime);
+            telemetry.addData("coast time", servo.profile.coastTime);
+            telemetry.addData("decel time", servo.profile.decelTime);
+
 
             if (gamepad1.left_bumper && !lbTriggered) {
                 position = initialPos;
@@ -59,6 +67,7 @@ public class ProfiledServoTestOpMode extends LinearOpMode
             servo.periodic();
 
             telemetry.update();
+            Dashboard.periodic();
         }
     }
 }
