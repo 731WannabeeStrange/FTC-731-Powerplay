@@ -9,10 +9,10 @@ import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 
 public class Dashboard {
     public static TelemetryPacket packet = new TelemetryPacket();
-    FtcDashboard dashboard = FtcDashboard.getInstance();
-    ElapsedTime dashboardTimer = new ElapsedTime();
+    static FtcDashboard dashboard = FtcDashboard.getInstance();
+    static ElapsedTime dashboardTimer = new ElapsedTime();
 
-    public void periodic() {
+    public static void periodic() {
         dashboard.sendTelemetryPacket(packet);
         packet = new TelemetryPacket();
         packet.put("Loop time", dashboardTimer.milliseconds());
