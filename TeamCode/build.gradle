@@ -30,8 +30,7 @@ android {
 }
 
 repositories {
-    // Add this line
-    maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.catboy.camp' }
 }
 
 dependencies {
@@ -44,6 +43,5 @@ dependencies {
     implementation 'org.openftc:apriltag:1.1.0'
     implementation 'org.ftclib.ftclib:core:2.0.1'
 
-    implementation files('lib/ftc265-3.0.0-pre.5.aar')
-    implementation 'com.github.cansik:librealsense-java:2.50.0-0.5.0'
+    implementation 'com.spartronics4915.lib:ftc265:2.1.9'
 }
