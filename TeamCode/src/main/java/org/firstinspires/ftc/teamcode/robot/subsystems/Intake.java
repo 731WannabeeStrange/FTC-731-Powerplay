@@ -19,6 +19,7 @@ public class Intake {
     public static double v4b1ExtendedPos = 1;
     public static double v4b2RetractedPos = 1;
     public static double v4b2ExtendedPos = 0;
+    public static int autoExtension = 500;
     public static int[][] stackPositions = {
             {0, 0},
             {0, 0},
@@ -113,5 +114,9 @@ public class Intake {
 
     public int getSlidePosition() {
         return slide1.getCurrentPosition();
+    }
+
+    public boolean isBusy() {
+        return slide1.isBusy() || slide2.isBusy();
     }
 }
