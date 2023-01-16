@@ -137,6 +137,7 @@ public class Lift {
                 break;
             case RETRACT:
                 grabber.setPosition(grabPos);
+                setYawArmAngle(0);
                 targetPosition = hoverPos;
                 break;
             case COLLECT:
