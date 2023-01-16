@@ -12,6 +12,7 @@ public class ProfiledServoPair {
     protected double endPosition;
     protected double previousEndPosition;
     protected double currentPosition;
+    public double initialPosition;
     protected String name;
 
     public AsymmetricMotionProfile profile;
@@ -21,7 +22,7 @@ public class ProfiledServoPair {
     public ProfiledServoPair(HardwareMap hwMap, String name1, String name2, MotionConstraint constraints, double initialPosition) {
         this.servo1 = new ProfiledServo(hwMap, name1, constraints, initialPosition);
         this.servo2 = new ProfiledServo(hwMap, name2, constraints,  1 - initialPosition);
-        this.name = servo1.name + " " + servo2.name;
+        this.name = servo1.name + " " + servo2.name + " pair ";
         this.endPosition = initialPosition;
         this.currentPosition = initialPosition;
         this.previousEndPosition = initialPosition + 100; // just guarantee that they are not equal
@@ -30,6 +31,7 @@ public class ProfiledServoPair {
 
     protected void regenerate_profile() {
         profile = new AsymmetricMotionProfile(this.currentPosition, this.endPosition, constraints);
+        initialPosition = this.currentPosition;
         timer.reset();
     }
 
@@ -38,9 +40,10 @@ public class ProfiledServoPair {
             regenerate_profile();
         }
         previousEndPosition = endPosition;
-        double current_target = profile.getState(timer.seconds()).getX();
-        setPositionsSynced(current_target);
-        Dashboard.packet.put(name + "position: ", current_target);
+        int multiplier = initialPosition > endPosition ? -1 : 1;
+        currentPosition = multiplier * profile.getState(timer.seconds()).getX() + initialPosition;
+        setPositionsSynced(currentPosition);
+        Dashboard.packet.put(name + "position", currentPosition);
     }
 
     public boolean isBusy() {
