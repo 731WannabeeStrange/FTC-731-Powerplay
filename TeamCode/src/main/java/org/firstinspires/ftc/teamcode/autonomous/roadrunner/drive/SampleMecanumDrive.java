@@ -26,6 +26,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.teamcode.autonomous.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.autonomous.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
@@ -147,6 +148,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
         //setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap));
+        setLocalizer(new T265Localizer(hardwareMap, this, true));
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
     }
@@ -314,6 +316,11 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public static TrajectoryAccelerationConstraint getAccelerationConstraint(double maxAccel) {
         return new ProfileAccelerationConstraint(maxAccel);
+    }
+
+    public T265Camera.PoseConfidence getPoseConfidence() {
+        // will throw an exception if called while not using T265Localizer
+        return ((T265Localizer) this.getLocalizer()).getConfidence();
     }
 
     @Override

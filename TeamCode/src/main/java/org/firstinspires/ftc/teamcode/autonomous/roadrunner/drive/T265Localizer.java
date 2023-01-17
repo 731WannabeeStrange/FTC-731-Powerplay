@@ -42,8 +42,9 @@ public class T265Localizer extends TwoTrackingWheelLocalizer {
     private T265Camera.PoseConfidence poseConfidence;
 
     private TwoWheelTrackingLocalizer wheelLocalizer;
+    private SampleMecanumDrive drive;
 
-    public T265Localizer(HardwareMap hardwareMap, boolean resetPos) {
+    public T265Localizer(HardwareMap hardwareMap, SampleMecanumDrive drive, boolean resetPos) {
         super(Arrays.asList(
                 new Pose2d(PARALLEL_X, PARALLEL_Y, 0),
                 new Pose2d(PERPENDICULAR_X, PERPENDICULAR_Y, Math.toRadians(90))
@@ -59,7 +60,7 @@ public class T265Localizer extends TwoTrackingWheelLocalizer {
         rawPose = new Pose2d();
 
         if (slamra == null) {
-            slamra = new T265Camera(new Transform2d(new Translation2d(0,0), new Rotation2d(0)), 0, hardwareMap.appContext);
+            slamra = new T265Camera(new Transform2d(new Translation2d(0,0), new Rotation2d(0)), 0.5, hardwareMap.appContext);
             System.out.println("731: Created Realsense object");
             setPoseEstimate(new Pose2d(0,0,0));
         }
@@ -75,6 +76,8 @@ public class T265Localizer extends TwoTrackingWheelLocalizer {
         if (slamra.getLastReceivedCameraUpdate().confidence == T265Camera.PoseConfidence.Failed) {
             System.out.println("731: Realsense failed to get position");
         }
+
+        this.drive = drive;
     }
 
     public static double encoderTicksToInches(double ticks) {
@@ -114,6 +117,10 @@ public class T265Localizer extends TwoTrackingWheelLocalizer {
         return norm(mPoseEstimate.getHeading());
     }
 
+    public Double getHeadingVelocity() {
+        return drive.getExternalHeadingVelocity();
+    }
+
     @Nullable
     @Override
     public Pose2d getPoseVelocity() {
@@ -123,6 +130,12 @@ public class T265Localizer extends TwoTrackingWheelLocalizer {
 
     @Override
     public void update() {
+        super.update();
+        Pose2d odometryVelocities = super.getPoseVelocity();
+
+        // Multiply by 0.0254 to convert inches to meters for ftc265 library
+        slamra.sendOdometry(odometryVelocities.getX() * 0.0254, odometryVelocities.getY() * 0.0254);
+
         cameraUpdate = slamra.getLastReceivedCameraUpdate();
         poseConfidence = cameraUpdate.confidence;
     }
