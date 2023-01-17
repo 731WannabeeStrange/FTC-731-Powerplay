@@ -41,10 +41,7 @@ public class T265Localizer extends TwoTrackingWheelLocalizer {
     public static T265Camera slamra;
     private T265Camera.PoseConfidence poseConfidence;
 
-    private TwoWheelTrackingLocalizer wheelLocalizer;
-    private SampleMecanumDrive drive;
-
-    public T265Localizer(HardwareMap hardwareMap, SampleMecanumDrive drive, boolean resetPos) {
+    public T265Localizer(HardwareMap hardwareMap, boolean resetPos) {
         super(Arrays.asList(
                 new Pose2d(PARALLEL_X, PARALLEL_Y, 0),
                 new Pose2d(PERPENDICULAR_X, PERPENDICULAR_Y, Math.toRadians(90))
@@ -76,8 +73,6 @@ public class T265Localizer extends TwoTrackingWheelLocalizer {
         if (slamra.getLastReceivedCameraUpdate().confidence == T265Camera.PoseConfidence.Failed) {
             System.out.println("731: Realsense failed to get position");
         }
-
-        this.drive = drive;
     }
 
     public static double encoderTicksToInches(double ticks) {
@@ -117,9 +112,7 @@ public class T265Localizer extends TwoTrackingWheelLocalizer {
         return norm(mPoseEstimate.getHeading());
     }
 
-    public Double getHeadingVelocity() {
-        return drive.getExternalHeadingVelocity();
-    }
+    public Double getHeadingVelocity() { return cameraUpdate.velocity.omegaRadiansPerSecond; }
 
     @Nullable
     @Override
