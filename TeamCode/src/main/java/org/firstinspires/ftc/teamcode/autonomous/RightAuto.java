@@ -8,7 +8,6 @@ import org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.SampleMecanumD
 import org.firstinspires.ftc.teamcode.autonomous.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
-import org.firstinspires.ftc.teamcode.vision.signal.AprilTagDetector;
 import org.firstinspires.ftc.teamcode.vision.signal.AprilTagVisionPipeline;
 import org.firstinspires.ftc.teamcode.vision.signal.Location;
 
@@ -19,8 +18,8 @@ public class RightAuto extends LinearOpMode {
 
     enum State {
         DRIVE_TO_SPOT,
-        CYCLE,
-        CYCLE_RESET,
+        DEPOSIT,
+        GRAB_CONE,
         COLLECT,
         PARK,
         IDLE
@@ -29,7 +28,7 @@ public class RightAuto extends LinearOpMode {
 
     Pose2d startPose = new Pose2d(-35, 64, Math.toRadians(90));
 
-    public int cycle = 1;
+    private int cycle = 1;
 
     SampleMecanumDrive drive;
     Lift lift;
@@ -76,22 +75,22 @@ public class RightAuto extends LinearOpMode {
             switch (state) {
                 case DRIVE_TO_SPOT:
                     if (!drive.isBusy()) {
-                        state = State.CYCLE;
+                        state = State.DEPOSIT;
                     }
                     break;
 
-                case CYCLE:
-                    cycle();
+                case DEPOSIT:
+                    deposit();
                     if (!lift.isBusy() && !lift.yawArm.isBusy()) {
                         lift.deposit();
                         if (!lift.grabber.isBusy()) {
-                            state = State.CYCLE_RESET;
+                            state = State.GRAB_CONE;
                         }
                     }
                     break;
 
-                case CYCLE_RESET:
-                    cycleReset();
+                case GRAB_CONE:
+                    grabCone();
 
                     if (!lift.isBusy() && !intake.isBusy() && !intake.v4b.isBusy()) {
                         state = State.COLLECT;
@@ -106,7 +105,8 @@ public class RightAuto extends LinearOpMode {
                         intake.release();
 
                         if (cycle < numCycles) {
-                            state = State.CYCLE;
+                            state = State.DEPOSIT;
+                            cycle++;
                         } else {
                             state = State.PARK;
                             switch (location) {
@@ -140,7 +140,7 @@ public class RightAuto extends LinearOpMode {
         }
     }
 
-    public void cycle() {
+    public void deposit() {
         intake.extendTicks(Intake.autoExtension, 0.5);
         lift.extendHigh();
         if (lift.getSlidePosition() > Lift.minHeightForArmRotation) {
@@ -148,7 +148,7 @@ public class RightAuto extends LinearOpMode {
         }
     }
 
-    public void cycleReset() {
+    public void grabCone() {
         lift.retract();
         intake.grab();
         if (!intake.claw.isBusy()) {
