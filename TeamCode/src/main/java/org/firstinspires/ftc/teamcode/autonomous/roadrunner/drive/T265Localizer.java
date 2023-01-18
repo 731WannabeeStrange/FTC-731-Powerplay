@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
+import com.acmerobotics.roadrunner.util.Angle;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
@@ -86,7 +87,7 @@ public class T265Localizer extends TwoTrackingWheelLocalizer {
             Translation2d oldPose = cameraUpdate.pose.getTranslation();
             Rotation2d oldRot = cameraUpdate.pose.getRotation();
             //The T265's unit of measurement is meters.  dividing it by .0254 converts meters to inches.
-            rawPose = new Pose2d(oldPose.getX() / .0254, oldPose.getY() / .0254, norm(oldRot.getRadians())); //raw pos
+            rawPose = new Pose2d(oldPose.getX() / .0254, oldPose.getY() / .0254, Angle.norm(oldRot.getRadians())); //raw pos
             mPoseEstimate = rawPose.plus(poseOffset); //offsets the pose to be what the pose estimate is;
         } else {
             System.out.println("731: Null camera update");
@@ -97,6 +98,8 @@ public class T265Localizer extends TwoTrackingWheelLocalizer {
 
     @Override
     public void setPoseEstimate(@NonNull Pose2d pose2d) {
+        super.setPoseEstimate(pose2d);
+
         pose2d = new Pose2d(pose2d.getX(),pose2d.getY(),0);
         System.out.println("731: Setting pose estimate to " + pose2d.toString());
         poseOffset = pose2d.minus(rawPose);
@@ -109,7 +112,7 @@ public class T265Localizer extends TwoTrackingWheelLocalizer {
     }
 
     public double getHeading() {
-        return norm(mPoseEstimate.getHeading());
+        return Angle.norm(mPoseEstimate.getHeading());
     }
 
     public Double getHeadingVelocity() { return cameraUpdate.velocity.omegaRadiansPerSecond; }
@@ -131,12 +134,6 @@ public class T265Localizer extends TwoTrackingWheelLocalizer {
 
         cameraUpdate = slamra.getLastReceivedCameraUpdate();
         poseConfidence = cameraUpdate.confidence;
-    }
-
-    private double norm(double angle) {
-        while (angle>Math.toRadians(360)) angle-=Math.toRadians(360);
-        while (angle<=0) angle+=Math.toRadians(360);
-        return angle;
     }
 
     @NonNull
