@@ -72,7 +72,7 @@ public class GridGuider {
 
         for (int i = 1; i < 6; i++) {
             for (int j = 1; j < 6; j++) {
-                junctions.add(new Junction((144 / 6) * i, (144 / 6) * j, 10, 0));
+                junctions.add(new Junction(24 * i, 24 * j, 3, 0));
             }
         }
     }
