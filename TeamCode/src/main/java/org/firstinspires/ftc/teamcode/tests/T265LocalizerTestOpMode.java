@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.T265Drive;
+import org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.T265Localizer;
 
 /**
  * This is a simple teleop routine for testing localization. Drive the robot around like a normal
@@ -19,7 +21,7 @@ import org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.SampleMecanumD
 public class T265LocalizerTestOpMode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        T265Drive drive = new T265Drive(hardwareMap);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
