@@ -1,11 +1,14 @@
-package org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.opmode;
+package org.firstinspires.ftc.teamcode.tests;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.T265Drive;
+import org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.T265Localizer;
 
 /**
  * This is a simple teleop routine for testing localization. Drive the robot around like a normal
@@ -14,11 +17,11 @@ import org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.SampleMecanumD
  * exercise is to ascertain whether the localizer has been configured properly (note: the pure
  * encoder localizer heading may be significantly off if the track width has not been tuned).
  */
-@TeleOp(group = "drive")
-public class LocalizationTest extends LinearOpMode {
+@TeleOp
+public class T265LocalizerTestOpMode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        T265Drive drive = new T265Drive(hardwareMap);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -39,6 +42,9 @@ public class LocalizationTest extends LinearOpMode {
             telemetry.addData("x", poseEstimate.getX());
             telemetry.addData("y", poseEstimate.getY());
             telemetry.addData("heading", poseEstimate.getHeading());
+
+            T265Camera.PoseConfidence poseConfidence = drive.getPoseConfidence();
+            telemetry.addData("confidence", poseConfidence);
 
             telemetry.update();
         }

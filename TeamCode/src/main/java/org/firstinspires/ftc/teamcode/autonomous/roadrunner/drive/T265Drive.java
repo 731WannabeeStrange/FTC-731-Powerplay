@@ -1,5 +1,17 @@
 package org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive;
 
+import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.MAX_ACCEL;
+import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.MAX_ANG_ACCEL;
+import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.MAX_ANG_VEL;
+import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.MAX_VEL;
+import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.MOTOR_VELO_PID;
+import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.RUN_USING_ENCODER;
+import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.TRACK_WIDTH;
+import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.encoderTicksToInches;
+import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.kA;
+import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.kStatic;
+import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.kV;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -37,23 +49,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.MAX_ACCEL;
-import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.MAX_ANG_ACCEL;
-import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.MAX_ANG_VEL;
-import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.MAX_VEL;
-import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.MOTOR_VELO_PID;
-import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.RUN_USING_ENCODER;
-import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.TRACK_WIDTH;
-import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.encoderTicksToInches;
-import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.kA;
-import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.kStatic;
-import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.kV;
-
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
  */
 @Config
-public class SampleMecanumDrive extends MecanumDrive {
+public class T265Drive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
 
@@ -76,7 +76,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     private BNO055IMU imu;
     private VoltageSensor batteryVoltageSensor;
 
-    public SampleMecanumDrive(HardwareMap hardwareMap) {
+    public T265Drive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
@@ -148,7 +148,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
         //setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap));
-        setLocalizer(new TwoWheelTrackingLocalizer(hardwareMap, this));
+        setLocalizer(new T265Localizer(hardwareMap, true));
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
     }
@@ -316,6 +316,11 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public static TrajectoryAccelerationConstraint getAccelerationConstraint(double maxAccel) {
         return new ProfileAccelerationConstraint(maxAccel);
+    }
+
+    public T265Camera.PoseConfidence getPoseConfidence() {
+        // will throw an exception if called while not using T265Localizer
+        return ((T265Localizer) this.getLocalizer()).getConfidence();
     }
 
     @Override
