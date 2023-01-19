@@ -70,8 +70,8 @@ public class GridGuider {
         this.robotHeight = robotHeight;
         this.robotWidth = robotWidth;
 
-        for (int i = 1; i < 6; i++) {
-            for (int j = 1; j < 6; j++) {
+        for (int i = -2; i < 3; i++) {
+            for (int j = -2; j < 3; j++) {
                 junctions.add(new Junction(24 * i, 24 * j, 3, 0));
             }
         }
