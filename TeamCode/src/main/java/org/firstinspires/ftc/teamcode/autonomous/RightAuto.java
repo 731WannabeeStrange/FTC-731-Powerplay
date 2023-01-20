@@ -141,7 +141,7 @@ public class RightAuto extends LinearOpMode {
     }
 
     public void deposit() {
-        intake.extendTicks(Intake.autoExtension, 0.5);
+        intake.extendTicks(Intake.maxExtension, 0.5);
         lift.extendHigh();
         if (lift.getSlidePosition() > Lift.minHeightForArmRotation) {
             lift.setYawArmAngle(-90);

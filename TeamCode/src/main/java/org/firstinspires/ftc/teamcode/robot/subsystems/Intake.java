@@ -3,9 +3,9 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -20,13 +20,13 @@ public class Intake {
     public static double clawClosedPos = 1;
     public static double v4bRetractedPos = 1;
     public static double v4bExtendedPos = 0;
-    public static int autoExtension = 500;
-    public static int[] stackPositions = {
-            0,
-            0,
-            0,
-            0,
-            0
+    public static int maxExtension = 780;
+    public static double[] stackPositions = {
+            0.55,
+            0.6,
+            0.65,
+            0.72,
+            0.72
     };
 
     public final Telemetry telemetry;
@@ -72,6 +72,8 @@ public class Intake {
         slide2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         slide2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         slide2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        slide2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         beamBreaker.setMode(DigitalChannel.Mode.INPUT);
     }

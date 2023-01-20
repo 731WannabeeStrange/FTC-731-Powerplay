@@ -30,7 +30,7 @@ public class IntakeTestOpMode extends LinearOpMode
         intake2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        intake1.setDirection(DcMotor.Direction.REVERSE);
+        intake2.setDirection(DcMotor.Direction.REVERSE);
 
         telemetry.addData("Mode", "waiting for start");
         telemetry.update();
