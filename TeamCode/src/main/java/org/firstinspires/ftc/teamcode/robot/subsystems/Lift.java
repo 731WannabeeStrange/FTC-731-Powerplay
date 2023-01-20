@@ -15,9 +15,9 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Lift {
     // Config parameters
-    public static int liftLow = 390;
-    public static int liftMid = 600;
-    public static int liftHigh = 850;
+    public static int liftLow = 800;
+    public static int liftMid = 1300;
+    public static int liftHigh = 1800;
     public static double grabPos = 0.5;
     public static double releasePos = 0.9;
     public static double waitTime = 1.5;
@@ -95,16 +95,22 @@ public class Lift {
 
     public void extendLow() { liftState = LiftState.LOW; }
 
-    public void retract() { liftState = LiftState.RETRACT; }
+    public void retract() {
+        liftState = LiftState.RETRACT;
+    }
     public void retract(int pos) { liftState = LiftState.RETRACT; } // ignores pos argument for now,
                                                                     // can change in the future
 
-    public void collect() { liftState = LiftState.COLLECT; }
+    public void collect() {
+        liftState = LiftState.COLLECT;
+        update();
+    }
 
     public void grab() { grabberState = GrabberState.HOLD; }
 
     public void deposit() {
         grabberState = GrabberState.RELEASE;
+        update();
     }
 
     public void setYawArmAngle(double angle) {
@@ -172,5 +178,8 @@ public class Lift {
                 }
                 break;
         }
+
+        yawArm.periodic();
+        grabber.periodic();
     }
 }

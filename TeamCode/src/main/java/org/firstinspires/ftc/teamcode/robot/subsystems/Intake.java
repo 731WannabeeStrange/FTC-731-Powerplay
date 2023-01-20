@@ -18,8 +18,7 @@ public class Intake {
     // Config parameters
     public static double clawOpenPos = 0;
     public static double clawClosedPos = 1;
-    public static double v4bRetractedPos = 1;
-    public static double v4bExtendedPos = 0;
+    public static double v4bRetractedPos = 0.2;
     public static int maxExtension = 780;
     public static double[] stackPositions = {
             0.55,
@@ -78,11 +77,16 @@ public class Intake {
         beamBreaker.setMode(DigitalChannel.Mode.INPUT);
     }
 
+    public void update() {
+        v4b.periodic();
+        claw.periodic();
+    }
+
     public void extend(double intakeExtension, double intakeRetraction) {
         release();
         slide1.setPower(intakeExtension - intakeRetraction);
         slide2.setPower(intakeExtension - intakeRetraction);
-        v4b.setPosition(v4bExtendedPos);
+        v4b.setPosition(stackPositions[4]);
     }
 
     public void retractFully() {
@@ -101,15 +105,18 @@ public class Intake {
         claw.setPosition(clawOpenPos);
     }
 
-    public void extendTicks(int ticks, double power) {
-        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    public void extendTicks(int ticks, double power, int cycle) {
         slide1.setTargetPosition(ticks);
         slide2.setTargetPosition(ticks);
         slide1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slide2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slide1.setPower(power);
         slide2.setPower(power);
+        v4b.setPosition(stackPositions[cycle]);
+    }
+
+    public void setV4bPos(double pos) {
+        v4b.setPosition(pos);
     }
 
     public int getSlidePosition() {
@@ -117,6 +124,6 @@ public class Intake {
     }
 
     public boolean isBusy() {
-        return slide1.isBusy() || slide2.isBusy();
+        return Math.abs(getSlidePosition() - slide1.getTargetPosition()) > 10;
     }
 }
