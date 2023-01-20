@@ -21,7 +21,7 @@ public class Lift {
     public static double grabPos = 0.5;
     public static double releasePos = 0.9;
     public static double waitTime = 1.5;
-    public static int hoverPos = 150;
+    public static int hoverPos = 884;
     public static int collectPos = 0;
     public static int minHeightForArmRotation = 200;
     public static double yawArmDefault = 0.3;
