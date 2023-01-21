@@ -85,20 +85,15 @@ public class ScoringMech {
 
             case GRABBING:
                 if (!intake.isClawBusy()) {
-                    intake.retractFully(0.095);
+                    intake.retractPart(0.13);
                     scoringState = ScoringState.RETRACTING;
                 }
                 break;
 
             case RETRACTING:
-                if (!intake.isBusy()) {
+                if (!intake.isBusy() && !intake.isV4BBusy()) {
                     //intake.setV4bPos(0.25);
-                    scoringState = ScoringState.RAISINGV4B;
-                }
-                break;
-
-            case RAISINGV4B:
-                if (!intake.isV4BBusy()) {
+                    lift.deposit();
                     lift.collect();
                     scoringState = ScoringState.TRANSFERRING;
                 }
@@ -108,20 +103,23 @@ public class ScoringMech {
                 if (!lift.isBusy()) {
                     lift.grab();
                     intake.release();
+                    intake.retractFully();
                     scoringState = ScoringState.LOWERED;
                 }
                 break;
 
             case LOWERED:
-                if (liftButtonHigh) {
-                    lift.extendHigh();
-                    scoringState = ScoringState.LIFTING;
-                } else if (liftButtonMid) {
-                    lift.extendMid();
-                    scoringState = ScoringState.LIFTING;
-                } else if (liftButtonLow) {
-                    lift.extendLow();
-                    scoringState = ScoringState.LIFTING;
+                if (!intake.isBusy()) {
+                    if (liftButtonHigh) {
+                        lift.extendHigh();
+                        scoringState = ScoringState.LIFTING;
+                    } else if (liftButtonMid) {
+                        lift.extendMid();
+                        scoringState = ScoringState.LIFTING;
+                    } else if (liftButtonLow) {
+                        lift.extendLow();
+                        scoringState = ScoringState.LIFTING;
+                    }
                 }
                 break;
 

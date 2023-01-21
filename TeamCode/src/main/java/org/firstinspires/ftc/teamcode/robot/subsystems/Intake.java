@@ -22,8 +22,9 @@ public class Intake {
     public static double clawOpenPos = 0;
     public static double clawClosedPos = 0.7;
     public static double v4bRetractedPos = 0;
+    public static int intakePartialRetract = 15;
     public static int maxExtension = 500;
-    public static int errorTolerance = 10;
+    public static int errorTolerance = 20;
     public static double[] stackPositions = {
             0.55,
             0.6,
@@ -50,13 +51,14 @@ public class Intake {
     public final ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
     private enum SlideState {
-        RETRACTING,
+        RETRACTFULL,
+        RETRACTPART,
         EXTENDING,
         CUSTOMEXTEND,
         STOP
     }
 
-    private SlideState slideState = SlideState.RETRACTING;
+    private SlideState slideState = SlideState.RETRACTFULL;
 
     public Intake(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
@@ -96,9 +98,19 @@ public class Intake {
         claw.periodic();
 
         switch (slideState) {
-            case RETRACTING:
+            case RETRACTFULL:
                 error1 = -slide1.getCurrentPosition();
                 error2 = -slide2.getCurrentPosition();
+                slide1.setPower(P * error1);
+                slide2.setPower(P * error2);
+
+                if (Math.abs(error1) < errorTolerance) {
+                    slideState = SlideState.STOP;
+                }
+                break;
+            case RETRACTPART:
+                error1 = intakePartialRetract - slide1.getCurrentPosition();
+                error2 = intakePartialRetract - slide2.getCurrentPosition();
                 slide1.setPower(P * error1);
                 slide2.setPower(P * error2);
 
@@ -175,13 +187,19 @@ public class Intake {
     public void retractFully() {
         v4b.setPosition(v4bRetractedPos);
         claw.setPosition(clawClosedPos);
-        slideState = SlideState.RETRACTING;
+        slideState = SlideState.RETRACTFULL;
     }
 
     public void retractFully(double v4bpos) {
         v4b.setPosition(v4bpos);
         claw.setPosition(clawClosedPos);
-        slideState = SlideState.RETRACTING;
+        slideState = SlideState.RETRACTFULL;
+    }
+
+    public void retractPart(double v4bpos) {
+        v4b.setPosition(v4bpos);
+        claw.setPosition(clawClosedPos);
+        slideState = SlideState.RETRACTPART;
     }
 
     public void stopSlides() {
@@ -189,6 +207,6 @@ public class Intake {
     }
 
     public boolean isConeDetected() {
-        return color.getDistance(DistanceUnit.CM) < 3;
+        return color.getDistance(DistanceUnit.CM) < 2;
     }
 }
