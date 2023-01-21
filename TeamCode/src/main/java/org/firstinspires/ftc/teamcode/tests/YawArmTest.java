@@ -51,14 +51,7 @@ public class YawArmTest extends LinearOpMode
                 if (angle > 180) {
                     angle -= 360;
                 }
-                if (angle > 90) {
-                    if (angle < 135) {
-                        angle = 180;
-                    } else {
-                        angle = -90;
-                    }
-                }
-                pos = (-angle + 90) / 270;
+                pos = (0.0037037 * angle) + 0.33333;
 
 
                 s1.setPosition(pos);

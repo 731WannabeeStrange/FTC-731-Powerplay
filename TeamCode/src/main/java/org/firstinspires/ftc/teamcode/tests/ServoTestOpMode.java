@@ -23,8 +23,8 @@ public class ServoTestOpMode extends LinearOpMode
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        s1 = hardwareMap.get(Servo.class, "yaw1");
-        s2 = hardwareMap.get(Servo.class, "yaw2");
+        s1 = hardwareMap.get(Servo.class, "v4b1");
+        s2 = hardwareMap.get(Servo.class, "v4b2");
 
         telemetry.addData("Mode", "waiting for start");
         telemetry.update();
@@ -43,19 +43,19 @@ public class ServoTestOpMode extends LinearOpMode
             telemetry.addData("s2 position", s2pos);
 
             if (gamepad1.left_bumper && !lbTriggered) {
-                s1pos+=0.05;
+                s1pos=0;
             }
 
             if (gamepad1.right_bumper && !rbTriggered) {
-                s1pos-=0.05;
+                s1pos=1;
             }
 
             if (gamepad1.a && !aTriggered) {
-                s2pos-=0.05;
+                s2pos=0;
             }
 
             if (gamepad1.b && !bTriggered) {
-                s2pos+=0.05;
+                s2pos=1;
             }
 
             lbTriggered = gamepad1.left_bumper;

@@ -23,8 +23,8 @@ public class V4BTestOpMode extends LinearOpMode
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        s1 = hardwareMap.get(Servo.class, "v4b1");
-        s2 = hardwareMap.get(Servo.class, "v4b2");
+        s1 = hardwareMap.get(Servo.class, "yaw1");
+        s2 = hardwareMap.get(Servo.class, "yaw2");
 
         telemetry.addData("Mode", "waiting for start");
         telemetry.update();

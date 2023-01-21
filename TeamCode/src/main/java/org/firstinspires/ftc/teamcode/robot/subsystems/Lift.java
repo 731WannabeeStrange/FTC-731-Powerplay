@@ -127,7 +127,7 @@ public class Lift {
                 angle = 90;
             }
         }
-        double pos = (-angle + 90) / 270;
+        double pos = (0.0037037 * angle) + 0.33333;
         yawArm.setPosition(pos);
     }
 
@@ -150,10 +150,11 @@ public class Lift {
                 break;
             case RETRACT:
                 grabber.setPosition(grabPos);
-                setYawArmAngle(0);
+                setYawArmAngle(-10);
                 targetPosition = hoverPos;
                 break;
             case COLLECT:
+                setYawArmAngle(-10);
                 targetPosition = collectPos;
                 break;
         }

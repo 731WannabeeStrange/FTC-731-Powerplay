@@ -30,6 +30,8 @@ public class ScoringMech {
 
     public ScoringState scoringState = ScoringState.RESET;
 
+    public boolean controllingArm = false;
+
     Lift lift;
     Intake intake;
 
@@ -56,8 +58,9 @@ public class ScoringMech {
         switch (scoringState) {
             case RETRACTED:
                 intake.retractFully();
+                lift.grab();
                 if (intakeGrabButton) {
-                    intake.setV4bPos(1.5);
+                    intake.setV4bPos(0.9);
                     scoringState = ScoringState.DROPPINGV4B;
                 }
                 break;
@@ -82,27 +85,26 @@ public class ScoringMech {
 
             case GRABBING:
                 if (!intake.isClawBusy()) {
-                    intake.retractFully();
+                    intake.retractFully(0.095);
                     scoringState = ScoringState.RETRACTING;
                 }
                 break;
 
             case RETRACTING:
                 if (!intake.isBusy()) {
-                    intake.setV4bPos(0.6);
-                    eTime.reset();
+                    //intake.setV4bPos(0.25);
                     scoringState = ScoringState.RAISINGV4B;
                 }
                 break;
 
             case RAISINGV4B:
-                if (eTime.time() > 0.5) {
+                if (!intake.isV4BBusy()) {
+                    lift.collect();
                     scoringState = ScoringState.TRANSFERRING;
                 }
                 break;
 
             case TRANSFERRING:
-                lift.collect();
                 if (!lift.isBusy()) {
                     lift.grab();
                     intake.release();
@@ -124,7 +126,9 @@ public class ScoringMech {
                 break;
 
             case LIFTING:
+                intake.retractFully();
                 if (lift.getSlidePosition() > Lift.minHeightForArmRotation) {
+                    controllingArm = true;
                     scoringState = ScoringState.CONTROLLING_ARM;
                 }
                 break;
@@ -154,6 +158,7 @@ public class ScoringMech {
 
             case DEPOSITING:
                 if (eTime.time() > Lift.waitTime) {
+                    controllingArm = false;
                     lift.grab();
                     scoringState = ScoringState.LOWERING;
                 }
@@ -167,6 +172,7 @@ public class ScoringMech {
                 break;
 
             case RESET:
+                controllingArm = false;
                 intake.retractFully();
                 lift.retract();
                 scoringState = ScoringState.RETRACTED;
@@ -181,5 +187,9 @@ public class ScoringMech {
         }
 
         previousIntakeGrabButton = intakeGrabButton;
+    }
+
+    public boolean isControllingArm() {
+        return controllingArm;
     }
 }

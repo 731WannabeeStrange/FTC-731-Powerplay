@@ -21,7 +21,7 @@ public class Intake {
     public static double P = 0.001;
     public static double clawOpenPos = 0;
     public static double clawClosedPos = 0.7;
-    public static double v4bRetractedPos = 0.6;
+    public static double v4bRetractedPos = 0;
     public static int maxExtension = 500;
     public static int errorTolerance = 10;
     public static double[] stackPositions = {
@@ -178,11 +178,17 @@ public class Intake {
         slideState = SlideState.RETRACTING;
     }
 
+    public void retractFully(double v4bpos) {
+        v4b.setPosition(v4bpos);
+        claw.setPosition(clawClosedPos);
+        slideState = SlideState.RETRACTING;
+    }
+
     public void stopSlides() {
         slideState = SlideState.STOP;
     }
 
     public boolean isConeDetected() {
-        return color.getDistance(DistanceUnit.CM) < 1;
+        return color.getDistance(DistanceUnit.CM) < 3;
     }
 }
