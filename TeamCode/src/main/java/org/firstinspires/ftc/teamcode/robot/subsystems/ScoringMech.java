@@ -15,9 +15,9 @@ public class ScoringMech {
     public enum ScoringState {
         RETRACTED,
         EXTENDING,
-        EXTENDED,
         GRABBING,
         RETRACTING,
+        RAISINGV4B,
         TRANSFERRING,
         LOWERED,
         LIFTING,
@@ -43,8 +43,7 @@ public class ScoringMech {
         intake = new Intake(hardwareMap, multipleTelemetry);
     }
 
-    public void score(double intakeExtension, double intakeRetraction, boolean intakeGrabButton, boolean automaticIntakeRetraction,
-                      boolean liftButtonHigh, boolean liftButtonMid, boolean liftButtonLow,
+    public void score(boolean intakeGrabButton, boolean liftButtonHigh, boolean liftButtonMid, boolean liftButtonLow,
                       boolean depositButton, double yawArmY, double yawArmX, boolean cancelAutomation,
                       boolean yawArm0, boolean yawArm90, boolean yawArm180, boolean yawArm270) {
         telemetry.addData("Timer", eTime.time());
@@ -53,43 +52,56 @@ public class ScoringMech {
         switch (scoringState) {
             case RETRACTED:
                 intake.retractFully();
-                if (intakeExtension > 0) {
-                    intake.slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    intake.slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                if (intakeGrabButton) {
+                    intake.release();
+                    intake.extendFully();
+                    intake.setV4bPos(0.7);
                     scoringState = ScoringState.EXTENDING;
                 }
                 break;
 
             case EXTENDING:
-                intake.extend(intakeExtension, intakeRetraction);
-                if (intakeGrabButton) {
+                if (intake.isConeDetected()) {
+                    intake.stopSlides();
+                    intake.grab();
+                    eTime.reset();
                     scoringState = ScoringState.GRABBING;
+                }
+                if (!intake.isBusy() && !intake.isConeDetected()) {
+                    scoringState = ScoringState.RESET;
                 }
                 break;
 
             case GRABBING:
-                intake.grab();
-                if (automaticIntakeRetraction) {
+                if (eTime.time() < 0.5) {
+                    intake.retractFully();
                     scoringState = ScoringState.RETRACTING;
-                }
-                if (intakeGrabButton && !previousIntakeGrabButton) {
-                    scoringState = ScoringState.EXTENDING;
                 }
                 break;
 
             case RETRACTING:
-                intake.retractFully();
-                if (Math.abs(intake.getSlidePosition()) < 5) {
+                if (!intake.isBusy()) {
+                    intake.setV4bPos(0.5);
+                    eTime.reset();
                     scoringState = ScoringState.TRANSFERRING;
                 }
                 break;
+
+            case RAISINGV4B:
+                if (eTime.time() > 0.5) {
+                    scoringState = ScoringState.TRANSFERRING;
+                }
+                break;
+
             case TRANSFERRING:
                 lift.collect();
-                if (Math.abs(lift.getSlidePosition() - Lift.collectPos) < 5) {
+                if (!lift.isBusy()) {
+                    lift.grab();
                     intake.release();
                     scoringState = ScoringState.LOWERED;
                 }
                 break;
+
             case LOWERED:
                 if (liftButtonHigh) {
                     lift.extendHigh();
@@ -104,7 +116,6 @@ public class ScoringMech {
                 break;
 
             case LIFTING:
-                lift.grab();
                 if (lift.getSlidePosition() > Lift.minHeightForArmRotation) {
                     scoringState = ScoringState.CONTROLLING_ARM;
                 }
@@ -124,8 +135,9 @@ public class ScoringMech {
                     lift.setYawArmAngle(270);
                 }
 
-                if (Math.abs(lift.getSlidePosition() - lift.getTargetPosition()) < 5) {
+                if (!lift.isBusy()) {
                     if (depositButton) {
+                        lift.deposit();
                         eTime.reset();
                         scoringState = ScoringState.DEPOSITING;
                     }
@@ -133,7 +145,6 @@ public class ScoringMech {
                 break;
 
             case DEPOSITING:
-                lift.deposit();
                 if (eTime.time() > Lift.waitTime) {
                     lift.grab();
                     scoringState = ScoringState.LOWERING;
@@ -142,7 +153,7 @@ public class ScoringMech {
 
             case LOWERING:
                 lift.retract();
-                if (Math.abs(lift.getSlidePosition() - lift.getTargetPosition()) < 5) {
+                if (!lift.isBusy()) {
                     scoringState = ScoringState.RETRACTED;
                 }
                 break;
@@ -150,8 +161,12 @@ public class ScoringMech {
             case RESET:
                 intake.retractFully();
                 lift.retract();
+                scoringState = ScoringState.RETRACTED;
                 break;
         }
+
+        lift.update();
+        intake.update();
 
         if (cancelAutomation) {
             scoringState = ScoringState.RESET;
