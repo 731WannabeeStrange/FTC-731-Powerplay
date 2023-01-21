@@ -51,7 +51,7 @@ public class AprilTagVisionPipeline
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(800, 448, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
