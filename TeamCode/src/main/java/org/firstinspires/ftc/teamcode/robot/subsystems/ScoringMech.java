@@ -14,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class ScoringMech {
     public enum ScoringState {
         RETRACTED,
+        DROPPINGV4B,
         EXTENDING,
         GRABBING,
         RETRACTING,
@@ -27,7 +28,7 @@ public class ScoringMech {
         RESET
     }
 
-    public ScoringState scoringState;
+    public ScoringState scoringState = ScoringState.RESET;
 
     Lift lift;
     Intake intake;
@@ -39,6 +40,8 @@ public class ScoringMech {
     public boolean previousIntakeGrabButton = false;
 
     public ScoringMech(HardwareMap hardwareMap, MultipleTelemetry multipleTelemetry) {
+        telemetry = multipleTelemetry;
+
         lift = new Lift(hardwareMap, multipleTelemetry);
         intake = new Intake(hardwareMap, multipleTelemetry);
     }
@@ -47,24 +50,29 @@ public class ScoringMech {
                       boolean depositButton, double yawArmY, double yawArmX, boolean cancelAutomation,
                       boolean yawArm0, boolean yawArm90, boolean yawArm180, boolean yawArm270) {
         telemetry.addData("Timer", eTime.time());
+        telemetry.addData("smState", scoringState);
         telemetry.update();
 
         switch (scoringState) {
             case RETRACTED:
                 intake.retractFully();
                 if (intakeGrabButton) {
-                    intake.release();
-                    intake.extendFully();
-                    intake.setV4bPos(0.7);
-                    scoringState = ScoringState.EXTENDING;
+                    intake.setV4bPos(1.5);
+                    scoringState = ScoringState.DROPPINGV4B;
                 }
                 break;
 
+            case DROPPINGV4B:
+                if (!intake.isV4BBusy()) {
+                    intake.release();
+                    intake.extendFully();
+                    scoringState = ScoringState.EXTENDING;
+                }
+                break;
             case EXTENDING:
                 if (intake.isConeDetected()) {
                     intake.stopSlides();
                     intake.grab();
-                    eTime.reset();
                     scoringState = ScoringState.GRABBING;
                 }
                 if (!intake.isBusy() && !intake.isConeDetected()) {
@@ -73,7 +81,7 @@ public class ScoringMech {
                 break;
 
             case GRABBING:
-                if (eTime.time() < 0.5) {
+                if (!intake.isClawBusy()) {
                     intake.retractFully();
                     scoringState = ScoringState.RETRACTING;
                 }
@@ -81,9 +89,9 @@ public class ScoringMech {
 
             case RETRACTING:
                 if (!intake.isBusy()) {
-                    intake.setV4bPos(0.5);
+                    intake.setV4bPos(0.6);
                     eTime.reset();
-                    scoringState = ScoringState.TRANSFERRING;
+                    scoringState = ScoringState.RAISINGV4B;
                 }
                 break;
 

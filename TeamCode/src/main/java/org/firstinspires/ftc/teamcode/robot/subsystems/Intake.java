@@ -18,11 +18,11 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Intake {
     // Config parameters
-    public static double P = 0.04;
+    public static double P = 0.001;
     public static double clawOpenPos = 0;
-    public static double clawClosedPos = 1;
-    public static double v4bRetractedPos = 0.2;
-    public static int maxExtension = 780;
+    public static double clawClosedPos = 0.7;
+    public static double v4bRetractedPos = 0.6;
+    public static int maxExtension = 500;
     public static int errorTolerance = 10;
     public static double[] stackPositions = {
             0.55,
@@ -67,24 +67,24 @@ public class Intake {
                 hardwareMap,
                 "v4b1",
                 "v4b2",
-                new MotionConstraint(1, 4, 4),
+                new MotionConstraint(1, 6, 6),
                 v4bRetractedPos
         );
         claw = new ProfiledServo(
                 hardwareMap,
                 "claw",
-                new MotionConstraint(1, 4, 4),
-                clawOpenPos
+                new MotionConstraint(1, 6, 6),
+                clawClosedPos
         );
         beamBreaker = hardwareMap.get(DigitalChannel.class, "beamBreaker");
         color = hardwareMap.get(RevColorSensorV3.class, "color");
 
         slide1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         slide1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        //slide1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         slide2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         slide2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        //slide2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        slide2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         slide2.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -99,8 +99,8 @@ public class Intake {
             case RETRACTING:
                 error1 = -slide1.getCurrentPosition();
                 error2 = -slide2.getCurrentPosition();
-                slide1.setPower(-P * error1);
-                slide2.setPower(-P * error2);
+                slide1.setPower(P * error1);
+                slide2.setPower(P * error2);
 
                 if (Math.abs(error1) < errorTolerance) {
                     slideState = SlideState.STOP;
@@ -109,8 +109,8 @@ public class Intake {
             case EXTENDING:
                 error1 = maxExtension - slide1.getCurrentPosition();
                 error2 = maxExtension - slide2.getCurrentPosition();
-                slide1.setPower(-P * error1);
-                slide2.setPower(-P * error2);
+                slide1.setPower(P * error1);
+                slide2.setPower(P * error2);
 
                 if (Math.abs(error1) < errorTolerance) {
                     slideState = SlideState.STOP;
@@ -119,8 +119,8 @@ public class Intake {
             case CUSTOMEXTEND:
                 error1 = customTarget - slide1.getCurrentPosition();
                 error2 = customTarget - slide2.getCurrentPosition();
-                slide1.setPower(-P * error1);
-                slide2.setPower(-P * error2);
+                slide1.setPower(P * error1);
+                slide2.setPower(P * error2);
 
                 if (Math.abs(error1) < errorTolerance) {
                     slideState = SlideState.STOP;
@@ -131,6 +131,11 @@ public class Intake {
                 slide2.setPower(0);
                 break;
         }
+
+        telemetry.addData("error1", P * error1);
+        telemetry.addData("error2", P * error2);
+        telemetry.addData("slidepos", slide1.getCurrentPosition());
+        telemetry.addData("intakeState", slideState);
     }
 
     public void grab() {
@@ -140,6 +145,8 @@ public class Intake {
     public void release() {
         claw.setPosition(clawOpenPos);
     }
+
+    public boolean isClawBusy() { return claw.isBusy(); };
 
     public void extendTicks(int ticks, double power, int cycle) {
         customTarget = ticks;
@@ -151,12 +158,14 @@ public class Intake {
         v4b.setPosition(pos);
     }
 
+    public boolean isV4BBusy() { return v4b.isBusy(); }
+
     public int getSlidePosition() {
         return slide1.getCurrentPosition();
     }
 
     public boolean isBusy() {
-        return slideState == SlideState.STOP;
+        return slideState != SlideState.STOP;
     }
 
     public void extendFully() {
@@ -164,6 +173,8 @@ public class Intake {
     }
 
     public void retractFully() {
+        v4b.setPosition(v4bRetractedPos);
+        claw.setPosition(clawClosedPos);
         slideState = SlideState.RETRACTING;
     }
 
