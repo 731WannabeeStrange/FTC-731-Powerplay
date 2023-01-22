@@ -20,6 +20,7 @@ public class ScoringMech {
         RETRACTING,
         RAISINGV4B,
         TRANSFERRING,
+        RELEASING,
         LOWERED,
         LIFTING,
         CONTROLLING_ARM,
@@ -58,6 +59,7 @@ public class ScoringMech {
         switch (scoringState) {
             case RETRACTED:
                 intake.retractFully();
+                intake.grab();
                 lift.grab();
                 if (intakeGrabButton) {
                     intake.setV4bPos(0.9);
@@ -103,6 +105,11 @@ public class ScoringMech {
                 if (!lift.isBusy()) {
                     lift.grab();
                     intake.release();
+                    scoringState = ScoringState.RELEASING;
+                }
+                break;
+            case RELEASING:
+                if (!intake.isClawBusy()) {
                     intake.retractFully();
                     scoringState = ScoringState.LOWERED;
                 }
@@ -124,7 +131,6 @@ public class ScoringMech {
                 break;
 
             case LIFTING:
-                intake.retractFully();
                 if (lift.getSlidePosition() > Lift.minHeightForArmRotation) {
                     controllingArm = true;
                     scoringState = ScoringState.CONTROLLING_ARM;
@@ -172,6 +178,7 @@ public class ScoringMech {
             case RESET:
                 controllingArm = false;
                 intake.retractFully();
+                intake.grab();
                 lift.retract();
                 scoringState = ScoringState.RETRACTED;
                 break;

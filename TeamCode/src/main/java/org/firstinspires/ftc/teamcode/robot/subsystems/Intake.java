@@ -22,7 +22,7 @@ public class Intake {
     public static double clawOpenPos = 0;
     public static double clawClosedPos = 0.7;
     public static double v4bRetractedPos = 0;
-    public static int intakePartialRetract = 15;
+    public static int intakePartialRetract = 60;
     public static int maxExtension = 500;
     public static int errorTolerance = 20;
     public static double[] stackPositions = {
@@ -186,7 +186,6 @@ public class Intake {
 
     public void retractFully() {
         v4b.setPosition(v4bRetractedPos);
-        claw.setPosition(clawClosedPos);
         slideState = SlideState.RETRACTFULL;
     }
 
