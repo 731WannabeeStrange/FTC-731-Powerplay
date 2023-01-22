@@ -50,9 +50,9 @@ public class RightAuto extends LinearOpMode {
         drive = new SampleMecanumDrive(hardwareMap);
         lift = new Lift(hardwareMap, telemetry);
         intake = new Intake(hardwareMap, telemetry);
-        //pipeline = new AprilTagVisionPipeline();
+        pipeline = new AprilTagVisionPipeline();
 
-        //pipeline.init(hardwareMap, telemetry);
+        pipeline.init(hardwareMap, telemetry);
 
         drive.setPoseEstimate(startPose);
 
@@ -76,8 +76,7 @@ public class RightAuto extends LinearOpMode {
                 .build();
 
         while (opModeInInit()) {
-            //location = pipeline.visionLoop(telemetry);
-            location = Location.LEFT;
+            location = pipeline.visionLoop(telemetry);
         }
 
         drive.followTrajectorySequenceAsync(driveToSpot);
