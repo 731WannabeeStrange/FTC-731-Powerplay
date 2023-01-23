@@ -118,6 +118,7 @@ public class RightAuto extends LinearOpMode {
 
                 case COLLECT:
                     lift.collect();
+                    lift.update();
 
                     if (!lift.isBusy()) {
                         intake.release();
@@ -175,11 +176,15 @@ public class RightAuto extends LinearOpMode {
     }
 
     public void deposit() {
-        intake.extendTicks(Intake.maxExtension, 0.6, cycle - 1);
+        intake.extendFully();
+        intake.setV4bPos(Intake.stackPositions[cycle]);
         lift.extendHigh();
         if (lift.getSlidePosition() > Lift.minHeightForArmRotation) {
             lift.setYawArmAngle(-90);
         }
+
+        intake.update();
+        lift.update();
     }
 
     public void grabCone() {
@@ -192,7 +197,7 @@ public class RightAuto extends LinearOpMode {
             intake.setV4bPos(Intake.v4bRetractedPos);
             if (!intake.v4b.isBusy()) {
                 telemetry.addLine("Retracting intake");
-                intake.retractFully();
+                intake.retractPart(Intake.v4bRetractedPos);
                 if (!intake.isBusy()) {
                     flag = true;
                 }

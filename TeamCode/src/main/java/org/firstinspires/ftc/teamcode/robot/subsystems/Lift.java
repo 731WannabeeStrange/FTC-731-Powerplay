@@ -103,7 +103,6 @@ public class Lift {
 
     public void collect() {
         liftState = LiftState.COLLECT;
-        update();
     }
 
     public void grab() { grabberState = GrabberState.HOLD; }
