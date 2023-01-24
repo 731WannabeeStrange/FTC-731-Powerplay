@@ -48,7 +48,7 @@ public class RightAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new SampleMecanumDrive(hardwareMap);
-        lift = new Lift(hardwareMap, telemetry, true);
+        lift = new Lift(hardwareMap, telemetry);
         intake = new Intake(hardwareMap, telemetry);
         pipeline = new AprilTagVisionPipeline();
 

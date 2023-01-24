@@ -64,7 +64,7 @@ public class ScrimmageAutoFTCChad extends LinearOpMode {
         frontleft.setDirection(DcMotorSimple.Direction.REVERSE);
         backleft.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        lift = new Lift(hardwareMap, telemetry, true);
+        lift = new Lift(hardwareMap, telemetry);
         pipeline = new AprilTagVisionPipeline();
         pipeline.init(hardwareMap, telemetry);
 

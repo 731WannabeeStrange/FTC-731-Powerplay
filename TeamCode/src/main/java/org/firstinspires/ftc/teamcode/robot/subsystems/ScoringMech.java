@@ -50,7 +50,7 @@ public class ScoringMech {
         telemetry = multipleTelemetry;
         this.rumbler = rumbler;
 
-        lift = new Lift(hardwareMap, multipleTelemetry, false);
+        lift = new Lift(hardwareMap, multipleTelemetry);
         intake = new Intake(hardwareMap, multipleTelemetry);
     }
 

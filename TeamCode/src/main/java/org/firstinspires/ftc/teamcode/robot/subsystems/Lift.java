@@ -25,19 +25,16 @@ public class Lift {
     public static int hoverPos = 884;
     public static int collectPos = 100;
     public static int minHeightForArmRotation = 200;
-    public static double yawArmDefault = 0.3;
-    public static double yawArmAuto = (0.0037037 * -45) + 0.33333;
-
     public static double P = 0.006;
     public static int errorTolerance = 25;
     public static double grabTime = 0.75;
 
     private final Telemetry telemetry;
 
-    private final DcMotorEx lift1;
-    private final DcMotorEx lift2;
-    private final ProfiledServoPair yawArm;
-    private final ProfiledServo grabber;
+    public final DcMotorEx lift1;
+    public final DcMotorEx lift2;
+    public final ProfiledServoPair yawArm;
+    public final ProfiledServo grabber;
 
     private int targetPosition = 0;
     private int error1 = 0;
@@ -57,7 +54,7 @@ public class Lift {
 
     private final ElapsedTime grabTimer = new ElapsedTime();
 
-    public Lift(HardwareMap hardwareMap, Telemetry multipleTelemetry, boolean auto) {
+    public Lift(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
 
         lift1 = hardwareMap.get(DcMotorEx.class, "lift1");
@@ -67,7 +64,7 @@ public class Lift {
                 "yaw1",
                 "yaw2",
                 new MotionConstraint(1, 4, 4),
-                auto ? yawArmAuto : yawArmDefault
+                (0.0037037 * -45) + 0.33333
         );
 
         grabber = new ProfiledServo(

@@ -45,7 +45,7 @@ public class PreloadParkAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new SampleMecanumDrive(hardwareMap);
-        lift = new Lift(hardwareMap, telemetry, true);
+        lift = new Lift(hardwareMap, telemetry);
         pipeline = new AprilTagVisionPipeline();
 
         pipeline.init(hardwareMap, telemetry);
