@@ -52,8 +52,15 @@ public class LiftTestOpMode extends LinearOpMode {
                     break;
             }
 
+            lift.update();
+
             multipleTelemetry.addData("current lift state", manualLiftState);
             multipleTelemetry.addData("current lift position", lift.getSlidePosition());
+
+            double[] motorPowers = lift.getMotorPowers();
+            multipleTelemetry.addData("lift1 power", motorPowers[0]);
+            multipleTelemetry.addData("lift2 power", motorPowers[1]);
+
             multipleTelemetry.update();
         }
     }

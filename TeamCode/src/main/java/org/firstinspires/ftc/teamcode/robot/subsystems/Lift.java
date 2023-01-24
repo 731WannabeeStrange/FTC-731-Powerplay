@@ -142,6 +142,8 @@ public class Lift {
 
     public boolean isBusy() { return Math.abs(error1) >= errorTolerance || Math.abs(error2) >= errorTolerance; }
 
+    public double[] getMotorPowers() { return new double[]{lift1.getPower(), lift2.getPower()}; }
+
     public void update() {
         switch (liftState) {
             case HIGH:
