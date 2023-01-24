@@ -12,15 +12,6 @@ public class LiftTestOpMode extends LinearOpMode {
     Lift lift;
     MultipleTelemetry multipleTelemetry;
 
-    private enum ManualLiftState {
-        HIGH,
-        MIDDLE,
-        LOW,
-        RETRACT
-    }
-
-    private ManualLiftState manualLiftState = ManualLiftState.RETRACT;
-
     @Override
     public void runOpMode() throws InterruptedException {
         multipleTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -39,7 +30,6 @@ public class LiftTestOpMode extends LinearOpMode {
 
             lift.update();
 
-            multipleTelemetry.addData("current lift state", manualLiftState);
             multipleTelemetry.addData("current lift position", lift.getSlidePosition());
 
             double[] motorPowers = lift.getMotorPowers();

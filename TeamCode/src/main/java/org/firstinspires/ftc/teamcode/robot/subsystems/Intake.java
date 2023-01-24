@@ -101,8 +101,6 @@ public class Intake {
             case RETRACTFULL:
                 error1 = -slide1.getCurrentPosition();
                 error2 = -slide2.getCurrentPosition();
-                slide1.setPower(P * error1);
-                slide2.setPower(P * error2);
 
                 if (Math.abs(error1) < errorTolerance) {
                     slideState = SlideState.STOP;
@@ -111,8 +109,6 @@ public class Intake {
             case RETRACTPART:
                 error1 = intakePartialRetract - slide1.getCurrentPosition();
                 error2 = intakePartialRetract - slide2.getCurrentPosition();
-                slide1.setPower(P * error1);
-                slide2.setPower(P * error2);
 
                 if (Math.abs(error1) < errorTolerance) {
                     slideState = SlideState.STOP;
@@ -121,8 +117,6 @@ public class Intake {
             case EXTENDING:
                 error1 = maxExtension - slide1.getCurrentPosition();
                 error2 = maxExtension - slide2.getCurrentPosition();
-                slide1.setPower(P * error1);
-                slide2.setPower(P * error2);
 
                 if (Math.abs(error1) < errorTolerance) {
                     slideState = SlideState.STOP;
@@ -131,23 +125,19 @@ public class Intake {
             case CUSTOMEXTEND:
                 error1 = customTarget - slide1.getCurrentPosition();
                 error2 = customTarget - slide2.getCurrentPosition();
-                slide1.setPower(P * error1);
-                slide2.setPower(P * error2);
 
                 if (Math.abs(error1) < errorTolerance) {
                     slideState = SlideState.STOP;
                 }
                 break;
             case STOP:
-                slide1.setPower(0);
-                slide2.setPower(0);
+                error1 = 0;
+                error2 = 0;
                 break;
         }
 
-        telemetry.addData("error1", P * error1);
-        telemetry.addData("error2", P * error2);
-        telemetry.addData("slidepos", slide1.getCurrentPosition());
-        telemetry.addData("intakeState", slideState);
+        slide1.setPower(P * error1);
+        slide2.setPower(P * error2);
     }
 
     public void grab() {
@@ -207,5 +197,9 @@ public class Intake {
 
     public boolean isConeDetected() {
         return color.getDistance(DistanceUnit.CM) < 2;
+    }
+
+    public double[] getMotorPowers() {
+        return new double[]{slide1.getPower(), slide2.getPower()};
     }
 }
