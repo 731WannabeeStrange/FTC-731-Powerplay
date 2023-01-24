@@ -28,28 +28,13 @@ public class LiftTestOpMode extends LinearOpMode {
 
         while (opModeIsActive() && !isStopRequested()) {
             if (gamepad1.y) {
-                manualLiftState = ManualLiftState.HIGH;
+                lift.extendHigh();
             } else if (gamepad1.b) {
-                manualLiftState = ManualLiftState.MIDDLE;
+                lift.extendMid();
             } else if (gamepad1.a) {
-                manualLiftState = ManualLiftState.LOW;
+                lift.extendLow();
             } else if (gamepad1.x) {
-                manualLiftState = ManualLiftState.RETRACT;
-            }
-
-            switch (manualLiftState) {
-                case HIGH:
-                    lift.extendHigh();
-                    break;
-                case MIDDLE:
-                    lift.extendMid();
-                    break;
-                case LOW:
-                    lift.extendLow();
-                    break;
-                case RETRACT:
-                    lift.retract();
-                    break;
+                lift.retract();
             }
 
             lift.update();
