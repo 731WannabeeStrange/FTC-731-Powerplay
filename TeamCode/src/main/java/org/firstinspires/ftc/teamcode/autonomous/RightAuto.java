@@ -48,7 +48,7 @@ public class RightAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new SampleMecanumDrive(hardwareMap);
-        lift = new Lift(hardwareMap, telemetry);
+        lift = new Lift(hardwareMap, telemetry, true);
         intake = new Intake(hardwareMap, telemetry);
         pipeline = new AprilTagVisionPipeline();
 
@@ -178,6 +178,7 @@ public class RightAuto extends LinearOpMode {
     public void deposit() {
         intake.extendFully();
         intake.setV4bPos(Intake.stackPositions[cycle]);
+        intake.release();
         lift.extendHigh();
         if (lift.getSlidePosition() > Lift.minHeightForArmRotation) {
             lift.setYawArmAngle(-90);
@@ -191,10 +192,12 @@ public class RightAuto extends LinearOpMode {
         lift.retract();
         lift.update();
         intake.grab();
+        intake.update();
         telemetry.addLine("Closing claw");
         if (!intake.claw.isBusy()) {
             telemetry.addLine("Setting v4b pos");
             intake.setV4bPos(Intake.v4bRetractedPos);
+            intake.update();
             if (!intake.v4b.isBusy()) {
                 telemetry.addLine("Retracting intake");
                 intake.retractPart(Intake.v4bRetractedPos);

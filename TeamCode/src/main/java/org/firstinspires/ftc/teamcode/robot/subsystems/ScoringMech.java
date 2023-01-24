@@ -45,7 +45,7 @@ public class ScoringMech {
     public ScoringMech(HardwareMap hardwareMap, MultipleTelemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
 
-        lift = new Lift(hardwareMap, multipleTelemetry);
+        lift = new Lift(hardwareMap, multipleTelemetry, false);
         intake = new Intake(hardwareMap, multipleTelemetry);
     }
 

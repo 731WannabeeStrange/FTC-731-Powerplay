@@ -15,9 +15,9 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Lift {
     // Config parameters
-    public static int liftLow = 800;
-    public static int liftMid = 1300;
-    public static int liftHigh = 1800;
+    public static int liftLow = 900;
+    public static int liftMid = 1750;
+    public static int liftHigh = 2500;
     public static double grabPos = 0.9;
     public static double releasePos = 0.5;
     public static double waitTime = 1.5;
@@ -25,6 +25,7 @@ public class Lift {
     public static int collectPos = 100;
     public static int minHeightForArmRotation = 200;
     public static double yawArmDefault = 0.3;
+    public static double yawArmAuto = (0.0037037 * -45) + 0.33333;
 
     public static double P = 0.006;
     public static int errorTolerance = 25;
@@ -61,7 +62,7 @@ public class Lift {
 
     private final ElapsedTime grabTimer = new ElapsedTime();
 
-    public Lift(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
+    public Lift(HardwareMap hardwareMap, Telemetry multipleTelemetry, boolean auto) {
         telemetry = multipleTelemetry;
 
         lift1 = hardwareMap.get(DcMotorEx.class, "lift1");
@@ -71,7 +72,7 @@ public class Lift {
                 "yaw1",
                 "yaw2",
                 new MotionConstraint(1, 4, 4),
-                yawArmDefault
+                auto ? yawArmAuto : yawArmDefault
         );
 
         grabber = new ProfiledServo(

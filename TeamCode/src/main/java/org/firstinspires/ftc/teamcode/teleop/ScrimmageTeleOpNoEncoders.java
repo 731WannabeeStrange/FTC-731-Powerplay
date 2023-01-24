@@ -27,7 +27,7 @@ public class ScrimmageTeleOpNoEncoders extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         MultipleTelemetry multipleTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         dt = new Drivetrain(hardwareMap, telemetry);
-        lift = new Lift(hardwareMap, telemetry);
+        lift = new Lift(hardwareMap, telemetry, false);
 
         waitForStart();
 
