@@ -13,13 +13,12 @@ import org.firstinspires.ftc.teamcode.robot.hardware.LiftState;
 
 @Config
 public class ScoringMech {
-    public enum ScoringState {
+    private enum ScoringState {
         RETRACTED,
         DROPPINGV4B,
         EXTENDING,
         GRABBING,
         RETRACTING,
-        RAISINGV4B,
         TRANSFERRING,
         RELEASING,
         LOWERED,
@@ -30,7 +29,7 @@ public class ScoringMech {
         RESET
     }
 
-    public ScoringState scoringState = ScoringState.RESET;
+    private ScoringState scoringState = ScoringState.RESET;
 
     private LiftState previousLiftState = LiftState.HIGH;
 
@@ -78,7 +77,7 @@ public class ScoringMech {
                     scoringState = ScoringState.EXTENDING;
                 }
                 break;
-                
+
             case EXTENDING:
                 if (intake.isConeDetected()) {
                     intake.stopSlides();
