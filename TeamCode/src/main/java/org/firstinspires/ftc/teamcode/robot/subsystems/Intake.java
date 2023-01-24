@@ -23,14 +23,14 @@ public class Intake {
     public static double clawClosedPos = 0.7;
     public static double v4bRetractedPos = 0;
     public static int intakePartialRetract = 60;
-    public static int maxExtension = 500;
+    public static int maxExtension = 800;
     public static int errorTolerance = 20;
     public static double[] stackPositions = {
-            0.55,
-            0.6,
-            0.65,
-            0.72,
-            0.72
+            0.70,
+            0.75,
+            0.8,
+            0.85,
+            0.9
     };
 
     public final Telemetry telemetry;
