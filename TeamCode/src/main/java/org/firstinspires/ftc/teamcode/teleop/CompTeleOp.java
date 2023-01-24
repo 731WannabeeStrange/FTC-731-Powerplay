@@ -6,18 +6,21 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.robot.subsystems.Rumbler;
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMech;
 
 @TeleOp
 public class CompTeleOp extends LinearOpMode {
     Drivetrain dt;
     ScoringMech sm;
+    Rumbler rb;
 
     @Override
     public void runOpMode() throws InterruptedException {
         MultipleTelemetry multipleTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        rb = new Rumbler(gamepad1);
         dt = new Drivetrain(hardwareMap, multipleTelemetry);
-        sm = new ScoringMech(hardwareMap, multipleTelemetry);
+        sm = new ScoringMech(hardwareMap, rb, multipleTelemetry);
 
         waitForStart();
 
