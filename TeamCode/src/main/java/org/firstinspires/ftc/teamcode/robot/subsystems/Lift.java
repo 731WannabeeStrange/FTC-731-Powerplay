@@ -102,10 +102,7 @@ public class Lift {
 
     public void grab() { grabberState = GrabberState.HOLD; }
 
-    public void deposit() {
-        grabberState = GrabberState.RELEASE;
-        update();
-    }
+    public void deposit() { grabberState = GrabberState.RELEASE; }
 
     public void setYawArmAngle(double angle) {
         currentYawArmAngle = angle;

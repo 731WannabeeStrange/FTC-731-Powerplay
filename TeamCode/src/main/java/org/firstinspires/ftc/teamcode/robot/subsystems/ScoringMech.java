@@ -37,6 +37,7 @@ public class ScoringMech {
 
     private Lift lift;
     private Intake intake;
+    private Rumbler rumbler;
 
     private MultipleTelemetry telemetry;
 
@@ -45,8 +46,9 @@ public class ScoringMech {
     private boolean previousIntakeGrabButton = false;
     private double previousYawArmAngle = 0;
 
-    public ScoringMech(HardwareMap hardwareMap, MultipleTelemetry multipleTelemetry) {
+    public ScoringMech(HardwareMap hardwareMap, Rumbler rumbler, MultipleTelemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
+        this.rumbler = rumbler;
 
         lift = new Lift(hardwareMap, multipleTelemetry);
         intake = new Intake(hardwareMap, multipleTelemetry);
@@ -63,7 +65,7 @@ public class ScoringMech {
             case RETRACTED:
                 intake.retractFully();
                 intake.grab();
-                lift.grab();
+
                 if (intakeGrabButton) {
                     intake.setV4bPos(0.9);
                     scoringState = ScoringState.DROPPINGV4B;
@@ -80,6 +82,7 @@ public class ScoringMech {
 
             case EXTENDING:
                 if (intake.isConeDetected()) {
+                    rumbler.rumble(1);
                     intake.stopSlides();
                     intake.grab();
                     scoringState = ScoringState.GRABBING;
@@ -174,6 +177,8 @@ public class ScoringMech {
                     if (depositButton) {
                         previousYawArmAngle = lift.getYawArmAngle();
                         previousLiftState = lift.getLiftState();
+                        controllingArm = false; // give back auto turn before or after deposit is
+                                                // finished?
 
                         lift.deposit();
                         eTime.reset();
@@ -184,14 +189,13 @@ public class ScoringMech {
 
             case DEPOSITING:
                 if (eTime.time() > Lift.waitTime) {
-                    controllingArm = false;
                     lift.grab();
+                    lift.retract();
                     scoringState = ScoringState.LOWERING;
                 }
                 break;
 
             case LOWERING:
-                lift.retract();
                 if (!lift.isBusy()) {
                     scoringState = ScoringState.RETRACTED;
                 }
@@ -202,6 +206,7 @@ public class ScoringMech {
                 intake.retractFully();
                 intake.grab();
                 lift.retract();
+                lift.grab();
                 scoringState = ScoringState.RETRACTED;
                 break;
         }
