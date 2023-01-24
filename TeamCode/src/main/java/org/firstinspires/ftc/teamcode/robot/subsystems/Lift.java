@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robot.hardware.LiftState;
 import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServo;
 import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServoPair;
 import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
@@ -30,24 +31,18 @@ public class Lift {
     public static int errorTolerance = 25;
     public static double grabTime = 0.75;
 
-    public final Telemetry telemetry;
+    private final Telemetry telemetry;
 
-    public final DcMotorEx lift1;
-    public final DcMotorEx lift2;
-    public final ProfiledServoPair yawArm;
-    public final ProfiledServo grabber;
+    private final DcMotorEx lift1;
+    private final DcMotorEx lift2;
+    private final ProfiledServoPair yawArm;
+    private final ProfiledServo grabber;
 
     private int targetPosition = 0;
     private int error1 = 0;
     private int error2 = 0;
 
-    private enum LiftState {
-        HIGH,
-        MID,
-        LOW,
-        RETRACT,
-        COLLECT
-    }
+    private double currentYawArmAngle = 0;
 
     private LiftState liftState = LiftState.RETRACT;
 
@@ -113,6 +108,8 @@ public class Lift {
     }
 
     public void setYawArmAngle(double angle) {
+        currentYawArmAngle = angle;
+
         while (angle < -180) {
             angle += 360;
         }
@@ -130,9 +127,21 @@ public class Lift {
         yawArm.setPosition(pos);
     }
 
+    public double getYawArmAngle() {
+        return currentYawArmAngle;
+    }
+
     public int getSlidePosition() { return lift1.getCurrentPosition(); }
 
     public int getTargetPosition() { return targetPosition; }
+
+    public boolean canControlArm() {
+        return lift1.getCurrentPosition() > minHeightForArmRotation;
+    }
+
+    public LiftState getLiftState() {
+        return liftState;
+    }
 
     public boolean isBusy() { return Math.abs(error1) >= errorTolerance || Math.abs(error2) >= errorTolerance; }
 

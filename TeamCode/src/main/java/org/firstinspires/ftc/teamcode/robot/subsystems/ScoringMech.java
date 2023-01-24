@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robot.hardware.LiftState;
 
 @Config
 public class ScoringMech {
@@ -31,16 +32,19 @@ public class ScoringMech {
 
     public ScoringState scoringState = ScoringState.RESET;
 
-    public boolean controllingArm = false;
+    private LiftState previousLiftState = LiftState.HIGH;
 
-    Lift lift;
-    Intake intake;
+    private boolean controllingArm = false;
 
-    MultipleTelemetry telemetry;
+    private Lift lift;
+    private Intake intake;
 
-    public final ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
+    private MultipleTelemetry telemetry;
 
-    public boolean previousIntakeGrabButton = false;
+    private final ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
+
+    private boolean previousIntakeGrabButton = false;
+    private double previousYawArmAngle = 0;
 
     public ScoringMech(HardwareMap hardwareMap, MultipleTelemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
@@ -74,6 +78,7 @@ public class ScoringMech {
                     scoringState = ScoringState.EXTENDING;
                 }
                 break;
+                
             case EXTENDING:
                 if (intake.isConeDetected()) {
                     intake.stopSlides();
@@ -94,7 +99,6 @@ public class ScoringMech {
 
             case RETRACTING:
                 if (!intake.isBusy() && !intake.isV4BBusy()) {
-                    //intake.setV4bPos(0.25);
                     lift.deposit();
                     lift.collect();
                     scoringState = ScoringState.TRANSFERRING;
@@ -108,6 +112,7 @@ public class ScoringMech {
                     scoringState = ScoringState.RELEASING;
                 }
                 break;
+
             case RELEASING:
                 if (!intake.isClawBusy()) {
                     intake.retractFully();
@@ -117,22 +122,29 @@ public class ScoringMech {
 
             case LOWERED:
                 if (!intake.isBusy()) {
-                    if (liftButtonHigh) {
-                        lift.extendHigh();
-                        scoringState = ScoringState.LIFTING;
-                    } else if (liftButtonMid) {
-                        lift.extendMid();
-                        scoringState = ScoringState.LIFTING;
-                    } else if (liftButtonLow) {
-                        lift.extendLow();
-                        scoringState = ScoringState.LIFTING;
+                    switch (previousLiftState) {
+                        case HIGH:
+                            lift.extendHigh();
+                            scoringState = ScoringState.LIFTING;
+                            break;
+                        case MID:
+                            lift.extendMid();
+                            scoringState = ScoringState.LIFTING;
+                            break;
+                        case LOW:
+                            lift.extendLow();
+                            scoringState = ScoringState.LIFTING;
+                            break;
+                        default:
+                            throw new IllegalStateException("Unexpected previous lift state: " + previousLiftState);
                     }
                 }
                 break;
 
             case LIFTING:
-                if (lift.getSlidePosition() > Lift.minHeightForArmRotation) {
+                if (lift.canControlArm()) {
                     controllingArm = true;
+                    lift.setYawArmAngle(previousYawArmAngle);
                     scoringState = ScoringState.CONTROLLING_ARM;
                 }
                 break;
@@ -151,8 +163,19 @@ public class ScoringMech {
                     lift.setYawArmAngle(270);
                 }
 
+                if (liftButtonHigh) {
+                    lift.extendHigh();
+                } else if (liftButtonMid) {
+                    lift.extendMid();
+                } else if (liftButtonLow) {
+                    lift.extendLow();
+                }
+
                 if (!lift.isBusy()) {
                     if (depositButton) {
+                        previousYawArmAngle = lift.getYawArmAngle();
+                        previousLiftState = lift.getLiftState();
+
                         lift.deposit();
                         eTime.reset();
                         scoringState = ScoringState.DEPOSITING;
