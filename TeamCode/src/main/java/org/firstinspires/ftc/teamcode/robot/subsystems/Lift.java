@@ -63,7 +63,7 @@ public class Lift {
                 hardwareMap,
                 "yaw1",
                 "yaw2",
-                new MotionConstraint(1, 4, 4),
+                new MotionConstraint(2, 4, 4),
                 (0.0037037 * -45) + 0.33333
         );
 
