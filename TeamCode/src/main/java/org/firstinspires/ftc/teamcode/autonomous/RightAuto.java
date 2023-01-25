@@ -96,10 +96,12 @@ public class RightAuto extends LinearOpMode {
                     telemetry.addData("intake busy", intake.isBusy());
                     if (!lift.isBusy() && !intake.isBusy()) {
                         lift.deposit();
+                        lift.update();
                         if (!lift.grabber.isBusy()) {
                             state = State.WAIT;
                             nextState = State.GRAB_CONE;
                             waitTime = 500;
+                            eTime.reset();
                         }
                     }
                     break;
@@ -111,6 +113,7 @@ public class RightAuto extends LinearOpMode {
                         state = State.WAIT;
                         nextState = State.COLLECT;
                         waitTime = 500;
+                        eTime.reset();
                         flag = false;
                     }
 
@@ -122,12 +125,14 @@ public class RightAuto extends LinearOpMode {
 
                     if (!lift.isBusy()) {
                         intake.release();
+                        intake.update();
 
                         if (!intake.claw.isBusy()) {
                             if (cycle < numCycles) {
                                 state = State.WAIT;
                                 nextState = State.DEPOSIT;
                                 waitTime = 500;
+                                eTime.reset();
                                 cycle++;
                             } else {
                                 state = State.PARK;
@@ -201,6 +206,7 @@ public class RightAuto extends LinearOpMode {
             if (!intake.v4b.isBusy()) {
                 telemetry.addLine("Retracting intake");
                 intake.retractPart(Intake.v4bRetractedPos);
+                intake.update();
                 if (!intake.isBusy()) {
                     flag = true;
                 }
