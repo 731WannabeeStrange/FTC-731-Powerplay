@@ -57,8 +57,8 @@ public class RightAuto extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence driveToSpot = drive.trajectorySequenceBuilder(startPose)
-                .back(36)
-                .splineToSplineHeading(new Pose2d(-30, 12, Math.toRadians(177)), Math.toRadians(0))
+                .back(38)
+                .splineToSplineHeading(new Pose2d(-30, 10, Math.toRadians(177)), Math.toRadians(0))
                 .back(6)
                 .build();
 
@@ -100,7 +100,7 @@ public class RightAuto extends LinearOpMode {
                         if (!lift.grabber.isBusy()) {
                             state = State.WAIT;
                             nextState = State.GRAB_CONE;
-                            waitTime = 500;
+                            waitTime = 200;
                             eTime.reset();
                         }
                     }
@@ -112,7 +112,7 @@ public class RightAuto extends LinearOpMode {
                     if (flag) {
                         state = State.WAIT;
                         nextState = State.COLLECT;
-                        waitTime = 500;
+                        waitTime = 200;
                         eTime.reset();
                         flag = false;
                     }
@@ -131,7 +131,7 @@ public class RightAuto extends LinearOpMode {
                             if (cycle < numCycles) {
                                 state = State.WAIT;
                                 nextState = State.DEPOSIT;
-                                waitTime = 500;
+                                waitTime = 200;
                                 eTime.reset();
                                 cycle++;
                             } else {
@@ -182,10 +182,10 @@ public class RightAuto extends LinearOpMode {
 
     public void deposit() {
         intake.extendFully();
-        intake.setV4bPos(Intake.stackPositions[cycle]);
+        intake.setV4bPos(Intake.stackPositions[cycle - 1]);
         intake.release();
         lift.extendHigh();
-        if (lift.getSlidePosition() > Lift.minHeightForArmRotation) {
+        if (lift.getSlidePosition() > Lift.liftMid) {
             lift.setYawArmAngle(-90);
         }
 
@@ -194,8 +194,12 @@ public class RightAuto extends LinearOpMode {
     }
 
     public void grabCone() {
-        lift.retract();
+        lift.setYawArmAngle(-10);
         lift.update();
+        if (!lift.yawArm.isBusy()) {
+            lift.retract();
+            lift.update();
+        }
         intake.grab();
         intake.update();
         telemetry.addLine("Closing claw");
@@ -207,7 +211,7 @@ public class RightAuto extends LinearOpMode {
                 telemetry.addLine("Retracting intake");
                 intake.retractPart(Intake.v4bRetractedPos);
                 intake.update();
-                if (!intake.isBusy()) {
+                if (!intake.isBusy() && !lift.isBusy()) {
                     flag = true;
                 }
             }
