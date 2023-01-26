@@ -40,7 +40,11 @@ public class Lift {
     private double currentYawArmAngle = 0;
 
     public enum LiftState {
-        HIGH, MID, LOW, RETRACT, COLLECT
+        HIGH,
+        MID,
+        LOW,
+        RETRACT,
+        COLLECT
     }
 
     private LiftState liftState = LiftState.RETRACT;
