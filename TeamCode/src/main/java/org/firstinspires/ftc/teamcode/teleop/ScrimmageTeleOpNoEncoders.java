@@ -45,13 +45,13 @@ public class ScrimmageTeleOpNoEncoders extends LinearOpMode {
 
             //lift.setPower((gamepad1.right_trigger - gamepad1.left_trigger) / 2);
             if (gamepad1.y) {
-                lift.extendHigh();
+                lift.setLiftState(Lift.LiftState.HIGH);
             } else if (gamepad1.b) {
-                lift.extendMid();
+                lift.setLiftState(Lift.LiftState.MID);
             } else if (gamepad1.a) {
-                lift.extendLow();
+                lift.setLiftState(Lift.LiftState.LOW);
             } else if (gamepad1.x) {
-                lift.collect();
+                lift.setLiftState(Lift.LiftState.COLLECT);
             }
             if (gamepad2.right_stick_y != 0 || gamepad2.right_stick_x != 0) {
                 lift.setYawArmAngle(Math.atan2(gamepad2.right_stick_y, gamepad2.right_stick_x));

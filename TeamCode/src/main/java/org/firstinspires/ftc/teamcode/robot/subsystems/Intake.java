@@ -33,22 +33,20 @@ public class Intake {
             0.8
     };
 
-    public final Telemetry telemetry;
+    private final Telemetry telemetry;
 
-    public DcMotorEx slide1;
-    public DcMotorEx slide2;
+    private DcMotorEx slide1;
+    private DcMotorEx slide2;
 
-    public int error1, error2;
-    public int customTarget;
+    private int error1, error2;
+    private int customTarget;
 
-    public RevColorSensorV3 color;
+    private RevColorSensorV3 color;
 
-    public ProfiledServo claw;
-    public ProfiledServoPair v4b;
+    private ProfiledServo claw;
+    private ProfiledServoPair v4b;
 
-    public DigitalChannel beamBreaker;
-
-    public final ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
+    private DigitalChannel beamBreaker;
 
     private enum SlideState {
         RETRACTFULL,
@@ -101,39 +99,27 @@ public class Intake {
             case RETRACTFULL:
                 error1 = -slide1.getCurrentPosition();
                 error2 = -slide2.getCurrentPosition();
-
-                if (Math.abs(error1) < errorTolerance) {
-                    slideState = SlideState.STOP;
-                }
                 break;
             case RETRACTPART:
                 error1 = intakePartialRetract - slide1.getCurrentPosition();
                 error2 = intakePartialRetract - slide2.getCurrentPosition();
-
-                if (Math.abs(error1) < errorTolerance) {
-                    slideState = SlideState.STOP;
-                }
                 break;
             case EXTENDING:
                 error1 = maxExtension - slide1.getCurrentPosition();
                 error2 = maxExtension - slide2.getCurrentPosition();
-
-                if (Math.abs(error1) < errorTolerance) {
-                    slideState = SlideState.STOP;
-                }
                 break;
             case CUSTOMEXTEND:
                 error1 = customTarget - slide1.getCurrentPosition();
                 error2 = customTarget - slide2.getCurrentPosition();
-
-                if (Math.abs(error1) < errorTolerance) {
-                    slideState = SlideState.STOP;
-                }
                 break;
             case STOP:
                 error1 = 0;
                 error2 = 0;
                 break;
+        }
+
+        if (Math.abs(error1) < errorTolerance && slideState != SlideState.STOP) {
+            slideState = SlideState.STOP;
         }
 
         slide1.setPower(P * error1);

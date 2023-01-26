@@ -2,14 +2,8 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.hardware.LiftState;
 
 @Config
 public class ScoringMech {
@@ -31,7 +25,7 @@ public class ScoringMech {
 
     private ScoringState scoringState = ScoringState.RESET;
 
-    private LiftState previousLiftState = LiftState.HIGH;
+    private Lift.LiftState previousLiftState = Lift.LiftState.HIGH;
 
     private boolean controllingArm = false;
 
@@ -102,7 +96,7 @@ public class ScoringMech {
             case RETRACTING:
                 if (!intake.isBusy() && !intake.isV4BBusy()) {
                     lift.deposit();
-                    lift.collect();
+                    lift.setLiftState(Lift.LiftState.COLLECT);
                     scoringState = ScoringState.TRANSFERRING;
                 }
                 break;
@@ -124,22 +118,8 @@ public class ScoringMech {
 
             case LOWERED:
                 if (!intake.isBusy()) {
-                    switch (previousLiftState) {
-                        case HIGH:
-                            lift.extendHigh();
-                            scoringState = ScoringState.LIFTING;
-                            break;
-                        case MID:
-                            lift.extendMid();
-                            scoringState = ScoringState.LIFTING;
-                            break;
-                        case LOW:
-                            lift.extendLow();
-                            scoringState = ScoringState.LIFTING;
-                            break;
-                        default:
-                            throw new IllegalStateException("Unexpected previous lift state: " + previousLiftState);
-                    }
+                    lift.setLiftState(previousLiftState);
+                    scoringState = ScoringState.LIFTING;
                 }
                 break;
 
@@ -166,11 +146,14 @@ public class ScoringMech {
                 }
 
                 if (liftButtonHigh) {
-                    lift.extendHigh();
+                    lift.setLiftState(Lift.LiftState.HIGH);
+                    previousLiftState = lift.getLiftState();
                 } else if (liftButtonMid) {
-                    lift.extendMid();
+                    lift.setLiftState(Lift.LiftState.MID);
+                    previousLiftState = lift.getLiftState();
                 } else if (liftButtonLow) {
-                    lift.extendLow();
+                    lift.setLiftState(Lift.LiftState.LOW);
+                    previousLiftState = lift.getLiftState();
                 }
 
                 if (!lift.isBusy()) {
@@ -190,7 +173,7 @@ public class ScoringMech {
             case DEPOSITING:
                 if (eTime.time() > Lift.waitTime) {
                     lift.grab();
-                    lift.retract();
+                    lift.setLiftState(Lift.LiftState.RETRACT);
                     scoringState = ScoringState.LOWERING;
                 }
                 break;
@@ -205,7 +188,7 @@ public class ScoringMech {
                 controllingArm = false;
                 intake.retractFully();
                 intake.grab();
-                lift.retract();
+                lift.setLiftState(Lift.LiftState.RETRACT);
                 lift.grab();
                 scoringState = ScoringState.RETRACTED;
                 break;

@@ -19,13 +19,13 @@ public class LiftTestOpMode extends LinearOpMode {
 
         while (opModeIsActive() && !isStopRequested()) {
             if (gamepad1.y) {
-                lift.extendHigh();
+                lift.setLiftState(Lift.LiftState.HIGH);
             } else if (gamepad1.b) {
-                lift.extendMid();
+                lift.setLiftState(Lift.LiftState.MID);
             } else if (gamepad1.a) {
-                lift.extendLow();
+                lift.setLiftState(Lift.LiftState.LOW);
             } else if (gamepad1.x) {
-                lift.retract();
+                lift.setLiftState(Lift.LiftState.RETRACT);
             }
 
             lift.update();

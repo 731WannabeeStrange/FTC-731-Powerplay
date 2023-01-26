@@ -96,7 +96,7 @@ public class RightAuto extends LinearOpMode {
                     if (!lift.isBusy() && !intake.isBusy()) {
                         lift.deposit();
                         lift.update();
-                        if (!lift.grabber.isBusy()) {
+                        if (!lift.isGrabberBusy()) {
                             state = State.WAIT;
                             nextState = State.GRAB_CONE;
                             waitTime = 200;
@@ -119,14 +119,14 @@ public class RightAuto extends LinearOpMode {
                     break;
 
                 case COLLECT:
-                    lift.collect();
+                    lift.setLiftState(Lift.LiftState.COLLECT);
                     lift.update();
 
                     if (!lift.isBusy()) {
                         intake.release();
                         intake.update();
 
-                        if (!intake.claw.isBusy()) {
+                        if (!intake.isClawBusy()) {
                             if (cycle < numCycles) {
                                 state = State.WAIT;
                                 nextState = State.DEPOSIT;
@@ -183,7 +183,7 @@ public class RightAuto extends LinearOpMode {
         intake.extendFully();
         intake.setV4bPos(Intake.stackPositions[cycle - 1]);
         intake.release();
-        lift.extendHigh();
+        lift.setLiftState(Lift.LiftState.HIGH);
         if (lift.getSlidePosition() > Lift.liftMid) {
             lift.setYawArmAngle(-90);
         }
@@ -195,18 +195,18 @@ public class RightAuto extends LinearOpMode {
     public void grabCone() {
         lift.setYawArmAngle(-10);
         lift.update();
-        if (!lift.yawArm.isBusy()) {
-            lift.retract();
+        if (!lift.isYawArmBusy()) {
+            lift.setLiftState(Lift.LiftState.RETRACT);
             lift.update();
         }
         intake.grab();
         intake.update();
         telemetry.addLine("Closing claw");
-        if (!intake.claw.isBusy()) {
+        if (!intake.isClawBusy()) {
             telemetry.addLine("Setting v4b pos");
             intake.setV4bPos(Intake.v4bRetractedPos);
             intake.update();
-            if (!intake.v4b.isBusy()) {
+            if (!intake.isV4BBusy()) {
                 telemetry.addLine("Retracting intake");
                 intake.retractPart(Intake.v4bRetractedPos);
                 intake.update();

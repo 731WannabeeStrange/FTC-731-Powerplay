@@ -14,39 +14,39 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @Config
 public class Drivetrain {
-    public final Telemetry telemetry;
-
-    public final BNO055IMU imu;
-    public final DcMotor fr;
-    public final DcMotor rr;
-    public final DcMotor fl;
-    public final DcMotor rl;
-
-    public double FL_power;
-    public double FR_power;
-    public double RL_power;
-    public double RR_power;
-
-    public final ElapsedTime eTime = new ElapsedTime();
-
     public double previous_error, integral = 0;
     public static double P = 0.04;
     public static double I = 0;
     public static double D = 0;
+    
+    private final Telemetry telemetry;
 
-    public double errorAutoTurn, errorHeadingControl;
-    public double desiredAngleAutoTurn = 0;
-    public double desiredAngleHeadingControl = 0;
+    private final BNO055IMU imu;
+    private final DcMotor fr;
+    private final DcMotor rr;
+    private final DcMotor fl;
+    private final DcMotor rl;
 
-    public String turnState = "auto";
+    private double FL_power;
+    private double FR_power;
+    private double RL_power;
+    private double RR_power;
 
-    public double denominator;
+    private final ElapsedTime eTime = new ElapsedTime();
 
-    public enum DriveMode {
+    private double errorAutoTurn, errorHeadingControl;
+    private double desiredAngleAutoTurn = 0;
+    private double desiredAngleHeadingControl = 0;
+
+    private String turnState = "auto";
+
+    private double denominator;
+
+    private enum DriveMode {
         DRIVER_CONTROLLED,
         AUTO_CONTROL
     }
-    public DriveMode driveState = DriveMode.AUTO_CONTROL;
+    private DriveMode driveState = DriveMode.AUTO_CONTROL;
 
     public Drivetrain(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;

@@ -1,14 +1,11 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.robot.hardware.LiftState;
 import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServo;
 import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServoPair;
 import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
@@ -31,16 +28,20 @@ public class Lift {
 
     private final Telemetry telemetry;
 
-    public final DcMotorEx lift1;
-    public final DcMotorEx lift2;
-    public final ProfiledServoPair yawArm;
-    public final ProfiledServo grabber;
+    private final DcMotorEx lift1;
+    private final DcMotorEx lift2;
+    private final ProfiledServoPair yawArm;
+    private final ProfiledServo grabber;
 
     private int targetPosition = 0;
     private int error1 = 0;
     private int error2 = 0;
 
     private double currentYawArmAngle = 0;
+
+    public enum LiftState {
+        HIGH, MID, LOW, RETRACT, COLLECT
+    }
 
     private LiftState liftState = LiftState.RETRACT;
 
@@ -82,20 +83,12 @@ public class Lift {
         lift2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 
-    public void extendHigh() { liftState = LiftState.HIGH; }
-
-    public void extendMid() { liftState = LiftState.MID; }
-
-    public void extendLow() { liftState = LiftState.LOW; }
-
-    public void retract() {
-        liftState = LiftState.RETRACT;
+    public void setLiftState(LiftState state) {
+        liftState = state;
     }
-    public void retract(int pos) { liftState = LiftState.RETRACT; } // ignores pos argument for now,
-                                                                    // can change in the future
 
-    public void collect() {
-        liftState = LiftState.COLLECT;
+    public LiftState getLiftState() {
+        return liftState;
     }
 
     public void grab() { grabberState = GrabberState.HOLD; }
@@ -121,12 +114,13 @@ public class Lift {
         double pos = (0.0037037 * angle) + 0.33333;
         yawArm.setPosition(pos);
     }
-
     public double getYawArmAngle() {
         return currentYawArmAngle;
     }
 
     public int getSlidePosition() { return lift1.getCurrentPosition(); }
+
+    public double[] getMotorPowers() { return new double[]{lift1.getPower(), lift2.getPower()}; }
 
     public int getTargetPosition() { return targetPosition; }
 
@@ -134,13 +128,11 @@ public class Lift {
         return lift1.getCurrentPosition() > minHeightForArmRotation;
     }
 
-    public LiftState getLiftState() {
-        return liftState;
-    }
-
     public boolean isBusy() { return Math.abs(error1) >= errorTolerance || Math.abs(error2) >= errorTolerance; }
 
-    public double[] getMotorPowers() { return new double[]{lift1.getPower(), lift2.getPower()}; }
+    public boolean isYawArmBusy() { return yawArm.isBusy(); }
+
+    public boolean isGrabberBusy() { return grabber.isBusy(); }
 
     public void update() {
         switch (liftState) {

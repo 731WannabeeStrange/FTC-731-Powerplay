@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.autonomous.roadrunner.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.vision.signal.AprilTagVisionPipeline;
 import org.firstinspires.ftc.teamcode.vision.signal.Location;
@@ -89,7 +88,7 @@ public class PreloadParkAuto extends LinearOpMode {
                     telemetry.addData("lift busy", lift.isBusy());
                     if (!lift.isBusy()) {
                         lift.deposit();
-                        if (!lift.grabber.isBusy()) {
+                        if (!lift.isGrabberBusy()) {
                             state = State.WAIT;
                             nextState = State.PARK;
                             waitTime = 500;
@@ -134,7 +133,7 @@ public class PreloadParkAuto extends LinearOpMode {
     }
 
     public void deposit() {
-        lift.extendHigh();
+        lift.setLiftState(Lift.LiftState.HIGH);
         if (lift.getSlidePosition() > Lift.minHeightForArmRotation) {
             lift.setYawArmAngle(-90);
         }
