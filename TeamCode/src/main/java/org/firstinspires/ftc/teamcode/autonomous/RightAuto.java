@@ -57,8 +57,8 @@ public class RightAuto extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         TrajectorySequence driveToSpot = drive.trajectorySequenceBuilder(startPose)
-                .back(38)
-                .splineToSplineHeading(new Pose2d(-30, 10, Math.toRadians(177)), Math.toRadians(0))
+                .back(36)
+                .splineToSplineHeading(new Pose2d(-30, 12, Math.toRadians(180)), Math.toRadians(0))
                 .back(6)
                 .build();
 
