@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServo;
 import org.firstinspires.ftc.teamcode.utils.Dashboard;
 import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 
-@TeleOp
+@TeleOp(group="test")
 @Config
 public class ProfiledServoTestOpMode extends LinearOpMode
 {

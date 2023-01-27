@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.utils.Dashboard;
 
-@TeleOp
+@TeleOp(group="test")
 @Config
 public class AutoGrabTestOpMode extends LinearOpMode
 {

@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@TeleOp(name = "Beam Breaker Test", group = "Sensor")
+@TeleOp(group="test")
 public class BeamBreakerTest extends LinearOpMode {
 
     DigitalChannel beamBreaker;

@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.T265Localizer;
 import org.firstinspires.ftc.teamcode.utils.GridGuider;
 
-@TeleOp
+@TeleOp(group="test")
 public class GridGuideTestOpMode extends LinearOpMode {
     FtcDashboard dashboard;
     DcMotorEx fl, fr, rl, rr;

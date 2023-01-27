@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 @Config
-@TeleOp
+@TeleOp(group="test")
 public class KalmanFilterTest extends LinearOpMode {
     public static double Q = 0.5;
     public static double R = 2;

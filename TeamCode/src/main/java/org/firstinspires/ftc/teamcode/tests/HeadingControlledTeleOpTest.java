@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @Config
-@TeleOp
+@TeleOp(group="test")
 public class HeadingControlledTeleOpTest extends LinearOpMode {
     FtcDashboard dashboard;
 

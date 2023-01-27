@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.spartronics4915.lib.T265Camera;
 
-@TeleOp
+@TeleOp(group="test")
 @Config
 public class T265TestOpMode extends LinearOpMode
 {

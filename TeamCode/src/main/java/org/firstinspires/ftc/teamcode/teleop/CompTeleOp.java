@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Rumbler;
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMech;
 
-@TeleOp
+@TeleOp(group="a")
 public class CompTeleOp extends LinearOpMode {
     Drivetrain dt;
     ScoringMech sm;

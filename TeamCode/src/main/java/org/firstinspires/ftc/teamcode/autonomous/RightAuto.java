@@ -22,6 +22,7 @@ public class RightAuto extends LinearOpMode {
         DEPOSIT,
         GRAB_CONE,
         COLLECT,
+        CHOOSE_PARK_LOCATION,
         PARK,
         WAIT,
         IDLE
@@ -40,6 +41,7 @@ public class RightAuto extends LinearOpMode {
     Location location = Location.LEFT;
 
     boolean flag = false;
+    boolean parking = false;
 
     ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     double waitTime = 0;
@@ -134,22 +136,28 @@ public class RightAuto extends LinearOpMode {
                                 eTime.reset();
                                 cycle++;
                             } else {
-                                state = State.PARK;
-                                switch (location) {
-                                    case LEFT:
-                                        drive.followTrajectorySequenceAsync(leftPark);
-                                        break;
-                                    case MIDDLE:
-                                        drive.followTrajectorySequenceAsync(midPark);
-                                        break;
-                                    case RIGHT:
-                                        drive.followTrajectorySequenceAsync(rightPark);
-                                        break;
-                                }
+                                state = State.CHOOSE_PARK_LOCATION;
+
                             }
                         }
 
                     }
+                    break;
+
+                case CHOOSE_PARK_LOCATION:
+                    switch (location) {
+                        case LEFT:
+                            drive.followTrajectorySequenceAsync(leftPark);
+                            break;
+                        case MIDDLE:
+                            drive.followTrajectorySequenceAsync(midPark);
+                            break;
+                        case RIGHT:
+                            drive.followTrajectorySequenceAsync(rightPark);
+                            break;
+                    }
+                    state = State.PARK;
+                    parking = true;
                     break;
 
                 case PARK:
@@ -166,6 +174,12 @@ public class RightAuto extends LinearOpMode {
 
                 case IDLE:
                     break;
+            }
+
+            if (getRuntime() > 27 && !parking) {
+                state = State.CHOOSE_PARK_LOCATION;
+                intake.retractPart(Intake.v4bRetractedPos);
+                lift.setLiftState(Lift.LiftState.RETRACT);
             }
 
             drive.update();

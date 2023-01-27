@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.utils.KalmanFilter;
 
 import java.util.Arrays;
 
-@TeleOp
+@TeleOp(group="test")
 public class KalmanFilterIMUTest extends LinearOpMode {
     BNO055IMU imu;
     Drivetrain dt;

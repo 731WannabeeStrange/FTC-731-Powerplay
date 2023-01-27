@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 
-@TeleOp
+@TeleOp(group="test")
 public class LiftTestOpMode extends LinearOpMode {
     Lift lift;
     MultipleTelemetry multipleTelemetry;

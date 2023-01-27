@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.vision.signal.AprilTagVisionPipeline;
 import org.firstinspires.ftc.teamcode.vision.signal.Location;
 
-@TeleOp(name="AprilTagTest")
+@TeleOp(group="test")
 public class AprilTagTest extends LinearOpMode {
     AprilTagVisionPipeline pipeline;
     Location location = Location.LEFT;
