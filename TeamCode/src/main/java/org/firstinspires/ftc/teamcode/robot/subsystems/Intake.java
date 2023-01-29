@@ -18,12 +18,12 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Intake {
     // Config parameters
-    public static double P = 0.001;
-    public static double clawOpenPos = 0;
-    public static double clawClosedPos = 0.7;
+    public static double P = 0.002;
+    public static double clawOpenPos = 0.4;
+    public static double clawClosedPos = 0.65;
     public static double v4bRetractedPos = 0.13;
     public static int intakePartialRetract = 60;
-    public static int maxExtension = 835;
+    public static int maxExtension = 850;
     public static int errorTolerance = 20;
     public static double[] stackPositions = {
             0.55,

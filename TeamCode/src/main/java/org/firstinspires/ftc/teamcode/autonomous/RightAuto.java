@@ -61,7 +61,7 @@ public class RightAuto extends LinearOpMode {
         TrajectorySequence driveToSpot = drive.trajectorySequenceBuilder(startPose)
                 .back(36)
                 .splineToSplineHeading(new Pose2d(-30, 12, Math.toRadians(180)), Math.toRadians(0))
-                .back(6)
+                .back(5)
                 .build();
 
         TrajectorySequence leftPark = drive.trajectorySequenceBuilder(driveToSpot.end())
@@ -82,6 +82,8 @@ public class RightAuto extends LinearOpMode {
 
         drive.followTrajectorySequenceAsync(driveToSpot);
         intake.setV4bPos(Intake.v4bRetractedPos - 0.1);
+
+        double startTime = getRuntime();
 
         while (opModeIsActive()) {
             switch (state) {
@@ -176,7 +178,7 @@ public class RightAuto extends LinearOpMode {
                     break;
             }
 
-            if (getRuntime() > 27 && !parking) {
+            if (getRuntime() - startTime > 27 && !parking) {
                 state = State.CHOOSE_PARK_LOCATION;
                 intake.retractPart(Intake.v4bRetractedPos);
                 lift.setLiftState(Lift.LiftState.RETRACT);
@@ -188,6 +190,7 @@ public class RightAuto extends LinearOpMode {
 
             telemetry.addData("State", state);
             telemetry.addData("Intake ticks", intake.getSlidePosition());
+            telemetry.addData("Runtime", getRuntime());
             telemetry.update();
 
         }
