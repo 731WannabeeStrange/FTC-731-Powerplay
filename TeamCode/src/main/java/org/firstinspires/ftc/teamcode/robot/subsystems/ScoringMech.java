@@ -75,6 +75,11 @@ public class ScoringMech {
                 break;
 
             case EXTENDING:
+                if (intake.isConeClose()) {
+                    intake.setMultiplier(Intake.slowSpeed);
+                } else {
+                    intake.setMultiplier(1);
+                }
                 if (intake.isConeDetected()) {
                     rumbler.rumble(1);
                     intake.stopSlides();
@@ -145,17 +150,6 @@ public class ScoringMech {
                     lift.setYawArmAngle(270);
                 }
 
-                if (liftButtonHigh) {
-                    lift.setLiftState(Lift.LiftState.HIGH);
-                    previousLiftState = lift.getLiftState();
-                } else if (liftButtonMid) {
-                    lift.setLiftState(Lift.LiftState.MID);
-                    previousLiftState = lift.getLiftState();
-                } else if (liftButtonLow) {
-                    lift.setLiftState(Lift.LiftState.LOW);
-                    previousLiftState = lift.getLiftState();
-                }
-
                 if (!lift.isBusy()) {
                     if (depositButton) {
                         previousYawArmAngle = lift.getYawArmAngle();
@@ -192,6 +186,17 @@ public class ScoringMech {
                 lift.grab();
                 scoringState = ScoringState.RETRACTED;
                 break;
+        }
+
+        if (liftButtonHigh) {
+            lift.setLiftState(Lift.LiftState.HIGH);
+            previousLiftState = lift.getLiftState();
+        } else if (liftButtonMid) {
+            lift.setLiftState(Lift.LiftState.MID);
+            previousLiftState = lift.getLiftState();
+        } else if (liftButtonLow) {
+            lift.setLiftState(Lift.LiftState.LOW);
+            previousLiftState = lift.getLiftState();
         }
 
         lift.update();

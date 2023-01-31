@@ -22,15 +22,16 @@ public class Intake {
     public static double clawOpenPos = 0.4;
     public static double clawClosedPos = 0.65;
     public static double v4bRetractedPos = 0.13;
-    public static int intakePartialRetract = 60;
+    public static int intakePartialRetract = 80;
     public static int maxExtension = 850;
     public static int errorTolerance = 20;
+    public static double slowSpeed = 0.4;
     public static double[] stackPositions = {
-            0.55,
-            0.6,
             0.65,
             0.7,
-            0.8
+            0.75,
+            0.8,
+            0.9
     };
 
     private final Telemetry telemetry;
@@ -47,6 +48,8 @@ public class Intake {
     private ProfiledServoPair v4b;
 
     private DigitalChannel beamBreaker;
+
+    private double multiplier = 1;
 
     private enum SlideState {
         RETRACTFULL,
@@ -122,8 +125,8 @@ public class Intake {
             slideState = SlideState.STOP;
         }
 
-        slide1.setPower(P * error1);
-        slide2.setPower(P * error2);
+        slide1.setPower(P * error1 * multiplier);
+        slide2.setPower(P * error2 * multiplier);
     }
 
     public void grab() {
@@ -185,7 +188,15 @@ public class Intake {
         return color.getDistance(DistanceUnit.CM) < 2;
     }
 
+    public boolean isConeClose() {
+        return color.getDistance(DistanceUnit.CM) < 10;
+    }
+
     public double[] getMotorPowers() {
         return new double[]{slide1.getPower(), slide2.getPower()};
+    }
+
+    public void setMultiplier(double multiplier) {
+        this.multiplier = multiplier;
     }
 }

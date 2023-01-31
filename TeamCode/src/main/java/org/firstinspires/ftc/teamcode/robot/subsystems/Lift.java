@@ -15,12 +15,12 @@ public class Lift {
     // Config parameters
     public static int liftLow = 900;
     public static int liftMid = 1750;
-    public static int liftHigh = 2500;
+    public static int liftHigh = 2450;
     public static double grabPos = 0.9;
     public static double releasePos = 0.5;
     public static double waitTime = 1.5;
     public static int hoverPos = 884;
-    public static int collectPos = 50;
+    public static int collectPos = 0;
     public static int minHeightForArmRotation = 200;
     public static double P = 0.006;
     public static int errorTolerance = 25;
@@ -151,11 +151,11 @@ public class Lift {
                 break;
             case RETRACT:
                 grabber.setPosition(grabPos);
-                setYawArmAngle(-10);
+                setYawArmAngle(0);
                 targetPosition = hoverPos;
                 break;
             case COLLECT:
-                setYawArmAngle(-10);
+                setYawArmAngle(0);
                 targetPosition = collectPos;
                 break;
         }

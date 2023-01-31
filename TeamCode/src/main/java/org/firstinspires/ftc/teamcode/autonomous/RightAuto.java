@@ -60,7 +60,7 @@ public class RightAuto extends LinearOpMode {
 
         TrajectorySequence driveToSpot = drive.trajectorySequenceBuilder(startPose)
                 .back(36)
-                .splineToSplineHeading(new Pose2d(-30, 12, Math.toRadians(180)), Math.toRadians(0))
+                .splineToSplineHeading(new Pose2d(-30, 11, Math.toRadians(180)), Math.toRadians(0))
                 .back(5)
                 .build();
 
@@ -180,7 +180,7 @@ public class RightAuto extends LinearOpMode {
 
             if (getRuntime() - startTime > 27 && !parking) {
                 state = State.CHOOSE_PARK_LOCATION;
-                intake.retractPart(Intake.v4bRetractedPos);
+                intake.retractFully();
                 lift.setLiftState(Lift.LiftState.RETRACT);
             }
 
@@ -210,7 +210,7 @@ public class RightAuto extends LinearOpMode {
     }
 
     public void grabCone() {
-        lift.setYawArmAngle(-10);
+        lift.setYawArmAngle(0);
         lift.update();
         if (!lift.isYawArmBusy()) {
             lift.setLiftState(Lift.LiftState.RETRACT);
