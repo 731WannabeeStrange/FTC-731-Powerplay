@@ -22,7 +22,7 @@ public class Lift {
     public static int hoverPos = 884;
     public static int collectPos = 0;
     public static int minHeightForArmRotation = 200;
-    public static double P = 0.006;
+    public static double P = 0.01;
     public static int errorTolerance = 25;
     public static double grabTime = 0.75;
 
