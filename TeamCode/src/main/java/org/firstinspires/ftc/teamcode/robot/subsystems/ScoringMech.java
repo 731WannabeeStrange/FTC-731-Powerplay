@@ -62,7 +62,8 @@ public class ScoringMech {
 
                 if (intakeGrabButton) {
                     intake.setV4bPos(0.9);
-                    scoringState = ScoringState.DROPPINGV4B;
+                    intake.release();
+                    scoringState = ScoringState.EXTENDING;
                 }
                 break;
 
@@ -86,14 +87,16 @@ public class ScoringMech {
                     intake.grab();
                     scoringState = ScoringState.GRABBING;
                 }
+                /*
                 if (!intake.isBusy() && !intake.isConeDetected()) {
                     scoringState = ScoringState.RESET;
                 }
+                 */
                 break;
 
             case GRABBING:
                 if (!intake.isClawBusy()) {
-                    intake.retractPart(0.13);
+                    intake.retractPart(Intake.v4bRetractedPos);
                     scoringState = ScoringState.RETRACTING;
                 }
                 break;
@@ -117,12 +120,13 @@ public class ScoringMech {
             case RELEASING:
                 if (!intake.isClawBusy()) {
                     intake.retractFully();
+                    intake.setV4bPos(Intake.v4bCompletelyRetractedPos);
                     scoringState = ScoringState.LOWERED;
                 }
                 break;
 
             case LOWERED:
-                if (!intake.isBusy()) {
+                if (!intake.isBusy() && !intake.isV4BBusy()) {
                     lift.setLiftState(previousLiftState);
                     scoringState = ScoringState.LIFTING;
                 }
@@ -173,7 +177,7 @@ public class ScoringMech {
                 break;
 
             case LOWERING:
-                if (!lift.isBusy()) {
+                if (!lift.isBusy() && !lift.isYawArmBusy()) {
                     scoringState = ScoringState.RETRACTED;
                 }
                 break;

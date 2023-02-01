@@ -18,14 +18,16 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Intake {
     // Config parameters
-    public static double P = 0.002;
-    public static double clawOpenPos = 0.4;
-    public static double clawClosedPos = 0.65;
-    public static double v4bRetractedPos = 0.13;
-    public static int intakePartialRetract = 80;
+    public static double P = 0.003;
+    public static double clawOpenPos = 0.65;
+    public static double clawClosedPos = 0.4;
+    public static double v4bRetractedPos = 0.25;
+    public static double v4bCompletelyRetractedPos = 0.1;
+    public static int intakePartialRetract = 0;
     public static int maxExtension = 850;
-    public static int errorTolerance = 20;
+    public static int errorTolerance = 10;
     public static double slowSpeed = 0.4;
+    public static double coneCloseValue = 5;
     public static double[] stackPositions = {
             0.65,
             0.7,
@@ -189,7 +191,7 @@ public class Intake {
     }
 
     public boolean isConeClose() {
-        return color.getDistance(DistanceUnit.CM) < 10;
+        return color.getDistance(DistanceUnit.CM) < coneCloseValue;
     }
 
     public double[] getMotorPowers() {

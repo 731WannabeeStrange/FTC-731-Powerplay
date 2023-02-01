@@ -19,12 +19,13 @@ public class Lift {
     public static double grabPos = 0.9;
     public static double releasePos = 0.5;
     public static double waitTime = 1.5;
-    public static int hoverPos = 884;
-    public static int collectPos = 0;
+    public static int hoverPos = 800;
+    public static int collectPos = 50;
     public static int minHeightForArmRotation = 200;
     public static double P = 0.01;
-    public static int errorTolerance = 25;
+    public static int errorTolerance = 10;
     public static double grabTime = 0.75;
+    public static double yawArmAngle = -10;
 
     private final Telemetry telemetry;
 
@@ -68,7 +69,7 @@ public class Lift {
                 hardwareMap,
                 "yaw1",
                 "yaw2",
-                new MotionConstraint(2, 4, 4),
+                new MotionConstraint(3, 6, 2),
                 (0.0037037 * -45) + 0.33333
         );
 
@@ -151,11 +152,14 @@ public class Lift {
                 break;
             case RETRACT:
                 grabber.setPosition(grabPos);
-                setYawArmAngle(0);
-                targetPosition = hoverPos;
+                setYawArmAngle(yawArmAngle);
+                yawArm.periodic();
+                if (!isYawArmBusy()) {
+                    targetPosition = hoverPos;
+                }
                 break;
             case COLLECT:
-                setYawArmAngle(0);
+                setYawArmAngle(yawArmAngle);
                 targetPosition = collectPos;
                 break;
         }
