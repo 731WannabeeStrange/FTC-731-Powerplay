@@ -135,7 +135,7 @@ public class AprilTagVisionPipeline
                     break;
             }
         } catch(Exception ignored) {
-
+            location = Location.LEFT;
         }
         return location;
     }

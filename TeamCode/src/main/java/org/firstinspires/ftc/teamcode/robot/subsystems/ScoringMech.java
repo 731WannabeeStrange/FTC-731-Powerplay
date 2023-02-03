@@ -5,6 +5,8 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.concurrent.TimeUnit;
+
 @Config
 public class ScoringMech {
     private enum ScoringState {
@@ -37,6 +39,8 @@ public class ScoringMech {
 
     private final ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
+    public static int v4bRetractTime = 1000;
+
     private boolean previousIntakeGrabButton = false;
     private double previousYawArmAngle = 0;
 
@@ -53,11 +57,12 @@ public class ScoringMech {
                       boolean yawArm0, boolean yawArm90, boolean yawArm180, boolean yawArm270) {
         telemetry.addData("Timer", eTime.time());
         telemetry.addData("smState", scoringState);
+        telemetry.addData("v4bBusy", intake.isV4BBusy());
         telemetry.update();
 
         switch (scoringState) {
             case RETRACTED:
-                intake.retractFully();
+                intake.retractPart(Intake.v4bRetractedPos);
                 intake.grab();
 
                 if (intakeGrabButton) {
@@ -98,11 +103,12 @@ public class ScoringMech {
                 if (!intake.isClawBusy()) {
                     intake.retractPart(Intake.v4bRetractedPos);
                     scoringState = ScoringState.RETRACTING;
+                    eTime.reset();
                 }
                 break;
 
             case RETRACTING:
-                if (!intake.isBusy() && !intake.isV4BBusy()) {
+                if (!intake.isBusy() && !intake.isV4BBusy() && eTime.time(TimeUnit.MILLISECONDS) > 1000) {
                     lift.deposit();
                     lift.setLiftState(Lift.LiftState.COLLECT);
                     scoringState = ScoringState.TRANSFERRING;
@@ -119,14 +125,14 @@ public class ScoringMech {
 
             case RELEASING:
                 if (!intake.isClawBusy()) {
-                    intake.retractFully();
+                    /*intake.retractFully();*/
                     intake.setV4bPos(Intake.v4bCompletelyRetractedPos);
                     scoringState = ScoringState.LOWERED;
                 }
                 break;
 
             case LOWERED:
-                if (!intake.isBusy() && !intake.isV4BBusy()) {
+                if (/*!intake.isBusy() && */!intake.isV4BBusy()) {
                     lift.setLiftState(previousLiftState);
                     scoringState = ScoringState.LIFTING;
                 }
@@ -184,7 +190,7 @@ public class ScoringMech {
 
             case RESET:
                 controllingArm = false;
-                intake.retractFully();
+                intake.retractPart(Intake.v4bRetractedPos);
                 intake.grab();
                 lift.setLiftState(Lift.LiftState.RETRACT);
                 lift.grab();

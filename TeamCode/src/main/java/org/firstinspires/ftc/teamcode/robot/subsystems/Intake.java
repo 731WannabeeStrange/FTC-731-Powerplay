@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -18,13 +19,13 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Intake {
     // Config parameters
-    public static double P = 0.003;
+    public static double P = 0.0035;
     public static double clawOpenPos = 0.65;
     public static double clawClosedPos = 0.4;
     public static double v4bRetractedPos = 0.25;
     public static double v4bCompletelyRetractedPos = 0.1;
-    public static int intakePartialRetract = 0;
-    public static int maxExtension = 850;
+    public static int intakePartialRetract = 22;
+    public static int maxExtension = 865;
     public static int errorTolerance = 10;
     public static double slowSpeed = 0.4;
     public static double coneCloseValue = 5;
@@ -179,6 +180,7 @@ public class Intake {
     public void retractPart(double v4bpos) {
         v4b.setPosition(v4bpos);
         claw.setPosition(clawClosedPos);
+        v4b.periodic();
         slideState = SlideState.RETRACTPART;
     }
 

@@ -69,7 +69,7 @@ public class Lift {
                 hardwareMap,
                 "yaw1",
                 "yaw2",
-                new MotionConstraint(3, 6, 2),
+                new MotionConstraint(3, 4, 3),
                 (0.0037037 * -45) + 0.33333
         );
 
@@ -109,11 +109,11 @@ public class Lift {
         while (angle > 180) {
             angle -= 360;
         }
-        if (angle > 90) {
-            if (angle < 135) {
-                angle = -180;
+        if (angle < -90) {
+            if (angle > -135) {
+                angle = -90;
             } else {
-                angle = 90;
+                angle = -180;
             }
         }
         double pos = (0.0037037 * angle) + 0.33333;
