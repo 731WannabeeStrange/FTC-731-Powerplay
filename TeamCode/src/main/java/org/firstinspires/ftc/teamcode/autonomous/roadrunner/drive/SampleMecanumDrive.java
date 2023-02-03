@@ -36,6 +36,7 @@ import org.firstinspires.ftc.teamcode.autonomous.roadrunner.util.LynxModuleUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.MAX_ACCEL;
@@ -293,11 +294,19 @@ public class SampleMecanumDrive extends MecanumDrive {
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
         double voltage = batteryVoltageSensor.getVoltage();
-        double scaleFactor = 12 / voltage;
-        fl.setPower(v * scaleFactor);
-        bl.setPower(v1 * scaleFactor);
-        br.setPower(v2 * scaleFactor);
-        fr.setPower(v3 * scaleFactor);
+        double scalar = 12.0 / voltage;
+
+        v *= scalar;
+        v1 *= scalar;
+        v2 *= scalar;
+        v3 *= scalar;
+
+        // Only find max when one of the values is greater than 1
+        double max = Collections.max(Arrays.asList(v, v1, v2, v3, 1.0));
+        fl.setPower(v / max);
+        bl.setPower(v1 / max);
+        br.setPower(v2 / max);
+        fr.setPower(v3 / max);
     }
 
     @Override
