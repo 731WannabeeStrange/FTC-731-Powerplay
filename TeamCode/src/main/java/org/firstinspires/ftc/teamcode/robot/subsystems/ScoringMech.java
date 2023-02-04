@@ -15,6 +15,7 @@ public class ScoringMech {
         EXTENDING,
         GRABBING,
         RETRACTING,
+        COLLECTING_1,
         TRANSFERRING,
         RELEASING_1,
         RELEASING_2,
@@ -111,23 +112,28 @@ public class ScoringMech {
             case RETRACTING:
                 if (!intake.isBusy() && !intake.isV4BBusy() && eTime.time(TimeUnit.MILLISECONDS) > 1000) {
                     lift.openGrabber();
-                    lift.update();
-                    if (!lift.isGrabberBusy()) {
-                        lift.setLiftState(Lift.LiftState.COLLECT);
-                        scoringState = ScoringState.TRANSFERRING;
-                    }
+                    eTime.reset();
+                    scoringState = ScoringState.COLLECTING_1;
+                }
+                break;
+
+            case COLLECTING_1:
+                if (eTime.time() > 0.5) {
+                    lift.setLiftState(Lift.LiftState.COLLECT);
+                    scoringState = ScoringState.TRANSFERRING;
                 }
                 break;
 
             case TRANSFERRING:
                 if (!lift.isBusy()) {
                     lift.closeGrabber();
+                    eTime.reset();
                     scoringState = ScoringState.RELEASING_1;
                 }
                 break;
 
             case RELEASING_1:
-                if (!lift.isGrabberBusy()) {
+                if (eTime.time() > 0.5) {
                     intake.release();
                     scoringState = ScoringState.RELEASING_2;
                 }

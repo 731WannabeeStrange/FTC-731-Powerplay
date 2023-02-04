@@ -24,8 +24,10 @@ public class RightAuto extends LinearOpMode {
         DRIVE_TO_SPOT,
         DEPOSIT,
         DEPOSIT_2,
+        OPENING,
         GRAB_CONE,
         COLLECT,
+        CLOSING,
         CHOOSE_PARK_LOCATION,
         PARK,
         WAIT,
@@ -116,12 +118,17 @@ public class RightAuto extends LinearOpMode {
                     if (!lift.isBusy() && !intake.isBusy()) {
                         lift.openGrabber();
                         lift.update();
-                        if (!lift.isGrabberBusy()) {
-                            state = State.WAIT;
-                            nextState = State.GRAB_CONE;
-                            waitTime = 200;
-                            eTime.reset();
-                        }
+                        eTime.reset();
+                        state = State.OPENING;
+                    }
+                    break;
+
+                case OPENING:
+                    if (eTime.time() > 0.5) {
+                        state = State.WAIT;
+                        nextState = State.GRAB_CONE;
+                        waitTime = 200;
+                        eTime.reset();
                     }
                     break;
 
@@ -146,25 +153,29 @@ public class RightAuto extends LinearOpMode {
                         intake.release();
                         if (!intake.isClawBusy()) {
                             lift.closeGrabber();
-                            if (!lift.isGrabberBusy()) {
-                                intake.setV4bPos(Intake.v4bCompletelyRetractedPos);
-                                intake.update();
-                                if (!intake.isClawBusy() && !intake.isV4BBusy()) {
-                                    if (cycle < numCycles) {
-                                        state = State.WAIT;
-                                        nextState = State.DEPOSIT;
-                                        waitTime = 200;
-                                        eTime.reset();
-                                        intakeTimer.reset();
-                                        cycle++;
-                                    } else {
-                                        state = State.CHOOSE_PARK_LOCATION;
-                                    }
-                                }
-                            }
-
+                            eTime.reset();
+                            state = State.CLOSING;
                         }
 
+                    }
+                    break;
+
+                case CLOSING:
+                    if (eTime.time() > 0.5) {
+                        intake.setV4bPos(Intake.v4bCompletelyRetractedPos);
+                        intake.update();
+                        if (!intake.isClawBusy() && !intake.isV4BBusy()) {
+                            if (cycle < numCycles) {
+                                state = State.WAIT;
+                                nextState = State.DEPOSIT;
+                                waitTime = 200;
+                                eTime.reset();
+                                intakeTimer.reset();
+                                cycle++;
+                            } else {
+                                state = State.CHOOSE_PARK_LOCATION;
+                            }
+                        }
                     }
                     break;
 

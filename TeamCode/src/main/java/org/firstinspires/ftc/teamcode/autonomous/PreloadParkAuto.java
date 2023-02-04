@@ -19,6 +19,7 @@ public class PreloadParkAuto extends LinearOpMode {
     enum State {
         DRIVE_TO_SPOT,
         DEPOSIT,
+        OPENING,
         PARK,
         WAIT,
         IDLE
@@ -88,13 +89,17 @@ public class PreloadParkAuto extends LinearOpMode {
                     telemetry.addData("lift busy", lift.isBusy());
                     if (!lift.isBusy()) {
                         lift.openGrabber();
-                        if (!lift.isGrabberBusy()) {
-                            state = State.WAIT;
-                            nextState = State.PARK;
-                            waitTime = 500;
-                        }
+                        eTime.reset();
+                        state = State.OPENING;
                     }
                     break;
+
+                case OPENING:
+                    if (eTime.time() > 0.5) {
+                        state = State.WAIT;
+                        nextState = State.PARK;
+                        waitTime = 500;
+                    }
 
                 case PARK:
                     if (!drive.isBusy()) {

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -16,13 +17,13 @@ public class Lift {
     public static int liftLow = 900;
     public static int liftMid = 1750;
     public static int liftHigh = 2450;
-    public static double grabPos = 0.45;
+    public static double grabPos = 0.41;
     public static double releasePos = 0.1;
     public static double waitTime = 1.5;
     public static int hoverPos = 800;
     public static int collectPos = 50;
     public static int minHeightForArmRotation = 200;
-    public static double P = 0.01;
+    public static double P = 0.007;
     public static int errorTolerance = 10;
     public static double grabTime = 0.75;
     public static double yawArmAngle = -7;
@@ -32,7 +33,7 @@ public class Lift {
     private final DcMotorEx lift1;
     private final DcMotorEx lift2;
     private final ProfiledServoPair yawArm;
-    private final ProfiledServo grabber;
+    private final Servo grabber;
 
     private int targetPosition = 0;
     private int error1 = 0;
@@ -73,12 +74,8 @@ public class Lift {
                 (0.0037037 * -45) + 0.33333
         );
 
-        grabber = new ProfiledServo(
-                hardwareMap,
-                "grab",
-                new MotionConstraint(2, 4, 4),
-                grabPos
-        );
+        grabber = hardwareMap.get(Servo.class, "grab");
+        grabber.setPosition(grabPos);
 
         lift1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         lift1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -137,8 +134,6 @@ public class Lift {
 
     public boolean isYawArmBusy() { return yawArm.isBusy(); }
 
-    public boolean isGrabberBusy() { return grabber.isBusy(); }
-
     public void update() {
         switch (liftState) {
             case HIGH:
@@ -153,7 +148,6 @@ public class Lift {
             case RETRACT:
                 grabber.setPosition(grabPos);
                 setYawArmAngle(yawArmAngle);
-                yawArm.periodic();
                 if (!isYawArmBusy()) {
                     targetPosition = hoverPos;
                 }
@@ -179,6 +173,5 @@ public class Lift {
         }
 
         yawArm.periodic();
-        grabber.periodic();
     }
 }
