@@ -20,7 +20,7 @@ public class Lift {
     public static double releasePos = 0.5;
     public static double waitTime = 1.5;
     public static int hoverPos = 884;
-    public static int collectPos = 50;
+    public static int collectPos = 25;
     public static int minHeightForArmRotation = 200;
     public static double P = 0.006;
     public static int errorTolerance = 25;
@@ -151,11 +151,11 @@ public class Lift {
                 break;
             case RETRACT:
                 grabber.setPosition(grabPos);
-                setYawArmAngle(-10);
+                setYawArmAngle(-5);
                 targetPosition = hoverPos;
                 break;
             case COLLECT:
-                setYawArmAngle(-10);
+                setYawArmAngle(-5);
                 targetPosition = collectPos;
                 break;
         }

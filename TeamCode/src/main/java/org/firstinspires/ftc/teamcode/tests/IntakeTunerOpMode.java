@@ -19,14 +19,23 @@ public class IntakeTunerOpMode extends LinearOpMode {
         multipleTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         intake = new Intake(hardwareMap, multipleTelemetry);
         lift = new Lift(hardwareMap, multipleTelemetry);
-        
+
+        waitForStart();
         while (opModeIsActive() && !isStopRequested()) {
+            intake.setV4bPos(0.9);
+
             if (!lift.isBusy()) {
                 if (gamepad1.b) {
                     intake.extendFully();
                 } else if (gamepad1.x) {
                     intake.retractFully();
                 }
+            }
+
+            if (gamepad1.y) {
+                intake.release();
+            } else if (gamepad1.a) {
+                intake.grab();
             }
 
             lift.update();

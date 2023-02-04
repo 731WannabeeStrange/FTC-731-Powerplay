@@ -19,8 +19,8 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 public class Intake {
     // Config parameters
     public static double P = 0.001;
-    public static double clawOpenPos = 0;
-    public static double clawClosedPos = 0.7;
+    public static double clawOpenPos = 0.4;
+    public static double clawClosedPos = 0.67;
     public static double v4bRetractedPos = 0.13;
     public static int intakePartialRetract = 60;
     public static int maxExtension = 835;
@@ -73,7 +73,7 @@ public class Intake {
         claw = new ProfiledServo(
                 hardwareMap,
                 "claw",
-                new MotionConstraint(1, 6, 6),
+                new MotionConstraint(1, 4, 4),
                 clawClosedPos
         );
         beamBreaker = hardwareMap.get(DigitalChannel.class, "beamBreaker");
@@ -173,7 +173,7 @@ public class Intake {
 
     public void retractPart(double v4bpos) {
         v4b.setPosition(v4bpos);
-        claw.setPosition(clawClosedPos);
+        //claw.setPosition(clawClosedPos);
         slideState = SlideState.RETRACTPART;
     }
 
@@ -182,7 +182,7 @@ public class Intake {
     }
 
     public boolean isConeDetected() {
-        return color.getDistance(DistanceUnit.CM) < 2;
+        return color.getDistance(DistanceUnit.CM) < 1;
     }
 
     public double[] getMotorPowers() {
