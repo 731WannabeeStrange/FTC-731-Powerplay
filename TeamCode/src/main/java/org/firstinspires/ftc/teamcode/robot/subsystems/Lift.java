@@ -16,8 +16,8 @@ public class Lift {
     public static int liftLow = 900;
     public static int liftMid = 1750;
     public static int liftHigh = 2450;
-    public static double grabPos = 0.9;
-    public static double releasePos = 0.5;
+    public static double grabPos = 0.45;
+    public static double releasePos = 0.1;
     public static double waitTime = 1.5;
     public static int hoverPos = 800;
     public static int collectPos = 50;
@@ -25,7 +25,7 @@ public class Lift {
     public static double P = 0.01;
     public static int errorTolerance = 10;
     public static double grabTime = 0.75;
-    public static double yawArmAngle = -10;
+    public static double yawArmAngle = -7;
 
     private final Telemetry telemetry;
 
@@ -76,7 +76,7 @@ public class Lift {
         grabber = new ProfiledServo(
                 hardwareMap,
                 "grab",
-                new MotionConstraint(1, 4, 4),
+                new MotionConstraint(2, 4, 4),
                 grabPos
         );
 
@@ -96,9 +96,9 @@ public class Lift {
         return liftState;
     }
 
-    public void grab() { grabberState = GrabberState.HOLD; }
+    public void closeGrabber() { grabberState = GrabberState.HOLD; }
 
-    public void deposit() { grabberState = GrabberState.RELEASE; }
+    public void openGrabber() { grabberState = GrabberState.RELEASE; }
 
     public void setYawArmAngle(double angle) {
         currentYawArmAngle = angle;
@@ -175,13 +175,6 @@ public class Lift {
                 break;
             case RELEASE:
                 grabber.setPosition(releasePos);
-                grabberState = GrabberState.DEPOSITING;
-                grabTimer.reset();
-                break;
-            case DEPOSITING:
-                if (grabTimer.time() > grabTime) {
-                    grabberState = GrabberState.HOLD;
-                }
                 break;
         }
 

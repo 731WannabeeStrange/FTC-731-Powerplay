@@ -114,7 +114,7 @@ public class RightAuto extends LinearOpMode {
                 case DEPOSIT_2:
                     deposit();
                     if (!lift.isBusy() && !intake.isBusy()) {
-                        lift.deposit();
+                        lift.openGrabber();
                         lift.update();
                         if (!lift.isGrabberBusy()) {
                             state = State.WAIT;
@@ -144,20 +144,25 @@ public class RightAuto extends LinearOpMode {
 
                     if (!lift.isBusy()) {
                         intake.release();
-                        intake.setV4bPos(Intake.v4bCompletelyRetractedPos);
-                        intake.update();
-
-                        if (!intake.isClawBusy() && !intake.isV4BBusy()) {
-                            if (cycle < numCycles) {
-                                state = State.WAIT;
-                                nextState = State.DEPOSIT;
-                                waitTime = 200;
-                                eTime.reset();
-                                intakeTimer.reset();
-                                cycle++;
-                            } else {
-                                state = State.CHOOSE_PARK_LOCATION;
+                        if (!intake.isClawBusy()) {
+                            lift.closeGrabber();
+                            if (!lift.isGrabberBusy()) {
+                                intake.setV4bPos(Intake.v4bCompletelyRetractedPos);
+                                intake.update();
+                                if (!intake.isClawBusy() && !intake.isV4BBusy()) {
+                                    if (cycle < numCycles) {
+                                        state = State.WAIT;
+                                        nextState = State.DEPOSIT;
+                                        waitTime = 200;
+                                        eTime.reset();
+                                        intakeTimer.reset();
+                                        cycle++;
+                                    } else {
+                                        state = State.CHOOSE_PARK_LOCATION;
+                                    }
+                                }
                             }
+
                         }
 
                     }
@@ -202,7 +207,7 @@ public class RightAuto extends LinearOpMode {
 
             if (getRuntime() - startTime > 28 && !parking) {
                 state = State.CHOOSE_PARK_LOCATION;
-                intake.retractFully();
+                intake.retractPart(Intake.v4bCompletelyRetractedPos);
                 lift.setLiftState(Lift.LiftState.RETRACT);
             }
 
