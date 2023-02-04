@@ -36,6 +36,7 @@ import org.firstinspires.ftc.teamcode.autonomous.roadrunner.util.LynxModuleUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveConstants.MAX_ACCEL;
@@ -56,7 +57,7 @@ import static org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.DriveCo
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(7, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -81,7 +82,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
+                new Pose2d(0.2, 0.2, Math.toRadians(2.0)), 1.2);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -292,10 +293,20 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        fl.setPower(v);
-        bl.setPower(v1);
-        br.setPower(v2);
-        fr.setPower(v3);
+        double voltage = batteryVoltageSensor.getVoltage();
+        double scalar = 12.0 / voltage;
+
+        v *= scalar;
+        v1 *= scalar;
+        v2 *= scalar;
+        v3 *= scalar;
+
+        // Only find max when one of the values is greater than 1
+        double max = Collections.max(Arrays.asList(v, v1, v2, v3, 1.0));
+        fl.setPower(v / max);
+        bl.setPower(v1 / max);
+        br.setPower(v2 / max);
+        fr.setPower(v3 / max);
     }
 
     @Override

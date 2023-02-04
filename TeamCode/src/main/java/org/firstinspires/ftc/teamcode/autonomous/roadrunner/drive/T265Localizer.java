@@ -48,10 +48,11 @@ public class T265Localizer extends TwoTrackingWheelLocalizer {
                 new Pose2d(PERPENDICULAR_X, PERPENDICULAR_Y, Math.toRadians(90))
         ));
 
-        parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "parallelEncoder"));
-        perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "perpendicularEncoder"));
+        parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rrMotor"));
+        perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "flMotor"));
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
+        perpendicularEncoder.setDirection(Encoder.Direction.REVERSE);
 
         poseOffset = new Pose2d();
         mPoseEstimate = new Pose2d();

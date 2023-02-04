@@ -87,7 +87,7 @@ public class PreloadParkAuto extends LinearOpMode {
                     deposit();
                     telemetry.addData("lift busy", lift.isBusy());
                     if (!lift.isBusy()) {
-                        lift.deposit();
+                        lift.openGrabber();
                         if (!lift.isGrabberBusy()) {
                             state = State.WAIT;
                             nextState = State.PARK;

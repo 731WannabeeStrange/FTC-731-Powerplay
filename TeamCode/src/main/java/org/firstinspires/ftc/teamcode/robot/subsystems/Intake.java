@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -18,19 +19,22 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Intake {
     // Config parameters
-    public static double P = 0.001;
-    public static double clawOpenPos = 0.4;
-    public static double clawClosedPos = 0.67;
-    public static double v4bRetractedPos = 0.13;
-    public static int intakePartialRetract = 60;
-    public static int maxExtension = 835;
-    public static int errorTolerance = 20;
+    public static double P = 0.0035;
+    public static double clawOpenPos = 0.65;
+    public static double clawClosedPos = 0.4;
+    public static double v4bRetractedPos = 0.25;
+    public static double v4bCompletelyRetractedPos = 0.1;
+    public static int intakePartialRetract = 20;
+    public static int maxExtension = 865;
+    public static int errorTolerance = 10;
+    public static double slowSpeed = 0.4;
+    public static double coneCloseValue = 5;
     public static double[] stackPositions = {
-            0.55,
-            0.6,
             0.65,
             0.7,
-            0.8
+            0.75,
+            0.8,
+            0.9
     };
 
     private final Telemetry telemetry;
@@ -47,6 +51,8 @@ public class Intake {
     private ProfiledServoPair v4b;
 
     private DigitalChannel beamBreaker;
+
+    private double multiplier = 1;
 
     private enum SlideState {
         RETRACTFULL,
@@ -122,8 +128,8 @@ public class Intake {
             slideState = SlideState.STOP;
         }
 
-        slide1.setPower(P * error1);
-        slide2.setPower(P * error2);
+        slide1.setPower(P * error1 * multiplier);
+        slide2.setPower(P * error2 * multiplier);
     }
 
     public void grab() {
@@ -185,7 +191,15 @@ public class Intake {
         return color.getDistance(DistanceUnit.CM) < 1;
     }
 
+    public boolean isConeClose() {
+        return color.getDistance(DistanceUnit.CM) < coneCloseValue;
+    }
+
     public double[] getMotorPowers() {
         return new double[]{slide1.getPower(), slide2.getPower()};
+    }
+
+    public void setMultiplier(double multiplier) {
+        this.multiplier = multiplier;
     }
 }

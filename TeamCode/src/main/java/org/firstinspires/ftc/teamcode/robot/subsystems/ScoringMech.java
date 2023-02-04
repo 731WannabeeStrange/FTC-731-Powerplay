@@ -5,6 +5,8 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.concurrent.TimeUnit;
+
 @Config
 public class ScoringMech {
     private enum ScoringState {
@@ -14,7 +16,8 @@ public class ScoringMech {
         GRABBING,
         RETRACTING,
         TRANSFERRING,
-        RELEASING,
+        RELEASING_1,
+        RELEASING_2,
         LOWERED,
         LIFTING,
         CONTROLLING_ARM,
@@ -37,6 +40,8 @@ public class ScoringMech {
 
     private final ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
+    public static int v4bRetractTime = 1000;
+
     private boolean previousIntakeGrabButton = false;
     private double previousYawArmAngle = 0;
 
@@ -53,16 +58,18 @@ public class ScoringMech {
                       boolean yawArm0, boolean yawArm90, boolean yawArm180, boolean yawArm270) {
         telemetry.addData("Timer", eTime.time());
         telemetry.addData("smState", scoringState);
+        telemetry.addData("v4bBusy", intake.isV4BBusy());
         telemetry.update();
 
         switch (scoringState) {
             case RETRACTED:
-                intake.retractFully();
+                intake.retractPart(Intake.v4bRetractedPos);
                 intake.grab();
 
                 if (intakeGrabButton) {
-                    intake.setV4bPos(0.8);
-                    scoringState = ScoringState.DROPPINGV4B;
+                    intake.setV4bPos(0.9);
+                    intake.release();
+                    scoringState = ScoringState.EXTENDING;
                 }
                 break;
 
@@ -75,49 +82,67 @@ public class ScoringMech {
                 break;
 
             case EXTENDING:
+                if (intake.isConeClose()) {
+                    intake.setMultiplier(Intake.slowSpeed);
+                } else {
+                    intake.setMultiplier(1);
+                }
                 if (intake.isConeDetected()) {
                     rumbler.rumble(1);
                     intake.stopSlides();
                     intake.grab();
                     scoringState = ScoringState.GRABBING;
                 }
+                /*
                 if (!intake.isBusy() && !intake.isConeDetected()) {
                     scoringState = ScoringState.RESET;
                 }
+                 */
                 break;
 
             case GRABBING:
                 if (!intake.isClawBusy()) {
-                    intake.retractPart(0.13);
+                    intake.retractPart(Intake.v4bRetractedPos);
                     scoringState = ScoringState.RETRACTING;
+                    eTime.reset();
                 }
                 break;
 
             case RETRACTING:
-                if (!intake.isBusy() && !intake.isV4BBusy()) {
-                    lift.deposit();
-                    lift.setLiftState(Lift.LiftState.COLLECT);
-                    scoringState = ScoringState.TRANSFERRING;
+                if (!intake.isBusy() && !intake.isV4BBusy() && eTime.time(TimeUnit.MILLISECONDS) > 1000) {
+                    lift.openGrabber();
+                    lift.update();
+                    if (!lift.isGrabberBusy()) {
+                        lift.setLiftState(Lift.LiftState.COLLECT);
+                        scoringState = ScoringState.TRANSFERRING;
+                    }
                 }
                 break;
 
             case TRANSFERRING:
                 if (!lift.isBusy()) {
-                    lift.grab();
-                    intake.release();
-                    scoringState = ScoringState.RELEASING;
+                    lift.closeGrabber();
+                    scoringState = ScoringState.RELEASING_1;
                 }
                 break;
 
-            case RELEASING:
+            case RELEASING_1:
+                if (!lift.isGrabberBusy()) {
+                    intake.release();
+                    scoringState = ScoringState.RELEASING_2;
+                }
+                break;
+
+            case RELEASING_2:
                 if (!intake.isClawBusy()) {
-                    intake.retractFully();
+                    /*intake.retractFully();*/
+                    intake.setV4bPos(Intake.v4bCompletelyRetractedPos);
                     scoringState = ScoringState.LOWERED;
                 }
                 break;
 
             case LOWERED:
-                if (!intake.isBusy()) {
+                if (/*!intake.isBusy() && */!intake.isV4BBusy()) {
                     lift.setLiftState(previousLiftState);
                     scoringState = ScoringState.LIFTING;
                 }
@@ -145,17 +170,6 @@ public class ScoringMech {
                     lift.setYawArmAngle(270);
                 }
 
-                if (liftButtonHigh) {
-                    lift.setLiftState(Lift.LiftState.HIGH);
-                    previousLiftState = lift.getLiftState();
-                } else if (liftButtonMid) {
-                    lift.setLiftState(Lift.LiftState.MID);
-                    previousLiftState = lift.getLiftState();
-                } else if (liftButtonLow) {
-                    lift.setLiftState(Lift.LiftState.LOW);
-                    previousLiftState = lift.getLiftState();
-                }
-
                 if (!lift.isBusy()) {
                     if (depositButton) {
                         previousYawArmAngle = lift.getYawArmAngle();
@@ -163,7 +177,7 @@ public class ScoringMech {
                         controllingArm = false; // give back auto turn before or after deposit is
                                                 // finished?
 
-                        lift.deposit();
+                        lift.openGrabber();
                         eTime.reset();
                         scoringState = ScoringState.DEPOSITING;
                     }
@@ -172,26 +186,37 @@ public class ScoringMech {
 
             case DEPOSITING:
                 if (eTime.time() > Lift.waitTime) {
-                    lift.grab();
+                    lift.closeGrabber();
                     lift.setLiftState(Lift.LiftState.RETRACT);
                     scoringState = ScoringState.LOWERING;
                 }
                 break;
 
             case LOWERING:
-                if (!lift.isBusy()) {
+                if (!lift.isBusy() && !lift.isYawArmBusy()) {
                     scoringState = ScoringState.RETRACTED;
                 }
                 break;
 
             case RESET:
                 controllingArm = false;
-                intake.retractFully();
+                intake.retractPart(Intake.v4bRetractedPos);
                 intake.grab();
                 lift.setLiftState(Lift.LiftState.RETRACT);
-                lift.grab();
+                lift.closeGrabber();
                 scoringState = ScoringState.RETRACTED;
                 break;
+        }
+
+        if (liftButtonHigh) {
+            lift.setLiftState(Lift.LiftState.HIGH);
+            previousLiftState = lift.getLiftState();
+        } else if (liftButtonMid) {
+            lift.setLiftState(Lift.LiftState.MID);
+            previousLiftState = lift.getLiftState();
+        } else if (liftButtonLow) {
+            lift.setLiftState(Lift.LiftState.LOW);
+            previousLiftState = lift.getLiftState();
         }
 
         lift.update();

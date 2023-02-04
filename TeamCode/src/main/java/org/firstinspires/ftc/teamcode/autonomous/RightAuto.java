@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
+import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -14,12 +17,13 @@ import org.firstinspires.ftc.teamcode.vision.signal.Location;
 
 @Autonomous
 public class RightAuto extends LinearOpMode {
-    public static int numCycles = 6;
+    public static int numCycles = 3;
 
 
     enum State {
         DRIVE_TO_SPOT,
         DEPOSIT,
+        DEPOSIT_2,
         GRAB_CONE,
         COLLECT,
         CHOOSE_PARK_LOCATION,
@@ -41,9 +45,11 @@ public class RightAuto extends LinearOpMode {
     Location location = Location.LEFT;
 
     boolean flag = false;
+    boolean flag2 = false;
     boolean parking = false;
 
-    ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    ElapsedTime eTime = new ElapsedTime(MILLISECONDS);
+    ElapsedTime intakeTimer = new ElapsedTime(MILLISECONDS);
     double waitTime = 0;
     State nextState = State.IDLE;
 
@@ -58,22 +64,25 @@ public class RightAuto extends LinearOpMode {
 
         drive.setPoseEstimate(startPose);
 
+        intake.setV4bPos(Intake.v4bCompletelyRetractedPos);
+
         TrajectorySequence driveToSpot = drive.trajectorySequenceBuilder(startPose)
                 .back(36)
-                .splineToSplineHeading(new Pose2d(-30, 12, Math.toRadians(180)), Math.toRadians(0))
-                .back(6)
+                .splineToSplineHeading(new Pose2d(-30, 12.5, Math.toRadians(180)), Math.toRadians(0))
+                .back(4)
+                .waitSeconds(1)
                 .build();
 
         TrajectorySequence leftPark = drive.trajectorySequenceBuilder(driveToSpot.end())
-                .back(12)
+                .lineTo(new Vector2d(-12, 12))
                 .build();
 
         TrajectorySequence midPark = drive.trajectorySequenceBuilder(driveToSpot.end())
-                .forward(12)
+                .lineTo(new Vector2d(-36, 12))
                 .build();
 
         TrajectorySequence rightPark = drive.trajectorySequenceBuilder(driveToSpot.end())
-                .forward(36)
+                .lineTo(new Vector2d(-60, 12))
                 .build();
 
         while (opModeInInit()) {
@@ -81,7 +90,9 @@ public class RightAuto extends LinearOpMode {
         }
 
         drive.followTrajectorySequenceAsync(driveToSpot);
-        intake.setV4bPos(Intake.v4bRetractedPos - 0.1);
+        lift.setLiftState(Lift.LiftState.RETRACT);
+
+        double startTime = getRuntime();
 
         while (opModeIsActive()) {
             switch (state) {
@@ -93,10 +104,17 @@ public class RightAuto extends LinearOpMode {
 
                 case DEPOSIT:
                     deposit();
-                    telemetry.addData("lift busy", lift.isBusy());
-                    telemetry.addData("intake busy", intake.isBusy());
+                    state = State.WAIT;
+                    nextState = State.DEPOSIT_2;
+                    waitTime = 2000;
+                    flag2 = true;
+                    eTime.reset();
+                    break;
+
+                case DEPOSIT_2:
+                    deposit();
                     if (!lift.isBusy() && !intake.isBusy()) {
-                        lift.deposit();
+                        lift.openGrabber();
                         lift.update();
                         if (!lift.isGrabberBusy()) {
                             state = State.WAIT;
@@ -126,19 +144,25 @@ public class RightAuto extends LinearOpMode {
 
                     if (!lift.isBusy()) {
                         intake.release();
-                        intake.update();
-
                         if (!intake.isClawBusy()) {
-                            if (cycle < numCycles) {
-                                state = State.WAIT;
-                                nextState = State.DEPOSIT;
-                                waitTime = 200;
-                                eTime.reset();
-                                cycle++;
-                            } else {
-                                state = State.CHOOSE_PARK_LOCATION;
-
+                            lift.closeGrabber();
+                            if (!lift.isGrabberBusy()) {
+                                intake.setV4bPos(Intake.v4bCompletelyRetractedPos);
+                                intake.update();
+                                if (!intake.isClawBusy() && !intake.isV4BBusy()) {
+                                    if (cycle < numCycles) {
+                                        state = State.WAIT;
+                                        nextState = State.DEPOSIT;
+                                        waitTime = 200;
+                                        eTime.reset();
+                                        intakeTimer.reset();
+                                        cycle++;
+                                    } else {
+                                        state = State.CHOOSE_PARK_LOCATION;
+                                    }
+                                }
                             }
+
                         }
 
                     }
@@ -169,16 +193,21 @@ public class RightAuto extends LinearOpMode {
                 case WAIT:
                     if (eTime.time() > waitTime) {
                         state = nextState;
+                        flag2 = false;
                     }
+                    if (flag2) {
+                        deposit();
+                    }
+
                     break;
 
                 case IDLE:
                     break;
             }
 
-            if (getRuntime() > 27 && !parking) {
+            if (getRuntime() - startTime > 28 && !parking) {
                 state = State.CHOOSE_PARK_LOCATION;
-                intake.retractPart(Intake.v4bRetractedPos);
+                intake.retractPart(Intake.v4bCompletelyRetractedPos);
                 lift.setLiftState(Lift.LiftState.RETRACT);
             }
 
@@ -188,15 +217,18 @@ public class RightAuto extends LinearOpMode {
 
             telemetry.addData("State", state);
             telemetry.addData("Intake ticks", intake.getSlidePosition());
+            telemetry.addData("Runtime", getRuntime());
             telemetry.update();
 
         }
     }
 
     public void deposit() {
-        intake.extendFully();
-        intake.setV4bPos(Intake.stackPositions[cycle - 1]);
-        intake.release();
+        if (intakeTimer.time() > 500) {
+            intake.extendFully();
+            intake.setV4bPos(Intake.stackPositions[cycle - 1]);
+            intake.release();
+        }
         lift.setLiftState(Lift.LiftState.HIGH);
         if (lift.getSlidePosition() > Lift.liftMid) {
             lift.setYawArmAngle(-90);
@@ -207,7 +239,7 @@ public class RightAuto extends LinearOpMode {
     }
 
     public void grabCone() {
-        lift.setYawArmAngle(-10);
+        lift.setYawArmAngle(0);
         lift.update();
         if (!lift.isYawArmBusy()) {
             lift.setLiftState(Lift.LiftState.RETRACT);

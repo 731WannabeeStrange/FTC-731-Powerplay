@@ -9,22 +9,19 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(group="test")
 @Config
-public class ServoTestOpMode extends LinearOpMode
+public class GrabberTestOpMode extends LinearOpMode
 {
-    private Servo s1;
-    private Servo s2;
+    private Servo servo;
 
-    private double s1pos = 0.5;
-    private double s2pos = 0.5;
+    private double servoPos = 0.5;
 
-    private boolean lbTriggered = false, rbTriggered = false, aTriggered = false, bTriggered = false;
+    private boolean lbTriggered = false, rbTriggered = false;
 
     @Override
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        s1 = hardwareMap.get(Servo.class, "grab");
-        s2 = hardwareMap.get(Servo.class, "s2");
+        servo = hardwareMap.get(Servo.class, "grab");
 
         telemetry.addData("Mode", "waiting for start");
         telemetry.update();
@@ -36,32 +33,20 @@ public class ServoTestOpMode extends LinearOpMode
         telemetry.update();
 
         while (opModeIsActive()) {
-            s1.setPosition(s1pos);
-            s2.setPosition(s2pos);
+            servo.setPosition(servoPos);
 
-            telemetry.addData("s1 position", s1pos);
-            telemetry.addData("s2 position", s2pos);
+            telemetry.addData("servo position", servoPos);
 
             if (gamepad1.left_bumper && !lbTriggered) {
-                s1pos=0;
+                servoPos-=0.05;
             }
 
             if (gamepad1.right_bumper && !rbTriggered) {
-                s1pos=1;
-            }
-
-            if (gamepad1.a && !aTriggered) {
-                s2pos=0;
-            }
-
-            if (gamepad1.b && !bTriggered) {
-                s2pos=1;
+                servoPos+=0.05;
             }
 
             lbTriggered = gamepad1.left_bumper;
             rbTriggered = gamepad1.right_bumper;
-            aTriggered = gamepad1.a;
-            bTriggered = gamepad1.b;
 
             telemetry.update();
         }

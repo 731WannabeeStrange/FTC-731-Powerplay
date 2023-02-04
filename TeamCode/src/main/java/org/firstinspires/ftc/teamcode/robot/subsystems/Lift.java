@@ -15,16 +15,17 @@ public class Lift {
     // Config parameters
     public static int liftLow = 900;
     public static int liftMid = 1750;
-    public static int liftHigh = 2500;
-    public static double grabPos = 0.9;
-    public static double releasePos = 0.5;
+    public static int liftHigh = 2450;
+    public static double grabPos = 0.45;
+    public static double releasePos = 0.1;
     public static double waitTime = 1.5;
-    public static int hoverPos = 884;
-    public static int collectPos = 25;
+    public static int hoverPos = 800;
+    public static int collectPos = 50;
     public static int minHeightForArmRotation = 200;
-    public static double P = 0.006;
-    public static int errorTolerance = 25;
+    public static double P = 0.01;
+    public static int errorTolerance = 10;
     public static double grabTime = 0.75;
+    public static double yawArmAngle = -7;
 
     private final Telemetry telemetry;
 
@@ -68,14 +69,14 @@ public class Lift {
                 hardwareMap,
                 "yaw1",
                 "yaw2",
-                new MotionConstraint(2, 4, 4),
+                new MotionConstraint(3, 4, 3),
                 (0.0037037 * -45) + 0.33333
         );
 
         grabber = new ProfiledServo(
                 hardwareMap,
                 "grab",
-                new MotionConstraint(1, 4, 4),
+                new MotionConstraint(2, 4, 4),
                 grabPos
         );
 
@@ -95,9 +96,9 @@ public class Lift {
         return liftState;
     }
 
-    public void grab() { grabberState = GrabberState.HOLD; }
+    public void closeGrabber() { grabberState = GrabberState.HOLD; }
 
-    public void deposit() { grabberState = GrabberState.RELEASE; }
+    public void openGrabber() { grabberState = GrabberState.RELEASE; }
 
     public void setYawArmAngle(double angle) {
         currentYawArmAngle = angle;
@@ -108,11 +109,11 @@ public class Lift {
         while (angle > 180) {
             angle -= 360;
         }
-        if (angle > 90) {
-            if (angle < 135) {
-                angle = -180;
+        if (angle < -90) {
+            if (angle > -135) {
+                angle = -90;
             } else {
-                angle = 90;
+                angle = -180;
             }
         }
         double pos = (0.0037037 * angle) + 0.33333;
@@ -151,11 +152,14 @@ public class Lift {
                 break;
             case RETRACT:
                 grabber.setPosition(grabPos);
-                setYawArmAngle(-5);
-                targetPosition = hoverPos;
+                setYawArmAngle(yawArmAngle);
+                yawArm.periodic();
+                if (!isYawArmBusy()) {
+                    targetPosition = hoverPos;
+                }
                 break;
             case COLLECT:
-                setYawArmAngle(-5);
+                setYawArmAngle(yawArmAngle);
                 targetPosition = collectPos;
                 break;
         }
@@ -171,13 +175,6 @@ public class Lift {
                 break;
             case RELEASE:
                 grabber.setPosition(releasePos);
-                grabberState = GrabberState.DEPOSITING;
-                grabTimer.reset();
-                break;
-            case DEPOSITING:
-                if (grabTimer.time() > grabTime) {
-                    grabberState = GrabberState.HOLD;
-                }
                 break;
         }
 
