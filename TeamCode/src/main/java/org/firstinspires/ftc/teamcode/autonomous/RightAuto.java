@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.vision.signal.AprilTagVisionPipeline;
 import org.firstinspires.ftc.teamcode.vision.signal.Location;
 
-@Autonomous
+@Autonomous(preselectTeleOp = "CompTeleOp")
 public class RightAuto extends LinearOpMode {
     public static int numCycles = 3;
 
@@ -27,6 +27,7 @@ public class RightAuto extends LinearOpMode {
         OPENING,
         GRAB_CONE,
         COLLECT,
+        RELEASE_CONE,
         CLOSING,
         CHOOSE_PARK_LOCATION,
         PARK,
@@ -77,14 +78,17 @@ public class RightAuto extends LinearOpMode {
 
         TrajectorySequence leftPark = drive.trajectorySequenceBuilder(driveToSpot.end())
                 .lineTo(new Vector2d(-12, 12))
+                .turn(Math.toRadians(90))
                 .build();
 
         TrajectorySequence midPark = drive.trajectorySequenceBuilder(driveToSpot.end())
                 .lineTo(new Vector2d(-36, 12))
+                .turn(Math.toRadians(90))
                 .build();
 
         TrajectorySequence rightPark = drive.trajectorySequenceBuilder(driveToSpot.end())
                 .lineTo(new Vector2d(-60, 12))
+                .turn(Math.toRadians(90))
                 .build();
 
         while (opModeInInit()) {
@@ -150,13 +154,19 @@ public class RightAuto extends LinearOpMode {
                     lift.update();
 
                     if (!lift.isBusy()) {
+                        lift.closeGrabber();
+                        eTime.reset();
+                        state = State.RELEASE_CONE;
+                    }
+                    break;
+
+                case RELEASE_CONE:
+                    if (eTime.time() > 500) {
                         intake.release();
                         if (!intake.isClawBusy()) {
-                            lift.closeGrabber();
                             eTime.reset();
                             state = State.CLOSING;
                         }
-
                     }
                     break;
 
@@ -197,6 +207,8 @@ public class RightAuto extends LinearOpMode {
 
                 case PARK:
                     if (!drive.isBusy()) {
+                        lift.setLiftState(Lift.LiftState.ZERO);
+                        intake.retractFully();
                         state = State.IDLE;
                     }
                     break;
@@ -216,7 +228,7 @@ public class RightAuto extends LinearOpMode {
                     break;
             }
 
-            if (getRuntime() - startTime > 28 && !parking) {
+            if (getRuntime() - startTime > 25 && !parking) {
                 state = State.CHOOSE_PARK_LOCATION;
                 intake.retractPart(Intake.v4bCompletelyRetractedPos);
                 lift.setLiftState(Lift.LiftState.RETRACT);
@@ -240,6 +252,9 @@ public class RightAuto extends LinearOpMode {
             intake.setV4bPos(Intake.stackPositions[cycle - 1]);
             intake.release();
         }
+        if (intake.isConeDetected()) {
+            intake.stopSlides();
+        }
         lift.setLiftState(Lift.LiftState.HIGH);
         if (lift.getSlidePosition() > Lift.liftMid) {
             lift.setYawArmAngle(-90);
@@ -250,7 +265,7 @@ public class RightAuto extends LinearOpMode {
     }
 
     public void grabCone() {
-        lift.setYawArmAngle(0);
+        lift.setYawArmAngle(Lift.yawArmAngle);
         lift.update();
         if (!lift.isYawArmBusy()) {
             lift.setLiftState(Lift.LiftState.RETRACT);

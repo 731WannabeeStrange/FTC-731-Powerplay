@@ -17,16 +17,16 @@ public class Lift {
     public static int liftLow = 900;
     public static int liftMid = 1750;
     public static int liftHigh = 2450;
-    public static double grabPos = 0.41;
-    public static double releasePos = 0.1;
+    public static double grabPos = 0.45;
+    public static double releasePos = 0.9;
     public static double waitTime = 1.5;
     public static int hoverPos = 800;
-    public static int collectPos = 50;
+    public static int collectPos = 200;
     public static int minHeightForArmRotation = 200;
-    public static double P = 0.007;
+    public static double P = 0.005;
     public static int errorTolerance = 10;
     public static double grabTime = 0.75;
-    public static double yawArmAngle = -7;
+    public static double yawArmAngle = -10;
 
     private final Telemetry telemetry;
 
@@ -46,7 +46,8 @@ public class Lift {
         MID,
         LOW,
         RETRACT,
-        COLLECT
+        COLLECT,
+        ZERO
     }
 
     private LiftState liftState = LiftState.RETRACT;
@@ -155,6 +156,10 @@ public class Lift {
             case COLLECT:
                 setYawArmAngle(yawArmAngle);
                 targetPosition = collectPos;
+                break;
+            case ZERO:
+                setYawArmAngle(-45);
+                targetPosition = 0;
                 break;
         }
         error1 = targetPosition - lift1.getCurrentPosition();

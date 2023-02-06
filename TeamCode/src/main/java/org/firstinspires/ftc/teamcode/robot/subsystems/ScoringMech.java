@@ -89,7 +89,7 @@ public class ScoringMech {
                     intake.setMultiplier(1);
                 }
                 if (intake.isConeDetected()) {
-                    rumbler.rumble(1);
+                    rumbler.rumble(500);
                     intake.stopSlides();
                     intake.grab();
                     scoringState = ScoringState.GRABBING;
@@ -110,7 +110,7 @@ public class ScoringMech {
                 break;
 
             case RETRACTING:
-                if (!intake.isBusy() && !intake.isV4BBusy() && eTime.time(TimeUnit.MILLISECONDS) > 1000) {
+                if (eTime.time() > 1) {
                     lift.openGrabber();
                     eTime.reset();
                     scoringState = ScoringState.COLLECTING_1;
@@ -150,6 +150,7 @@ public class ScoringMech {
             case LOWERED:
                 if (/*!intake.isBusy() && */!intake.isV4BBusy()) {
                     lift.setLiftState(previousLiftState);
+                    rumbler.rumble(1000);
                     scoringState = ScoringState.LIFTING;
                 }
                 break;

@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.vision.signal.AprilTagVisionPipeline;
 import org.firstinspires.ftc.teamcode.vision.signal.Location;
 
-@Autonomous
+@Autonomous(preselectTeleOp = "CompTeleOp")
 public class ParkAuto extends LinearOpMode {
 
     enum State {
