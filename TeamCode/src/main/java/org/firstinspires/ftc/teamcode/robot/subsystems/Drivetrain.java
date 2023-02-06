@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.utils.KalmanFilter;
 
 @Config
 public class Drivetrain {
@@ -18,6 +19,9 @@ public class Drivetrain {
     public static double P = 0.04;
     public static double I = 0;
     public static double D = 0;
+
+    public static double filterQ = 0.5;
+    public static double filterR = 0.5;
     
     private final Telemetry telemetry;
 
@@ -41,6 +45,8 @@ public class Drivetrain {
     private String turnState = "auto";
 
     private double denominator;
+
+    private KalmanFilter imuFilter = new KalmanFilter(filterQ, filterR, 5);
 
     private enum DriveMode {
         DRIVER_CONTROLLED,
@@ -84,19 +90,20 @@ public class Drivetrain {
                            boolean autoTurn270) {
         double time = eTime.time();
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double readAngle = imuFilter.estimate(angles.firstAngle);
 
         leftStickX *= 1.1;
 
-        double gyro_radians = angles.firstAngle * Math.PI/180;
+        double gyro_radians = readAngle * Math.PI/180;
         double newForward = leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
         double newStrafe = -leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
 
         boolean automaticTurning = (Math.abs(leftStickY) > 0 || Math.abs(leftStickX) > 0) && Math.abs(rightStickX) == 0;
         if (!automaticTurning) {
-            desiredAngleHeadingControl = angles.firstAngle;
+            desiredAngleHeadingControl = readAngle;
         }
 
-        errorAutoTurn = angleWrap(desiredAngleAutoTurn - angles.firstAngle);
+        errorAutoTurn = angleWrap(desiredAngleAutoTurn - readAngle);
 
         telemetry.addData("Turn Error", errorAutoTurn);
 
@@ -108,7 +115,7 @@ public class Drivetrain {
 
         previous_error = errorAutoTurn;
 
-        telemetry.addData("Read angle", angles.firstAngle);
+        telemetry.addData("Read angle", readAngle);
         telemetry.addData("RCW", rcw);
         telemetry.addData("Desired Angle", desiredAngleAutoTurn);
         telemetry.addData("rightStickX", rightStickX);
@@ -147,7 +154,7 @@ public class Drivetrain {
                     FR_power = (-newForward - newStrafe - rightStickX) / denominator;
                     RR_power = (-newForward + newStrafe - rightStickX) / denominator;
                 } else {
-                    errorHeadingControl = angleWrap(desiredAngleHeadingControl - angles.firstAngle);
+                    errorHeadingControl = angleWrap(desiredAngleHeadingControl - readAngle);
                     rcw = -errorHeadingControl * P;
                     denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rcw), 1);
                     FL_power = (-newForward + newStrafe + rcw) / denominator;
