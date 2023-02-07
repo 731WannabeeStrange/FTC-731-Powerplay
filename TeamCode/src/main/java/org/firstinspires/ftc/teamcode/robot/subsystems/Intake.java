@@ -2,13 +2,10 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -58,6 +55,7 @@ public class Intake {
         RETRACTFULL,
         RETRACTPART,
         EXTENDING,
+        EXTENDING_AUTO,
         CUSTOMEXTEND,
         STOP
     }
@@ -114,6 +112,15 @@ public class Intake {
                 error1 = maxExtension - slide1.getCurrentPosition();
                 error2 = maxExtension - slide2.getCurrentPosition();
                 break;
+            case EXTENDING_AUTO:
+                error1 = maxExtension - slide1.getCurrentPosition();
+                error2 = maxExtension - slide2.getCurrentPosition();
+
+                if (isConeDetected()) {
+                    slideState = SlideState.STOP;
+                }
+                break;
+
             case CUSTOMEXTEND:
                 error1 = customTarget - slide1.getCurrentPosition();
                 error2 = customTarget - slide2.getCurrentPosition();
@@ -166,16 +173,19 @@ public class Intake {
         slideState = SlideState.EXTENDING;
     }
 
+    public void extendAuto() { slideState = SlideState.EXTENDING_AUTO; }
+
     public void retractFully() {
         v4b.setPosition(v4bRetractedPos);
         slideState = SlideState.RETRACTFULL;
     }
-
+    /*
     public void retractFully(double v4bpos) {
         v4b.setPosition(v4bpos);
         claw.setPosition(clawClosedPos);
         slideState = SlideState.RETRACTFULL;
     }
+     */
 
     public void retractPart(double v4bpos) {
         v4b.setPosition(v4bpos);
