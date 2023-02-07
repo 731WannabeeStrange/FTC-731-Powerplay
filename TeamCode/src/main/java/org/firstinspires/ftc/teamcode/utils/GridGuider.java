@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.teamcode.utils;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 
 import java.util.ArrayList;
 
+@Config
 public class GridGuider {
+    public static double G = 3;
+
     private double robotWidth;
     private double robotHeight;
     private ArrayList<Junction> junctions = new ArrayList<>();
@@ -79,7 +83,6 @@ public class GridGuider {
 
     public Vector2d calculateRepulsedVector(Pose2d robotPose) {
         Vector2d vector = new Vector2d();
-        double G = 3;
 
         for (Junction j : junctions) {
             j.calculateDistance(robotPose, robotHeight, robotWidth);
