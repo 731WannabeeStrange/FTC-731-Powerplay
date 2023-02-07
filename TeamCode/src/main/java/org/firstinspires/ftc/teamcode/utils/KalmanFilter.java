@@ -20,7 +20,7 @@ public class KalmanFilter {
             estimates.push(0.0);
         }
         regression = new LinearRegression(stackToArr());
-        findK();
+        precomputeK();
     }
 
     public void setX(double x) {
@@ -40,7 +40,7 @@ public class KalmanFilter {
         return x;
     }
 
-    public void findK() {
+    public void precomputeK() {
         for (int i = 0; i < 2000; i++) solveDARE();
     }
 
