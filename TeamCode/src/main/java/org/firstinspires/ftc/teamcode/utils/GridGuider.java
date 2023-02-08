@@ -82,7 +82,7 @@ public class GridGuider {
     }
 
     public Vector2d calculateRepulsedVector(Pose2d robotPose) {
-        Vector2d vector = new Vector2d();
+        Vector2d vector = new Vector2d(0, 0);
 
         for (Junction j : junctions) {
             j.calculateDistance(robotPose, robotHeight, robotWidth);
