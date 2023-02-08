@@ -34,7 +34,7 @@ public class FindCone extends CommandBase {
     public void execute() {
         switch (findState) {
             case EXTENDING:
-                if (intakeSubsystem.isConeDetected()) {
+                if (intakeSubsystem.isConeDetected() || intakeSubsystem.getSlidePosition() > IntakeSubsystem.maxExtension) {
                     intakeSubsystem.stopSlides();
                     findState = FindState.IDLE;
                 }

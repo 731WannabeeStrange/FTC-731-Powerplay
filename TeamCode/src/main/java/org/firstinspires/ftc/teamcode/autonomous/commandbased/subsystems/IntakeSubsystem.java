@@ -142,4 +142,8 @@ public class IntakeSubsystem extends SubsystemBase {
     public boolean isConeClose() {
         return color.getDistance(DistanceUnit.CM) < coneCloseValue;
     }
+
+    public int getSlidePosition() {
+        return slide1.getCurrentPosition();
+    }
 }
