@@ -1,0 +1,24 @@
+package org.firstinspires.ftc.teamcode.autonomous.commandbased.groups;
+
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+
+import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.DepositCone;
+import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.FindCone;
+import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.RetrieveCone;
+import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.TransferCone;
+import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.LiftSubsystem;
+import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
+
+public class ScoreCone extends SequentialCommandGroup {
+    public ScoreCone(IntakeSubsystem intakeSubsystem, LiftSubsystem liftSubsystem, int desiredAngle,
+                     Lift.LiftState desiredHeight, double v4bpos) {
+        addCommands(
+                new ParallelCommandGroup(
+                        new DepositCone(liftSubsystem, desiredHeight, desiredAngle),
+                        new FindCone(intakeSubsystem, v4bpos)),
+                new RetrieveCone(intakeSubsystem),
+                new TransferCone(intakeSubsystem, liftSubsystem));
+    }
+}
