@@ -31,8 +31,7 @@ public class LiftSubsystem extends SubsystemBase {
     private int error2 = 0;
     private double currentYawArmAngle = 0;
 
-    private final DcMotorEx lift1;
-    private final DcMotorEx lift2;
+    private final DcMotorEx lift1, lift2;
     private final ProfiledServoPair yawArm;
     private final Servo grabber;
 
@@ -104,6 +103,7 @@ public class LiftSubsystem extends SubsystemBase {
         return lift1.getCurrentPosition() > minHeightForArmRotation;
     }
 
+    @Override
     public void periodic() {
         switch (liftState) {
             case HIGH:
