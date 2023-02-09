@@ -2,12 +2,14 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.outoftheboxrobotics.photoncore.PhotonCore;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.robot.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Rumbler;
 import org.firstinspires.ftc.teamcode.robot.subsystems.ScoringMech;
+import org.firstinspires.ftc.teamcode.utils.Dashboard;
 
 @TeleOp(group="a")
 public class CompTeleOp extends LinearOpMode {
@@ -17,6 +19,8 @@ public class CompTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        PhotonCore.enable();
+
         MultipleTelemetry multipleTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         rb = new Rumbler(gamepad1);
         dt = new Drivetrain(hardwareMap, multipleTelemetry);
@@ -78,5 +82,7 @@ public class CompTeleOp extends LinearOpMode {
             }
 
         }
+
+        Dashboard.periodic();
     }
 }
