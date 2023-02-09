@@ -11,9 +11,8 @@ import org.firstinspires.ftc.teamcode.autonomous.roadrunner.trajectorysequence.T
 public class DriveSubsystem extends SubsystemBase {
     private final SampleMecanumDrive drive;
 
-    public DriveSubsystem(HardwareMap hardwareMap, Pose2d startPose) {
+    public DriveSubsystem(HardwareMap hardwareMap) {
         drive = new SampleMecanumDrive(hardwareMap);
-        drive.setPoseEstimate(startPose);
     }
 
     public void periodic() {
@@ -22,6 +21,10 @@ public class DriveSubsystem extends SubsystemBase {
 
     public boolean isBusy() {
         return drive.isBusy();
+    }
+
+    public void setPoseEstimate(Pose2d pose) {
+        drive.setPoseEstimate(pose);
     }
 
     public TrajectorySequenceBuilder trajectorySequenceBuilder(Pose2d pose) {

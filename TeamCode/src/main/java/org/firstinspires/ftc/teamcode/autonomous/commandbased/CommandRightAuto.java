@@ -41,9 +41,11 @@ public class CommandRightAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         scheduler = CommandScheduler.getInstance();
 
-        driveSubsystem = new DriveSubsystem(hardwareMap, startPose);
+        driveSubsystem = new DriveSubsystem(hardwareMap);
         intakeSubsystem = new IntakeSubsystem(hardwareMap);
         liftSubsystem = new LiftSubsystem(hardwareMap);
+
+        driveSubsystem.setPoseEstimate(startPose);
 
         scheduler.registerSubsystem(driveSubsystem, intakeSubsystem, liftSubsystem);
 
@@ -94,7 +96,7 @@ public class CommandRightAuto extends LinearOpMode {
                                     put(Location.MIDDLE, new FollowTrajectory(driveSubsystem, midPark));
                                     put(Location.RIGHT, new FollowTrajectory(driveSubsystem, rightPark));
                                 }},
-                                this::getLocation
+                                () -> location
                         ),
                         new ResetLiftAndIntake(intakeSubsystem, liftSubsystem)
                 )
@@ -105,9 +107,5 @@ public class CommandRightAuto extends LinearOpMode {
         }
 
         scheduler.reset();
-    }
-
-    private Location getLocation() {
-        return location;
     }
 }
