@@ -8,6 +8,7 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.ParallelDeadlineGroup;
 import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.DepositCone;
@@ -25,6 +26,7 @@ import org.firstinspires.ftc.teamcode.vision.signal.Location;
 
 import java.util.HashMap;
 
+@Autonomous
 public class CommandRightAuto extends LinearOpMode {
     private CommandScheduler scheduler;
 
