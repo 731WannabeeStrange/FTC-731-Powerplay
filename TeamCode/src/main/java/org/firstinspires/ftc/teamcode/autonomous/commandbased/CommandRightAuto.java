@@ -4,11 +4,14 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.Subsystem;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.FollowTrajectory;
+import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.GoToLiftState;
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.groups.ScoreCone;
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.IntakeSubsystem;
@@ -17,6 +20,8 @@ import org.firstinspires.ftc.teamcode.autonomous.roadrunner.trajectorysequence.T
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.vision.signal.AprilTagVisionPipeline;
 import org.firstinspires.ftc.teamcode.vision.signal.Location;
+
+import java.util.HashMap;
 
 public class CommandRightAuto extends LinearOpMode {
     private DriveSubsystem driveSubsystem;
@@ -80,12 +85,33 @@ public class CommandRightAuto extends LinearOpMode {
             location = pipeline.visionLoop(telemetry);
         }
 
-        schedule(new FollowTrajectory(driveSubsystem, driveToSpot));
+        GoToLiftState retractCommand = new GoToLiftState(liftSubsystem, Lift.LiftState.RETRACT);
+        liftSubsystem.setDefaultCommand(retractCommand);
+
+        schedule(new SequentialCommandGroup(
+                new FollowTrajectory(driveSubsystem, driveToSpot),
+                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.65),
+                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.7),
+                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.75),
+                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.8),
+                new SelectCommand(
+                        new HashMap<Object, Command>() {{
+                            put(Location.LEFT, new FollowTrajectory(driveSubsystem, leftPark));
+                            put(Location.MIDDLE, new FollowTrajectory(driveSubsystem, midPark));
+                            put(Location.RIGHT, new FollowTrajectory(driveSubsystem, rightPark));
+                        }},
+                        this::getLocation
+                )
+        ));
 
         while (!isStopRequested() && opModeIsActive()) {
             run();
         }
 
         reset();
+    }
+
+    private Location getLocation() {
+        return location;
     }
 }
