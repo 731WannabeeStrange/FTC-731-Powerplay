@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.DepositCone;
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.FollowTrajectory;
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.GoToLiftState;
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.ResetLiftAndIntake;
@@ -85,6 +86,7 @@ public class CommandRightAuto extends LinearOpMode {
                 new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.7),
                 new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.75),
                 new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.8),
+                new DepositCone(liftSubsystem, Lift.LiftState.HIGH, -90),
                 new ParallelCommandGroup(
                         new SelectCommand(
                                 new HashMap<Object, Command>() {{

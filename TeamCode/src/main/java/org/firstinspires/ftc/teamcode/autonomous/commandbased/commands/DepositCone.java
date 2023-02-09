@@ -15,6 +15,7 @@ public class DepositCone extends CommandBase {
 
     private enum DepositState {
         RAISING,
+        MOVING_ARM,
         DROPPING,
         RETRACTING,
         IDLE
@@ -41,11 +42,14 @@ public class DepositCone extends CommandBase {
             case RAISING:
                 if (liftSubsystem.canControlArm()) {
                     liftSubsystem.setYawArmAngle(yawArmAngle);
-                    if (!liftSubsystem.isYawArmBusy()) {
-                        liftSubsystem.openGrabber();
-                        eTime.reset();
-                        depositState = DepositState.DROPPING;
-                    }
+                    depositState = DepositState.MOVING_ARM;
+                }
+                break;
+            case MOVING_ARM:
+                if (!liftSubsystem.isYawArmBusy() && !liftSubsystem.isBusy()) {
+                    liftSubsystem.openGrabber();
+                    eTime.reset();
+                    depositState = DepositState.DROPPING;
                 }
                 break;
             case DROPPING:
