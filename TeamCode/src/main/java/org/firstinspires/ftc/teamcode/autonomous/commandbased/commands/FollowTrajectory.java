@@ -22,6 +22,6 @@ public class FollowTrajectory extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return driveSubsystem.isBusy();
+        return !driveSubsystem.isBusy();
     }
 }
