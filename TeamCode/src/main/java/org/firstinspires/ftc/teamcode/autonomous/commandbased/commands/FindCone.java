@@ -9,8 +9,8 @@ public class FindCone extends CommandBase {
     private final double v4bpos;
 
     private enum FindState {
+        DROPPING,
         EXTENDING,
-        DETECTED,
         IDLE
     }
 
@@ -24,23 +24,22 @@ public class FindCone extends CommandBase {
 
     @Override
     public void initialize() {
-        intakeSubsystem.extendFully();
         intakeSubsystem.setV4bPos(v4bpos);
         intakeSubsystem.release();
-        findState = FindState.EXTENDING;
+        findState = FindState.DROPPING;
     }
 
     @Override
     public void execute() {
         switch (findState) {
+            case DROPPING:
+                if (!intakeSubsystem.isClawBusy() && !intakeSubsystem.isV4BBusy()) {
+                    intakeSubsystem.extendFully();
+                    findState = FindState.EXTENDING;
+                }
             case EXTENDING:
                 if (intakeSubsystem.isConeDetected() || intakeSubsystem.getSlidePosition() > IntakeSubsystem.maxExtension) {
                     intakeSubsystem.stopSlides();
-                    findState = FindState.IDLE;
-                }
-                break;
-            case DETECTED:
-                if (!intakeSubsystem.isClawBusy() && !intakeSubsystem.isV4BBusy()) {
                     findState = FindState.IDLE;
                 }
                 break;

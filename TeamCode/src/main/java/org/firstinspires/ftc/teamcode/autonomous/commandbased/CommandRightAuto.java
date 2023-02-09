@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.ParallelDeadlineGroup;
 import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -77,7 +78,9 @@ public class CommandRightAuto extends LinearOpMode {
         }
 
         scheduler.schedule(new SequentialCommandGroup(
-                new FollowTrajectory(driveSubsystem, driveToSpot),
+                new ParallelDeadlineGroup(
+                        new FollowTrajectory(driveSubsystem, driveToSpot),
+                        new GoToLiftState(liftSubsystem, Lift.LiftState.RETRACT)),
                 new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.65),
                 new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.7),
                 new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.75),
