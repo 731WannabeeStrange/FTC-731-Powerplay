@@ -33,7 +33,7 @@ public class CommandRightAuto extends LinearOpMode {
     private AprilTagVisionPipeline pipeline;
     private Location location = Location.LEFT;
 
-    private Pose2d startPose = new Pose2d(-35, 64, Math.toRadians(90));
+    private final Pose2d startPose = new Pose2d(-35, 64, Math.toRadians(90));
 
     @Override
     public void runOpMode() throws InterruptedException {

@@ -22,13 +22,6 @@ public class IntakeSubsystem extends SubsystemBase {
     public static int maxExtension = 865;
     public static int errorTolerance = 10;
     public static double coneCloseValue = 5;
-    public static double[] stackPositions = {
-            0.65,
-            0.7,
-            0.75,
-            0.8,
-            0.9
-    };
 
     private final DcMotorEx slide1, slide2;
     private final ProfiledServo claw;
@@ -36,7 +29,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private int error1, error2;
 
-    private RevColorSensorV3 color;
+    private final RevColorSensorV3 color;
 
     private enum SlideState {
         RETRACT,
@@ -110,7 +103,7 @@ public class IntakeSubsystem extends SubsystemBase {
         claw.setPosition(clawOpenPos);
     }
 
-    public boolean isClawBusy() { return claw.isBusy(); };
+    public boolean isClawBusy() { return claw.isBusy(); }
 
     public void setV4bPos(double pos) {
         v4b.setPosition(pos);
