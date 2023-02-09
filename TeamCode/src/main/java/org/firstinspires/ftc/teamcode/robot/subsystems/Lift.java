@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Lift {
     // Config parameters
+    public static PIDController liftController = new PIDController(0.005, 0, 0);
     public static int liftLow = 900;
     public static int liftMid = 1750;
     public static int liftHigh = 2450;
@@ -22,7 +24,6 @@ public class Lift {
     public static int hoverPos = 800;
     public static int collectPos = 200;
     public static int minHeightForArmRotation = 200;
-    public static double P = 0.005;
     public static int errorTolerance = 10;
     public static double grabTime = 0.75;
     public static double yawArmAngle = -10;
@@ -161,11 +162,9 @@ public class Lift {
                 targetPosition = 0;
                 break;
         }
-        error1 = targetPosition - lift1.getCurrentPosition();
-        error2 = targetPosition - lift2.getCurrentPosition();
 
-        lift1.setPower(P * error1);
-        lift2.setPower(P * error2);
+        lift1.setPower(liftController.calculate(lift1.getCurrentPosition(), targetPosition));
+        lift2.setPower(liftController.calculate(lift2.getCurrentPosition(), targetPosition));
 
         switch (grabberState) {
             case HOLD:

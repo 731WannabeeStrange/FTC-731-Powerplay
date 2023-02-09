@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -16,7 +17,7 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Intake {
     // Config parameters
-    public static double P = 0.0035;
+    public static PIDController intakeController = new PIDController(0.0035, 0, 0);
     public static double clawOpenPos = 0.65;
     public static double clawClosedPos = 0.4;
     public static double v4bRetractedPos = 0.25;
@@ -41,6 +42,7 @@ public class Intake {
 
     private int error1, error2;
     private int customTarget;
+    private int targetPosition;
 
     private RevColorSensorV3 color;
 
@@ -101,20 +103,16 @@ public class Intake {
 
         switch (slideState) {
             case RETRACTFULL:
-                error1 = -slide1.getCurrentPosition();
-                error2 = -slide2.getCurrentPosition();
+                targetPosition = 0;
                 break;
             case RETRACTPART:
-                error1 = intakePartialRetract - slide1.getCurrentPosition();
-                error2 = intakePartialRetract - slide2.getCurrentPosition();
+                targetPosition = intakePartialRetract;
                 break;
             case EXTENDING:
-                error1 = maxExtension - slide1.getCurrentPosition();
-                error2 = maxExtension - slide2.getCurrentPosition();
+                targetPosition = maxExtension;
                 break;
             case EXTENDING_AUTO:
-                error1 = maxExtension - slide1.getCurrentPosition();
-                error2 = maxExtension - slide2.getCurrentPosition();
+                targetPosition = maxExtension;
 
                 if (isConeDetected()) {
                     slideState = SlideState.STOP;
@@ -122,12 +120,10 @@ public class Intake {
                 break;
 
             case CUSTOMEXTEND:
-                error1 = customTarget - slide1.getCurrentPosition();
-                error2 = customTarget - slide2.getCurrentPosition();
+                targetPosition = customTarget;
                 break;
             case STOP:
-                error1 = 0;
-                error2 = 0;
+                targetPosition = getSlidePosition();
                 break;
         }
 
@@ -135,8 +131,8 @@ public class Intake {
             slideState = SlideState.STOP;
         }
 
-        slide1.setPower(P * error1 * multiplier);
-        slide2.setPower(P * error2 * multiplier);
+        slide1.setPower(intakeController.calculate(slide1.getCurrentPosition(), targetPosition));
+        slide2.setPower(intakeController.calculate(slide2.getCurrentPosition(), targetPosition));
     }
 
     public void grab() {
