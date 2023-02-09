@@ -30,7 +30,7 @@ public class CommandRightAuto extends LinearOpMode {
     private IntakeSubsystem intakeSubsystem;
     private LiftSubsystem liftSubsystem;
 
-    private AprilTagVisionPipeline pipeline;
+    private AprilTagVisionPipeline pipeline = new AprilTagVisionPipeline();
     private Location location = Location.LEFT;
 
     private final Pose2d startPose = new Pose2d(-35, 64, Math.toRadians(90));
@@ -45,7 +45,7 @@ public class CommandRightAuto extends LinearOpMode {
 
         scheduler.registerSubsystem(driveSubsystem, intakeSubsystem, liftSubsystem);
 
-        pipeline = new AprilTagVisionPipeline();
+        pipeline.init(hardwareMap, telemetry);
 
         TrajectorySequence driveToSpot = driveSubsystem.trajectorySequenceBuilder(startPose)
                 .back(36)
