@@ -43,7 +43,7 @@ dependencies {
     implementation 'org.openftc:easyopencv:1.5.2'
     implementation 'org.openftc:apriltag:1.1.0'
     implementation 'org.ftclib.ftclib:core:2.0.1'
-    implementation 'com.github.Eeshwar-Krishnan:PhotonFTC:v2.0.4'
+    implementation 'com.github.Eeshwar-Krishnan:PhotonFTC:v2.0.1'
 
     implementation 'com.spartronics4915.lib:ftc265:2.1.9'
 }
