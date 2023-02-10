@@ -159,6 +159,7 @@ public class ScoringMech {
                 if (lift.canControlArm()) {
                     controllingArm = true;
                     lift.setYawArmAngle(previousYawArmAngle);
+                    lift.setYawArmExtensionState(Lift.YawArmState.EXTENDED);
                     scoringState = ScoringState.CONTROLLING_ARM;
                 }
                 break;

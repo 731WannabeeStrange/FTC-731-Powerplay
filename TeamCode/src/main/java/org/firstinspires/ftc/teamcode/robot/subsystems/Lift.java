@@ -64,7 +64,7 @@ public class Lift {
 
     private GrabberState grabberState = GrabberState.HOLD;
 
-    private enum YawArmState {
+    public enum YawArmState {
         RETRACTED,
         EXTENDED
     }
@@ -153,6 +153,10 @@ public class Lift {
 
     public boolean isYawArmBusy() { return yawArm.isBusy(); }
 
+    public void setYawArmExtensionState(YawArmState state) {
+        yawArmState = state;
+    }
+
     public void update() {
         switch (liftState) {
             case HIGH:
@@ -167,6 +171,7 @@ public class Lift {
             case RETRACT:
                 grabber.setPosition(grabPos);
                 setYawArmAngle(yawArmAngle);
+                setYawArmExtensionState(YawArmState.RETRACTED);
                 if (!isYawArmBusy()) {
                     targetPosition = hoverPos;
                 }
