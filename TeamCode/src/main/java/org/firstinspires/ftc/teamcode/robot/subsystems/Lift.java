@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServo;
 import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServoPair;
 import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 
@@ -27,6 +28,8 @@ public class Lift {
     public static int errorTolerance = 10;
     public static double grabTime = 0.75;
     public static double yawArmAngle = -10;
+    public static double yawArmRetracted = 0;
+    public static double yawArmExtended = 1;
 
     private final Telemetry telemetry;
 
@@ -34,6 +37,7 @@ public class Lift {
     private final DcMotorEx lift2;
     private final ProfiledServoPair yawArm;
     private final Servo grabber;
+    private final ProfiledServo yawArmExtension;
 
     private int targetPosition = 0;
     private int error1 = 0;
@@ -60,6 +64,13 @@ public class Lift {
 
     private GrabberState grabberState = GrabberState.HOLD;
 
+    private enum YawArmState {
+        RETRACTED,
+        EXTENDED
+    }
+
+    private YawArmState yawArmState = YawArmState.RETRACTED;
+
     private final ElapsedTime grabTimer = new ElapsedTime();
 
     public Lift(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
@@ -77,6 +88,13 @@ public class Lift {
 
         grabber = hardwareMap.get(Servo.class, "grab");
         grabber.setPosition(grabPos);
+
+        yawArmExtension = new ProfiledServo(
+                hardwareMap,
+                "yawArmExtension",
+                new MotionConstraint(2, 4, 4),
+                yawArmRetracted
+        );
 
         lift1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         lift1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -131,7 +149,7 @@ public class Lift {
         return lift1.getCurrentPosition() > minHeightForArmRotation;
     }
 
-    public boolean isBusy() { return Math.abs(error1) >= errorTolerance || Math.abs(error2) >= errorTolerance; }
+    public boolean isBusy() { return liftController.getPositionError() >= errorTolerance; }
 
     public boolean isYawArmBusy() { return yawArm.isBusy(); }
 
@@ -175,6 +193,17 @@ public class Lift {
                 break;
         }
 
+        switch (yawArmState) {
+            case RETRACTED:
+                yawArmExtension.setPosition(yawArmRetracted);
+                break;
+
+            case EXTENDED:
+                yawArmExtension.setPosition(yawArmExtended);
+                break;
+        }
+
         yawArm.periodic();
+        yawArmExtension.periodic();
     }
 }
