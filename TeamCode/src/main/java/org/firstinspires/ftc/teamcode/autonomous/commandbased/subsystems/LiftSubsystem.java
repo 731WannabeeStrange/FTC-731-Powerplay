@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServo;
 import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServoPair;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
@@ -33,6 +34,7 @@ public class LiftSubsystem extends SubsystemBase {
 
     private final DcMotorEx lift1, lift2;
     private final ProfiledServoPair yawArm;
+    private final ProfiledServo yawArmExtension;
     private final Servo grabber;
 
     private Lift.LiftState liftState = Lift.LiftState.RETRACT;
@@ -45,6 +47,13 @@ public class LiftSubsystem extends SubsystemBase {
 
     private GrabberState grabberState = GrabberState.HOLD;
 
+    private enum YawArmState {
+        RETRACTED,
+        EXTENDED
+    }
+
+    private YawArmState yawArmState = YawArmState.RETRACTED;
+
     public LiftSubsystem(HardwareMap hardwareMap) {
         lift1 = hardwareMap.get(DcMotorEx.class, "lift1");
         lift2 = hardwareMap.get(DcMotorEx.class, "lift2");
@@ -54,6 +63,13 @@ public class LiftSubsystem extends SubsystemBase {
                 "yaw2",
                 new MotionConstraint(3, 4, 3),
                 (0.0037037 * -45) + 0.33333
+        );
+
+        yawArmExtension = new ProfiledServo(
+                hardwareMap,
+                "yawArmExtension",
+                new MotionConstraint(2, 4, 4),
+                Lift.yawArmRetracted
         );
 
         grabber = hardwareMap.get(Servo.class, "grab");
@@ -93,6 +109,14 @@ public class LiftSubsystem extends SubsystemBase {
         }
         double pos = (0.0037037 * angle) + 0.33333;
         yawArm.setPosition(pos);
+    }
+
+    public void setYawArmExtensionState(YawArmState state) {
+        yawArmState = state;
+    }
+
+    public boolean isYawArmExtensionBusy() {
+        return yawArmExtension.isBusy();
     }
 
     public boolean isBusy() { return Math.abs(error1) >= errorTolerance || Math.abs(error2) >= errorTolerance; }
@@ -146,6 +170,17 @@ public class LiftSubsystem extends SubsystemBase {
                 break;
         }
 
+        switch (yawArmState) {
+            case RETRACTED:
+                yawArmExtension.setPosition(Lift.yawArmRetracted);
+                break;
+
+            case EXTENDED:
+                yawArmExtension.setPosition(Lift.yawArmExtended);
+                break;
+        }
+
         yawArm.periodic();
+        yawArmExtension.periodic();
     }
 }
