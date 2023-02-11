@@ -17,7 +17,7 @@ public class DepositCone extends CommandBase {
         RAISING,
         MOVING_ARM,
         DROPPING,
-        RETRACTING,
+        //RETRACTING,
         IDLE
     }
 
@@ -55,14 +55,17 @@ public class DepositCone extends CommandBase {
             case DROPPING:
                 if (eTime.time() > 0.5) {
                     liftSubsystem.setLiftState(Lift.LiftState.RETRACT);
-                    depositState = DepositState.RETRACTING;
+                    depositState = DepositState.IDLE; //DepositState.RETRACTING;
                 }
                 break;
+            /*
             case RETRACTING:
                 if (!liftSubsystem.isBusy() && !liftSubsystem.isYawArmBusy()) {
                     depositState = DepositState.IDLE;
                 }
                 break;
+
+             */
             case IDLE:
                 break;
         }
