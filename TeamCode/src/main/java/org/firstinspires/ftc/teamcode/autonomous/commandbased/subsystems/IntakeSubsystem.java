@@ -18,8 +18,8 @@ public class IntakeSubsystem extends SubsystemBase {
     public static double clawOpenPos = 0.65;
     public static double clawClosedPos = 0.4;
     public static double v4bExtendedPos = 0.92;
-    public static double v4bRetractedPos = 0.25;
-    public static double v4bCompletelyRetractedPos = 0.1;
+    public static double v4bRetractedPos = 0.3;
+    public static double v4bCompletelyRetractedPos = 0.15;
     public static int maxExtension = 865;
     public static int errorTolerance = 10;
     public static double coneCloseValue = 5;

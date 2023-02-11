@@ -16,8 +16,8 @@ public class LiftSubsystem extends SubsystemBase {
     public static int liftLow = 900;
     public static int liftMid = 1750;
     public static int liftHigh = 2450;
-    public static double grabPos = 0.45;
-    public static double releasePos = 0.9;
+    public static double grabPos = 0.9;
+    public static double releasePos = 0.45;
     public static double waitTime = 1.5;
     public static int hoverPos = 800;
     public static int collectPos = 200;

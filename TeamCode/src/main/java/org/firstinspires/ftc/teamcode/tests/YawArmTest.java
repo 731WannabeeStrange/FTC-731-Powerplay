@@ -24,8 +24,8 @@ public class YawArmTest extends LinearOpMode
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        s1 = hardwareMap.get(ServoImplEx.class, "s1");
-        s2 = hardwareMap.get(ServoImplEx.class, "s2");
+        s1 = hardwareMap.get(ServoImplEx.class, "yaw1");
+        s2 = hardwareMap.get(ServoImplEx.class, "yaw2");
 
         s1.setPwmRange(new PwmControl.PwmRange(500, 2500));
         s2.setPwmRange(new PwmControl.PwmRange(500, 2500));
