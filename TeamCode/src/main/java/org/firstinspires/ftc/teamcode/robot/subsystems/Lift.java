@@ -91,7 +91,7 @@ public class Lift {
 
         yawArmExtension = new ProfiledServo(
                 hardwareMap,
-                "yawArmExtension",
+                "extension",
                 new MotionConstraint(2, 4, 4),
                 yawArmRetracted
         );

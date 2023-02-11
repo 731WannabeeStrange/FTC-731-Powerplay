@@ -68,7 +68,7 @@ public class ScoringMech {
                 intake.grab();
 
                 if (intakeGrabButton) {
-                    intake.setV4bPos(0.9);
+                    intake.setV4bPos(Intake.v4bExtendedPos);
                     intake.release();
                     scoringState = ScoringState.EXTENDING;
                 }

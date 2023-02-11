@@ -67,7 +67,7 @@ public class LiftSubsystem extends SubsystemBase {
 
         yawArmExtension = new ProfiledServo(
                 hardwareMap,
-                "yawArmExtension",
+                "extension",
                 new MotionConstraint(2, 4, 4),
                 Lift.yawArmRetracted
         );
