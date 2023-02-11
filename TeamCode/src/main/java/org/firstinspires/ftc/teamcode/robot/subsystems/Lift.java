@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
+import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -15,7 +17,8 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Lift {
     // Config parameters
-    public static PIDController liftController = new PIDController(0.005, 0, 0);
+    public static TrapezoidProfile.Constraints liftConstraints = new TrapezoidProfile.Constraints(1500, 1500);
+    public static ProfiledPIDController liftController = new ProfiledPIDController(0.005, 0, 0, liftConstraints);
     public static int liftLow = 900;
     public static int liftMid = 1750;
     public static int liftHigh = 2450;

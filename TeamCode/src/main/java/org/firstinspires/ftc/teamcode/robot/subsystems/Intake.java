@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
+import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -17,7 +19,8 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Intake {
     // Config parameters
-    public static PIDController intakeController = new PIDController(0.0035, 0, 0);
+    public static TrapezoidProfile.Constraints intakeConstraints = new TrapezoidProfile.Constraints(500, 500);
+    public static ProfiledPIDController intakeController = new ProfiledPIDController(0.0035, 0, 0, intakeConstraints);
     public static double clawOpenPos = 0.65;
     public static double clawClosedPos = 0.4;
     public static double v4bExtendedPos = 0.92;
