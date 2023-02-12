@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
-import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServoPair;
 import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 
 @Config
-public class Lift {
+public class Lift extends SubsystemBase {
     // Config parameters
     public static TrapezoidProfile.Constraints liftConstraints = new TrapezoidProfile.Constraints(2500, 2500);
     public static PIDCoefficients liftCoefficients = new PIDCoefficients(0.008, 0, 0);
@@ -39,7 +39,7 @@ public class Lift {
     public static double grabTime = 0.75;
     public static double yawArmAngle = -10;
     public static double yawArmRetracted = 0.4;
-    public static double yawArmExtended = 0.6;
+    public static double yawArmExtended = 0.7;
 
     private final Telemetry telemetry;
 
@@ -59,6 +59,7 @@ public class Lift {
         HIGH,
         MID,
         LOW,
+        GOING_UP,
         RETRACT,
         COLLECT,
         ZERO
@@ -167,7 +168,8 @@ public class Lift {
         yawArmState = state;
     }
 
-    public void update() {
+    @Override
+    public void periodic() {
         switch (liftState) {
             case HIGH:
                 targetPosition = liftHigh;
@@ -181,10 +183,18 @@ public class Lift {
                 targetPosition = liftLow;
                 setYawArmExtensionState(YawArmState.EXTENDED);
                 break;
+            case GOING_UP:
+                targetPosition = hoverPos;
+                grabberState = GrabberState.HOLD;
+                if (!isBusy()) {
+                    setYawArmAngle(yawArmAngle);
+                    setYawArmExtensionState(YawArmState.RETRACTED);
+                }
+                break;
             case RETRACT:
-                grabber.setPosition(grabPos);
                 setYawArmAngle(yawArmAngle);
                 setYawArmExtensionState(YawArmState.RETRACTED);
+                grabberState = GrabberState.HOLD;
                 if (!isYawArmBusy()) {
                     targetPosition = hoverPos;
                 }

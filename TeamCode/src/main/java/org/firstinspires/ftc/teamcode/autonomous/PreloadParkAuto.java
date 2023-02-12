@@ -129,7 +129,7 @@ public class PreloadParkAuto extends LinearOpMode {
             }
 
             drive.update();
-            lift.update();
+            lift.periodic();
 
             telemetry.addData("State", state);
             telemetry.update();

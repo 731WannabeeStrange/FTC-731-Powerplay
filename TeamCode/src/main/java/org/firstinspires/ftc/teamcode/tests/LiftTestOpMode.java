@@ -28,7 +28,7 @@ public class LiftTestOpMode extends LinearOpMode {
                 lift.setLiftState(Lift.LiftState.RETRACT);
             }
 
-            lift.update();
+            lift.periodic();
 
             multipleTelemetry.addData("current lift position", lift.getSlidePosition());
 

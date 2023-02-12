@@ -3,10 +3,10 @@ package org.firstinspires.ftc.teamcode.autonomous.commandbased.commands;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.robot.subsystems.Intake;
 
 public class RetrieveCone extends CommandBase {
-    private final IntakeSubsystem intakeSubsystem;
+    private final Intake intakeSubsystem;
 
     private final ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
@@ -19,7 +19,7 @@ public class RetrieveCone extends CommandBase {
 
     private RetrieveState retrieveState = RetrieveState.IDLE;
 
-    public RetrieveCone(IntakeSubsystem subsystem) {
+    public RetrieveCone(Intake subsystem) {
         intakeSubsystem = subsystem;
         addRequirements(intakeSubsystem);
     }
@@ -36,7 +36,7 @@ public class RetrieveCone extends CommandBase {
         switch (retrieveState) {
             case GRABBING:
                 if (eTime.time() > 0.5) {
-                    intakeSubsystem.setV4bPos(IntakeSubsystem.v4bRetractedPos);
+                    intakeSubsystem.setV4bPos(Intake.v4bRetractedPos);
                     retrieveState = RetrieveState.RETRACTING_V4B;
                 }
                 break;

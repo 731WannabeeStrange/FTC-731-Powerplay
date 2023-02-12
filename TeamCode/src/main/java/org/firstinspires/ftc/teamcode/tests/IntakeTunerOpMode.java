@@ -38,8 +38,8 @@ public class IntakeTunerOpMode extends LinearOpMode {
                 intake.grab();
             }
 
-            lift.update();
-            intake.update();
+            lift.periodic();
+            intake.periodic();
 
             multipleTelemetry.addData("current intake position", intake.getSlidePosition());
 

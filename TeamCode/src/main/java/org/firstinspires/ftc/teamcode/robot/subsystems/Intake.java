@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
-import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServoPair;
 import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 
 @Config
-public class Intake {
+public class Intake extends SubsystemBase {
     // Config parameters
     public static TrapezoidProfile.Constraints intakeConstraints = new TrapezoidProfile.Constraints(500, 500);
     public static PIDCoefficients intakeCoefficients = new PIDCoefficients(0.0035, 0, 0);
@@ -108,7 +108,8 @@ public class Intake {
         beamBreaker.setMode(DigitalChannel.Mode.INPUT);
     }
 
-    public void update() {
+    @Override
+    public void periodic() {
         v4b.periodic();
         claw.periodic();
 
@@ -138,7 +139,7 @@ public class Intake {
                 break;
         }
 
-        if (Math.abs(error1) < errorTolerance && slideState != SlideState.STOP) {
+        if (intakeController.atGoal() && slideState != SlideState.STOP) {
             slideState = SlideState.STOP;
         }
 

@@ -2,15 +2,14 @@ package org.firstinspires.ftc.teamcode.autonomous.commandbased.commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.LiftSubsystem;
+import org.firstinspires.ftc.teamcode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 
 public class ResetLiftAndIntake extends CommandBase {
-    private final IntakeSubsystem intakeSubsystem;
-    private final LiftSubsystem liftSubsystem;
+    private final Intake intakeSubsystem;
+    private final Lift liftSubsystem;
 
-    public ResetLiftAndIntake(IntakeSubsystem intake, LiftSubsystem lift) {
+    public ResetLiftAndIntake(Intake intake, Lift lift) {
         intakeSubsystem = intake;
         liftSubsystem = lift;
         addRequirements(intakeSubsystem, liftSubsystem);

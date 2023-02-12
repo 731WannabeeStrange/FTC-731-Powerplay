@@ -5,8 +5,6 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.util.concurrent.TimeUnit;
-
 @Config
 public class ScoringMech {
     private enum ScoringState {
@@ -230,8 +228,8 @@ public class ScoringMech {
             previousLiftState = lift.getLiftState();
         }
 
-        lift.update();
-        intake.update();
+        lift.periodic();
+        intake.periodic();
 
         if (cancelAutomation) {
             scoringState = ScoringState.RESET;

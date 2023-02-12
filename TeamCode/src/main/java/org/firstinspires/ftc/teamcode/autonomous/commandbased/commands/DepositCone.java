@@ -3,11 +3,10 @@ package org.firstinspires.ftc.teamcode.autonomous.commandbased.commands;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 
 public class DepositCone extends CommandBase {
-    private final LiftSubsystem liftSubsystem;
+    private final Lift liftSubsystem;
     private final Lift.LiftState desiredState;
     private final int yawArmAngle;
 
@@ -17,13 +16,13 @@ public class DepositCone extends CommandBase {
         RAISING,
         MOVING_ARM,
         DROPPING,
-        //RETRACTING,
+        RETRACTING,
         IDLE
     }
 
     private DepositState depositState = DepositState.IDLE;
 
-    public DepositCone(LiftSubsystem subsystem, Lift.LiftState height, int angle) {
+    public DepositCone(Lift subsystem, Lift.LiftState height, int angle) {
         liftSubsystem = subsystem;
         desiredState = height;
         yawArmAngle = angle;
@@ -42,6 +41,7 @@ public class DepositCone extends CommandBase {
             case RAISING:
                 if (liftSubsystem.canControlArm()) {
                     liftSubsystem.setYawArmAngle(yawArmAngle);
+                    liftSubsystem.setYawArmExtensionState(Lift.YawArmState.EXTENDED);
                     depositState = DepositState.MOVING_ARM;
                 }
                 break;
@@ -55,17 +55,15 @@ public class DepositCone extends CommandBase {
             case DROPPING:
                 if (eTime.time() > 0.5) {
                     liftSubsystem.setLiftState(Lift.LiftState.RETRACT);
-                    depositState = DepositState.IDLE; //DepositState.RETRACTING;
+                    liftSubsystem.setYawArmExtensionState(Lift.YawArmState.RETRACTED);
+                    depositState = DepositState.RETRACTING;
                 }
                 break;
-            /*
             case RETRACTING:
                 if (!liftSubsystem.isBusy() && !liftSubsystem.isYawArmBusy()) {
                     depositState = DepositState.IDLE;
                 }
                 break;
-
-             */
             case IDLE:
                 break;
         }

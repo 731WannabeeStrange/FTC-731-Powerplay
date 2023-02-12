@@ -238,8 +238,8 @@ public class FixedRightAuto extends LinearOpMode {
             }
 
             drive.update();
-            lift.update();
-            intake.update();
+            lift.periodic();
+            intake.periodic();
 
             telemetry.addData("State", autoState);
             telemetry.addData("Intake ticks", intake.getSlidePosition());

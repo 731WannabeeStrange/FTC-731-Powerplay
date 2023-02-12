@@ -121,7 +121,7 @@ public class RightAuto extends LinearOpMode {
                     deposit();
                     if (!lift.isBusy() && !intake.isBusy()) {
                         lift.openGrabber();
-                        lift.update();
+                        lift.periodic();
                         eTime.reset();
                         state = State.OPENING;
                     }
@@ -151,7 +151,7 @@ public class RightAuto extends LinearOpMode {
 
                 case COLLECT:
                     lift.setLiftState(Lift.LiftState.COLLECT);
-                    lift.update();
+                    lift.periodic();
 
                     if (!lift.isBusy()) {
                         lift.closeGrabber();
@@ -173,7 +173,7 @@ public class RightAuto extends LinearOpMode {
                 case CLOSING:
                     if (eTime.time() > 0.5) {
                         intake.setV4bPos(Intake.v4bCompletelyRetractedPos);
-                        intake.update();
+                        intake.periodic();
                         if (!intake.isClawBusy() && !intake.isV4BBusy()) {
                             if (cycle < numCycles) {
                                 state = State.WAIT;
@@ -235,8 +235,8 @@ public class RightAuto extends LinearOpMode {
             }
 
             drive.update();
-            lift.update();
-            intake.update();
+            lift.periodic();
+            intake.periodic();
 
             telemetry.addData("State", state);
             telemetry.addData("Intake ticks", intake.getSlidePosition());
@@ -260,28 +260,28 @@ public class RightAuto extends LinearOpMode {
             lift.setYawArmAngle(-90);
         }
 
-        intake.update();
-        lift.update();
+        intake.periodic();
+        lift.periodic();
     }
 
     public void grabCone() {
         lift.setYawArmAngle(Lift.yawArmAngle);
-        lift.update();
+        lift.periodic();
         if (!lift.isYawArmBusy()) {
             lift.setLiftState(Lift.LiftState.RETRACT);
-            lift.update();
+            lift.periodic();
         }
         intake.grab();
-        intake.update();
+        intake.periodic();
         telemetry.addLine("Closing claw");
         if (!intake.isClawBusy()) {
             telemetry.addLine("Setting v4b pos");
             intake.setV4bPos(Intake.v4bRetractedPos);
-            intake.update();
+            intake.periodic();
             if (!intake.isV4BBusy()) {
                 telemetry.addLine("Retracting intake");
                 intake.retractPart(Intake.v4bRetractedPos);
-                intake.update();
+                intake.periodic();
                 if (!intake.isBusy() && !lift.isBusy()) {
                     flag = true;
                 }

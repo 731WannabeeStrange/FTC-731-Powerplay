@@ -3,17 +3,17 @@ package org.firstinspires.ftc.teamcode.autonomous.commandbased.commands;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.LiftSubsystem;
+import org.firstinspires.ftc.teamcode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 
 public class TransferCone extends CommandBase {
-    private final IntakeSubsystem intakeSubsystem;
-    private final LiftSubsystem liftSubsystem;
+    private final Intake intakeSubsystem;
+    private final Lift liftSubsystem;
 
     private final ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
     private enum TransferState {
+        RELEASE_CONE,
         DROPPING,
         GRABBING,
         RELEASING,
@@ -23,7 +23,7 @@ public class TransferCone extends CommandBase {
 
     private TransferState transferState = TransferState.IDLE;
 
-    public TransferCone(IntakeSubsystem intake, LiftSubsystem lift) {
+    public TransferCone(Intake intake, Lift lift) {
         intakeSubsystem = intake;
         liftSubsystem = lift;
         addRequirements(intakeSubsystem, liftSubsystem);
@@ -31,16 +31,23 @@ public class TransferCone extends CommandBase {
 
     @Override
     public void initialize() {
-        liftSubsystem.setLiftState(Lift.LiftState.COLLECT);
-        transferState = TransferState.DROPPING;
+        intakeSubsystem.release();
+        transferState = TransferState.RELEASE_CONE;
     }
 
     @Override
     public void execute() {
         switch (transferState) {
+            case RELEASE_CONE:
+                if (!intakeSubsystem.isClawBusy()) {
+                    intakeSubsystem.setV4bPos(Intake.v4bCompletelyRetractedPos);
+                    liftSubsystem.closeGrabber();
+                    liftSubsystem.setLiftState(Lift.LiftState.COLLECT);
+                    transferState = TransferState.DROPPING;
+                }
+                break;
             case DROPPING:
                 if (!liftSubsystem.isBusy()) {
-                    liftSubsystem.closeGrabber();
                     eTime.reset();
                     transferState = TransferState.GRABBING;
                 }
@@ -53,7 +60,7 @@ public class TransferCone extends CommandBase {
                 break;
             case RELEASING:
                 if (!intakeSubsystem.isClawBusy()) {
-                    intakeSubsystem.setV4bPos(IntakeSubsystem.v4bCompletelyRetractedPos);
+                    intakeSubsystem.setV4bPos(Intake.v4bCompletelyRetractedPos);
                     transferState = TransferState.RETRACTING;
                 }
                 break;

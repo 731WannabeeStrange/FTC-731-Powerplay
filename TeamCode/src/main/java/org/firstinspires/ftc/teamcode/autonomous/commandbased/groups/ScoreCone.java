@@ -9,12 +9,11 @@ import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.FindCone;
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.GoToLiftState;
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.RetrieveCone;
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.TransferCone;
-import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.LiftSubsystem;
+import org.firstinspires.ftc.teamcode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
 
 public class ScoreCone extends SequentialCommandGroup {
-    public ScoreCone(IntakeSubsystem intakeSubsystem, LiftSubsystem liftSubsystem, int desiredAngle,
+    public ScoreCone(Intake intakeSubsystem, Lift liftSubsystem, int desiredAngle,
                      Lift.LiftState desiredHeight, double v4bpos) {
         addCommands(
                 new ParallelCommandGroup(

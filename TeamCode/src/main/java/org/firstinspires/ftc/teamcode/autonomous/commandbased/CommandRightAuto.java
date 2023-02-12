@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.autonomous.commandbased;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.Command;
@@ -17,10 +19,9 @@ import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.GoToLiftS
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.commands.ResetLiftAndIntake;
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.groups.ScoreCone;
 import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.DriveSubsystem;
-import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems.LiftSubsystem;
-import org.firstinspires.ftc.teamcode.autonomous.roadrunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
+import org.firstinspires.ftc.teamcode.autonomous.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.vision.signal.AprilTagVisionPipeline;
 import org.firstinspires.ftc.teamcode.vision.signal.Location;
 
@@ -31,21 +32,23 @@ public class CommandRightAuto extends LinearOpMode {
     private CommandScheduler scheduler;
 
     private DriveSubsystem driveSubsystem;
-    private IntakeSubsystem intakeSubsystem;
-    private LiftSubsystem liftSubsystem;
+    private Intake intakeSubsystem;
+    private Lift liftSubsystem;
 
     private AprilTagVisionPipeline pipeline = new AprilTagVisionPipeline();
     private Location location = Location.LEFT;
 
     private final Pose2d startPose = new Pose2d(-35, 64, Math.toRadians(90));
 
+    private MultipleTelemetry multipleTelemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
+
     @Override
     public void runOpMode() throws InterruptedException {
         scheduler = CommandScheduler.getInstance();
 
         driveSubsystem = new DriveSubsystem(hardwareMap);
-        intakeSubsystem = new IntakeSubsystem(hardwareMap);
-        liftSubsystem = new LiftSubsystem(hardwareMap);
+        intakeSubsystem = new Intake(hardwareMap, multipleTelemetry);
+        liftSubsystem = new Lift(hardwareMap, multipleTelemetry);
 
         driveSubsystem.setPoseEstimate(startPose);
 
@@ -55,7 +58,7 @@ public class CommandRightAuto extends LinearOpMode {
 
         TrajectorySequence driveToSpot = driveSubsystem.trajectorySequenceBuilder(startPose)
                 .back(36)
-                .splineToSplineHeading(new Pose2d(-30, 12.5, Math.toRadians(180)), Math.toRadians(0))
+                .splineToSplineHeading(new Pose2d(-28, 12, Math.toRadians(180)), Math.toRadians(0))
                 .back(4)
                 .waitSeconds(1)
                 .build();
@@ -85,11 +88,11 @@ public class CommandRightAuto extends LinearOpMode {
         scheduler.schedule(new SequentialCommandGroup(
                 new ParallelDeadlineGroup(
                         new FollowTrajectory(driveSubsystem, driveToSpot),
-                        new GoToLiftState(liftSubsystem, Lift.LiftState.RETRACT)),
-                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.65),
+                        new GoToLiftState(liftSubsystem, Lift.LiftState.GOING_UP)),
                 new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.7),
                 new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.75),
-                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.8),
+                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.77),
+                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.85),
                 new DepositCone(liftSubsystem, Lift.LiftState.HIGH, -90),
                 new ParallelCommandGroup(
                         new SelectCommand(
@@ -106,6 +109,7 @@ public class CommandRightAuto extends LinearOpMode {
 
         while (!isStopRequested() && opModeIsActive()) {
             scheduler.run();
+            multipleTelemetry.update();
         }
 
         scheduler.reset();
