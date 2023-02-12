@@ -79,6 +79,7 @@ public class Drivetrain {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
+        // TODO: see if I need to delete this
         imu.startAccelerationIntegration(null, null, 1000);
 
         telemetry.addData(">", "Hardware initialized");
