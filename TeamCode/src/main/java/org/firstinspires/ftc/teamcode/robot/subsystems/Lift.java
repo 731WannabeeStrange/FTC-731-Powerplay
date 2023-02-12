@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
@@ -17,22 +18,28 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Lift {
     // Config parameters
-    public static TrapezoidProfile.Constraints liftConstraints = new TrapezoidProfile.Constraints(1500, 1500);
-    public static ProfiledPIDController liftController = new ProfiledPIDController(0.005, 0, 0, liftConstraints);
+    public static TrapezoidProfile.Constraints liftConstraints = new TrapezoidProfile.Constraints(2500, 2500);
+    public static PIDCoefficients liftCoefficients = new PIDCoefficients(0.008, 0, 0);
+    public static ProfiledPIDController liftController = new ProfiledPIDController(
+            liftCoefficients.kP,
+            liftCoefficients.kI,
+            liftCoefficients.kD,
+            liftConstraints
+    );
     public static int liftLow = 900;
     public static int liftMid = 1750;
     public static int liftHigh = 2450;
     public static double grabPos = 0.9;
     public static double releasePos = 0.5;
     public static double waitTime = 1.5;
-    public static int hoverPos = 800;
-    public static int collectPos = 200;
+    public static int hoverPos = 900;
+    public static int collectPos = 0;
     public static int minHeightForArmRotation = 200;
     public static int errorTolerance = 10;
     public static double grabTime = 0.75;
     public static double yawArmAngle = -10;
-    public static double yawArmRetracted = 0;
-    public static double yawArmExtended = 1;
+    public static double yawArmRetracted = 0.4;
+    public static double yawArmExtended = 0.6;
 
     private final Telemetry telemetry;
 
@@ -152,7 +159,7 @@ public class Lift {
         return lift1.getCurrentPosition() > minHeightForArmRotation;
     }
 
-    public boolean isBusy() { return liftController.getPositionError() >= errorTolerance; }
+    public boolean isBusy() { return Math.abs(targetPosition - lift1.getCurrentPosition()) >= errorTolerance; }
 
     public boolean isYawArmBusy() { return yawArm.isBusy(); }
 
@@ -164,12 +171,15 @@ public class Lift {
         switch (liftState) {
             case HIGH:
                 targetPosition = liftHigh;
+                setYawArmExtensionState(YawArmState.EXTENDED);
                 break;
             case MID:
                 targetPosition = liftMid;
+                setYawArmExtensionState(YawArmState.EXTENDED);
                 break;
             case LOW:
                 targetPosition = liftLow;
+                setYawArmExtensionState(YawArmState.EXTENDED);
                 break;
             case RETRACT:
                 grabber.setPosition(grabPos);

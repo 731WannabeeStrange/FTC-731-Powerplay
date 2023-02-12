@@ -60,6 +60,7 @@ public class ScoringMech {
         telemetry.addData("Timer", eTime.time());
         telemetry.addData("smState", scoringState);
         telemetry.addData("v4bBusy", intake.isV4BBusy());
+        telemetry.addData("lift position", lift.getSlidePosition());
         telemetry.update();
 
         switch (scoringState) {
@@ -110,8 +111,8 @@ public class ScoringMech {
                 break;
 
             case RETRACTING:
-                if (eTime.time() > 1) {
-                    lift.openGrabber();
+                if (eTime.time() > 1.5) {
+                    intake.release();
                     eTime.reset();
                     scoringState = ScoringState.COLLECTING_1;
                 }
@@ -119,6 +120,8 @@ public class ScoringMech {
 
             case COLLECTING_1:
                 if (eTime.time() > 0.5) {
+                    intake.setV4bPos(Intake.v4bCompletelyRetractedPos);
+                    lift.closeGrabber();
                     lift.setLiftState(Lift.LiftState.COLLECT);
                     scoringState = ScoringState.TRANSFERRING;
                 }
@@ -128,7 +131,7 @@ public class ScoringMech {
                 if (!lift.isBusy()) {
                     lift.closeGrabber();
                     eTime.reset();
-                    scoringState = ScoringState.RELEASING_1;
+                    scoringState = ScoringState.LOWERED;
                 }
                 break;
 

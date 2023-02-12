@@ -7,17 +7,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.robot.subsystems.Lift;
+
 @TeleOp(group="test")
 @Config
 public class LinkageTest extends LinearOpMode
 {
     private Servo s1;
-    private Servo s2;
-    private Servo grabber;
 
-    private double s1pos = 1;
-    private double s2pos = 0;
-    private double grabberPos = 0.4;
+    private double s1pos = 0.5;
 
     private boolean lbTriggered = false, rbTriggered = false;
 
@@ -25,9 +23,7 @@ public class LinkageTest extends LinearOpMode
     public void runOpMode() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        s1 = hardwareMap.get(Servo.class, "s1");
-        s2 = hardwareMap.get(Servo.class, "s2");
-        grabber = hardwareMap.get(Servo.class, "grab");
+        s1 = hardwareMap.get(Servo.class, "extension");
 
         telemetry.addData("Mode", "waiting for start");
         telemetry.update();
@@ -40,29 +36,15 @@ public class LinkageTest extends LinearOpMode
 
         while (opModeIsActive()) {
             s1.setPosition(s1pos);
-            s2.setPosition(s2pos);
-            grabber.setPosition(grabberPos);
 
             telemetry.addData("s1 position", s1pos);
-            telemetry.addData("s2 position", s2pos);
-            telemetry.addData("grab position", grabberPos);
 
             if (gamepad1.left_bumper && !lbTriggered) {
-                s1pos=1;
-                s2pos=0;
+                s1pos -= 0.05;
             }
 
             if (gamepad1.right_bumper && !rbTriggered) {
-                s1pos=0.3;
-                s2pos=0.7;
-            }
-
-            if (gamepad1.a) {
-                grabberPos = 0.25;
-            }
-
-            if (gamepad1.b) {
-                grabberPos = 0.4;
+                s1pos += 0.05;
             }
 
             lbTriggered = gamepad1.left_bumper;

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.trajectory.TrapezoidProfile;
@@ -20,11 +21,17 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 public class Intake {
     // Config parameters
     public static TrapezoidProfile.Constraints intakeConstraints = new TrapezoidProfile.Constraints(500, 500);
-    public static ProfiledPIDController intakeController = new ProfiledPIDController(0.0035, 0, 0, intakeConstraints);
+    public static PIDCoefficients intakeCoefficients = new PIDCoefficients(0.0035, 0, 0);
+    public static ProfiledPIDController intakeController = new ProfiledPIDController(
+            intakeCoefficients.kP,
+            intakeCoefficients.kI,
+            intakeCoefficients.kD,
+            intakeConstraints
+    );
     public static double clawOpenPos = 0.65;
     public static double clawClosedPos = 0.4;
-    public static double v4bExtendedPos = 0.92;
-    public static double v4bRetractedPos = 0.3;
+    public static double v4bExtendedPos = 0.85;
+    public static double v4bRetractedPos = 0.27;
     public static int intakePartialRetract = 0;
     public static double v4bCompletelyRetractedPos = 0.15;
     public static int maxExtension = 865;
