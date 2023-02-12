@@ -80,7 +80,6 @@ public class CompTeleOp extends LinearOpMode {
                         gamepad2.dpad_left
                 );
             }
-
         }
 
         Dashboard.periodic();
