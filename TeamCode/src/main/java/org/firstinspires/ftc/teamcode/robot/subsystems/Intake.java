@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Intake extends SubsystemBase {
     // Config parameters
-    public static TrapezoidProfile.Constraints intakeConstraints = new TrapezoidProfile.Constraints(500, 500);
+    public static TrapezoidProfile.Constraints intakeConstraints = new TrapezoidProfile.Constraints(1000, 1000);
     public static PIDCoefficients intakeCoefficients = new PIDCoefficients(0.0035, 0, 0);
     public static ProfiledPIDController intakeController = new ProfiledPIDController(
             intakeCoefficients.kP,
