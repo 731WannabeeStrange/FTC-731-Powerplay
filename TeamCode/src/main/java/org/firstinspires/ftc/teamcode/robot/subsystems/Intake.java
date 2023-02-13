@@ -139,12 +139,12 @@ public class Intake extends SubsystemBase {
                 break;
         }
 
+        slide1.setPower(intakeController.calculate(slide1.getCurrentPosition(), targetPosition));
+        slide2.setPower(intakeController.calculate(slide2.getCurrentPosition(), targetPosition));
+
         if (intakeController.atGoal() && slideState != SlideState.STOP) {
             slideState = SlideState.STOP;
         }
-
-        slide1.setPower(intakeController.calculate(slide1.getCurrentPosition(), targetPosition));
-        slide2.setPower(intakeController.calculate(slide2.getCurrentPosition(), targetPosition));
     }
 
     public void grab() {

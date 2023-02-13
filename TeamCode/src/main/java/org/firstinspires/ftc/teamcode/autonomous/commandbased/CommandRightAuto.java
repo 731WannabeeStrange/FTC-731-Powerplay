@@ -42,6 +42,9 @@ public class CommandRightAuto extends LinearOpMode {
 
     private MultipleTelemetry multipleTelemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
 
+    private TimerTrigger timerTrigger;
+    private boolean parking = false;
+
     @Override
     public void runOpMode() throws InterruptedException {
         scheduler = CommandScheduler.getInstance();
@@ -107,9 +110,25 @@ public class CommandRightAuto extends LinearOpMode {
                 )
         ));
 
+        timerTrigger = new TimerTrigger(getRuntime());
+
         while (!isStopRequested() && opModeIsActive()) {
             scheduler.run();
             multipleTelemetry.update();
+
+            /*
+            timerTrigger.whenActive(new ParallelCommandGroup(
+                    new SelectCommand(
+                            new HashMap<Object, Command>() {{
+                                put(Location.LEFT, new FollowTrajectory(driveSubsystem, leftPark));
+                                put(Location.MIDDLE, new FollowTrajectory(driveSubsystem, midPark));
+                                put(Location.RIGHT, new FollowTrajectory(driveSubsystem, rightPark));
+                            }},
+                            () -> location
+                    ),
+                    new ResetLiftAndIntake(intakeSubsystem, liftSubsystem)
+            ));
+             */
         }
 
         scheduler.reset();
