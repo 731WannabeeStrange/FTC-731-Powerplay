@@ -20,6 +20,7 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -29,6 +30,10 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.spartronics4915.lib.T265Camera;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.autonomous.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.autonomous.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.autonomous.roadrunner.trajectorysequence.TrajectorySequenceRunner;
@@ -75,7 +80,13 @@ public class SampleMecanumDrive extends MecanumDrive {
     private DcMotorEx fl, bl, br, fr;
     private List<DcMotorEx> motors;
 
-    private BNO055IMU imu;
+    private final Object imuLock = new Object();
+    private final BNO055IMU imu;
+    private double imuAngle = 0;
+    private double headingVelocity = 0;
+    private Orientation angles;
+    private Thread imuThread;
+
     private VoltageSensor batteryVoltageSensor;
 
     public SampleMecanumDrive(HardwareMap hardwareMap) {
@@ -92,10 +103,12 @@ public class SampleMecanumDrive extends MecanumDrive {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        imu.initialize(parameters);
+        synchronized (imuLock) {
+            imu = hardwareMap.get(BNO055IMU.class, "imu");
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+            imu.initialize(parameters);
+        }
 
         // TODO: If the hub containing the IMU you are using is mounted so that the "REV" logo does
         // not face up, remap the IMU axes so that the z-axis points upward (normal to the floor.)
@@ -153,6 +166,19 @@ public class SampleMecanumDrive extends MecanumDrive {
         setLocalizer(new TwoWheelTrackingLocalizer(hardwareMap, this));
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
+    }
+
+    public void startIMUThread(LinearOpMode opMode) {
+        imuThread = new Thread(() -> {
+            while (!opMode.isStopRequested() && opMode.opModeIsActive()) {
+                synchronized (imuLock) {
+                    angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+                    imuAngle = angles.firstAngle;
+                    headingVelocity = -imu.getAngularVelocity().xRotationRate;
+                }
+            }
+        });
+        imuThread.start();
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
@@ -316,7 +342,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         // expected). This bug does NOT affect orientation. 
         //
         // See https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/251 for details.
-        return (double) -imu.getAngularVelocity().xRotationRate;
+        return headingVelocity;
     }
 
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {
@@ -332,6 +358,6 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     protected double getRawExternalHeading() {
-        return imu.getAngularOrientation().firstAngle;
+        return imuAngle;
     }
 }

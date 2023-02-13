@@ -53,6 +53,7 @@ public class CommandRightAuto extends LinearOpMode {
         intakeSubsystem = new Intake(hardwareMap, multipleTelemetry);
         liftSubsystem = new Lift(hardwareMap, multipleTelemetry);
 
+        driveSubsystem.startIMUThread(this);
         driveSubsystem.setPoseEstimate(startPose);
 
         scheduler.registerSubsystem(driveSubsystem, intakeSubsystem, liftSubsystem);

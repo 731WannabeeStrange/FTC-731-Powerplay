@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.autonomous.commandbased.subsystems;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.autonomous.roadrunner.drive.SampleMecanumDrive;
@@ -13,6 +14,10 @@ public class DriveSubsystem extends SubsystemBase {
 
     public DriveSubsystem(HardwareMap hardwareMap) {
         drive = new SampleMecanumDrive(hardwareMap);
+    }
+
+    public void startIMUThread(LinearOpMode opMode) {
+        drive.startIMUThread(opMode);
     }
 
     public void periodic() {

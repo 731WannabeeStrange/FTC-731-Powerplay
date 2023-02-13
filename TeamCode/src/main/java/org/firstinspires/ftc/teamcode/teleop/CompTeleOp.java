@@ -26,6 +26,8 @@ public class CompTeleOp extends LinearOpMode {
         dt = new Drivetrain(hardwareMap, multipleTelemetry);
         sm = new ScoringMech(hardwareMap, rb, multipleTelemetry);
 
+        dt.startIMUThread(this);
+
         waitForStart();
 
         while (opModeIsActive() && !isStopRequested()) {

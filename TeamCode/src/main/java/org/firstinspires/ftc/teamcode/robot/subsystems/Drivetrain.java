@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -25,7 +26,6 @@ public class Drivetrain {
     
     private final Telemetry telemetry;
 
-    private final BNO055IMU imu;
     private final DcMotor fr;
     private final DcMotor rr;
     private final DcMotor fl;
@@ -48,6 +48,12 @@ public class Drivetrain {
 
     private KalmanFilter imuFilter = new KalmanFilter(filterQ, filterR, 5);
 
+    private final Object imuLock = new Object();
+    private final BNO055IMU imu;
+    private double imuAngle = 0;
+    private Thread imuThread;
+
+
     private enum DriveMode {
         DRIVER_CONTROLLED,
         AUTO_CONTROL
@@ -57,11 +63,12 @@ public class Drivetrain {
     public Drivetrain(HardwareMap hardwareMap, Telemetry multipleTelemetry) {
         telemetry = multipleTelemetry;
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // see the calibration sample op mode
-        parameters.mode = BNO055IMU.SensorMode.IMU;
+        synchronized (imuLock) {
+            imu = hardwareMap.get(BNO055IMU.class, "imu");
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+            imu.initialize(parameters);
+        }
 
         fr = hardwareMap.get(DcMotor.class, "frMotor");
         rr = hardwareMap.get(DcMotor.class, "rrMotor");
@@ -76,9 +83,6 @@ public class Drivetrain {
         fl.setDirection(DcMotor.Direction.REVERSE);
         rl.setDirection(DcMotor.Direction.REVERSE);
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-
         // TODO: see if I need to delete this
         imu.startAccelerationIntegration(null, null, 1000);
 
@@ -86,25 +90,35 @@ public class Drivetrain {
         telemetry.update();
     }
 
+    public void startIMUThread(LinearOpMode opMode) {
+        imuThread = new Thread(() -> {
+            while (!opMode.isStopRequested() && opMode.opModeIsActive()) {
+                synchronized (imuLock) {
+                    Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+                    imuAngle = angles.firstAngle;
+                }
+            }
+        });
+        imuThread.start();
+    }
+
     public void driveRobot(double leftStickY, double leftStickX, double rightStickX, boolean slowMode,
                            boolean autoTurn0, boolean autoTurn90, boolean autoTurn180,
                            boolean autoTurn270) {
         double time = eTime.time();
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        double readAngle = imuFilter.estimate(angles.firstAngle);
 
         leftStickX *= 1.1;
 
-        double gyro_radians = readAngle * Math.PI/180;
+        double gyro_radians = imuAngle * Math.PI/180;
         double newForward = leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
         double newStrafe = -leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
 
         boolean automaticTurning = (Math.abs(leftStickY) > 0 || Math.abs(leftStickX) > 0) && Math.abs(rightStickX) == 0;
         if (!automaticTurning) {
-            desiredAngleHeadingControl = readAngle;
+            desiredAngleHeadingControl = imuAngle;
         }
 
-        errorAutoTurn = angleWrap(desiredAngleAutoTurn - readAngle);
+        errorAutoTurn = angleWrap(desiredAngleAutoTurn - imuAngle);
 
         telemetry.addData("Turn Error", errorAutoTurn);
 
@@ -116,7 +130,7 @@ public class Drivetrain {
 
         previous_error = errorAutoTurn;
 
-        telemetry.addData("Read angle", readAngle);
+        telemetry.addData("Read angle", imuAngle);
         telemetry.addData("RCW", rcw);
         telemetry.addData("Desired Angle", desiredAngleAutoTurn);
         telemetry.addData("rightStickX", rightStickX);
@@ -155,7 +169,7 @@ public class Drivetrain {
                     FR_power = (-newForward - newStrafe - rightStickX) / denominator;
                     RR_power = (-newForward + newStrafe - rightStickX) / denominator;
                 } else {
-                    errorHeadingControl = angleWrap(desiredAngleHeadingControl - readAngle);
+                    errorHeadingControl = angleWrap(desiredAngleHeadingControl - imuAngle);
                     rcw = -errorHeadingControl * P;
                     denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rcw), 1);
                     FL_power = (-newForward + newStrafe + rcw) / denominator;
