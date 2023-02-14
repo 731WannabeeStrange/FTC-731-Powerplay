@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 public class Lift extends SubsystemBase {
     // Config parameters
     public static TrapezoidProfile.Constraints liftConstraints = new TrapezoidProfile.Constraints(2500, 2500);
-    public static PIDCoefficients liftCoefficients = new PIDCoefficients(0.008, 0, 0);
+    public static PIDCoefficients liftCoefficients = new PIDCoefficients(0.005, 0, 0);
     public static ProfiledPIDController liftController = new ProfiledPIDController(
             liftCoefficients.kP,
             liftCoefficients.kI,
@@ -28,16 +28,16 @@ public class Lift extends SubsystemBase {
     );
     public static int liftLow = 900;
     public static int liftMid = 1750;
-    public static int liftHigh = 2450;
+    public static int liftHigh = 2500;
     public static double grabPos = 0.9;
-    public static double releasePos = 0.5;
+    public static double releasePos = 0.65;
     public static double waitTime = 1.5;
     public static int hoverPos = 900;
     public static int collectPos = 0;
     public static int minHeightForArmRotation = 200;
     public static int errorTolerance = 10;
     public static double grabTime = 0.75;
-    public static double yawArmAngle = -10;
+    public static double yawArmAngle = -5;
     public static double yawArmRetracted = 0.4;
     public static double yawArmExtended = 0.7;
 
