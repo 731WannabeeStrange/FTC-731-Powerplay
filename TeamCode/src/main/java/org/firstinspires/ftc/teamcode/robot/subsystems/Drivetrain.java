@@ -46,7 +46,7 @@ public class Drivetrain {
 
     private double denominator;
 
-    private KalmanFilter imuFilter = new KalmanFilter(filterQ, filterR, 5);
+    private KalmanFilter imuFilter = new KalmanFilter(filterQ, filterR, 3);
 
     private enum DriveMode {
         DRIVER_CONTROLLED,
@@ -99,7 +99,7 @@ public class Drivetrain {
         double newForward = leftStickY * Math.cos(gyro_radians) + leftStickX * Math.sin(gyro_radians);
         double newStrafe = -leftStickY * Math.sin(gyro_radians) + leftStickX * Math.cos(gyro_radians);
 
-        boolean automaticTurning = (Math.abs(leftStickY) > 0 || Math.abs(leftStickX) > 0) && Math.abs(rightStickX) == 0;
+        boolean automaticTurning = false; /*(Math.abs(leftStickY) > 0 || Math.abs(leftStickX) > 0) && Math.abs(rightStickX) == 0;*/
         if (!automaticTurning) {
             desiredAngleHeadingControl = readAngle;
         }
@@ -148,13 +148,13 @@ public class Drivetrain {
                 break;
             case DRIVER_CONTROLLED:
                 turnState = "driver";
-                if (!automaticTurning) {
+                /*if (!automaticTurning) {*/
                     denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rightStickX), 1);
                     FL_power = (-newForward + newStrafe + rightStickX) / denominator;
                     RL_power = (-newForward - newStrafe + rightStickX) / denominator;
                     FR_power = (-newForward - newStrafe - rightStickX) / denominator;
                     RR_power = (-newForward + newStrafe - rightStickX) / denominator;
-                } else {
+                /*} else {
                     errorHeadingControl = angleWrap(desiredAngleHeadingControl - readAngle);
                     rcw = -errorHeadingControl * P;
                     denominator = Math.max(Math.abs(newForward) + Math.abs(newStrafe) + Math.abs(rcw), 1);
@@ -162,7 +162,7 @@ public class Drivetrain {
                     RL_power = (-newForward - newStrafe + rcw) / denominator;
                     FR_power = (-newForward - newStrafe - rcw) / denominator;
                     RR_power = (-newForward + newStrafe - rcw) / denominator;
-                }
+                }*/
                 if (autoTurn0) {
                     desiredAngleAutoTurn = 0;
                     driveState = DriveMode.AUTO_CONTROL;
