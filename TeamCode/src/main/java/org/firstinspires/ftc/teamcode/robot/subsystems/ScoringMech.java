@@ -109,7 +109,7 @@ public class ScoringMech {
                 break;
 
             case RETRACTING:
-                if (eTime.time() > 1.5) {
+                if (eTime.time() > 0.8) {
                     intake.release();
                     eTime.reset();
                     scoringState = ScoringState.COLLECTING_1;
@@ -117,7 +117,7 @@ public class ScoringMech {
                 break;
 
             case COLLECTING_1:
-                if (eTime.time() > 0.5) {
+                if (eTime.time() > 0.1) {
                     intake.setV4bPos(Intake.v4bCompletelyRetractedPos);
                     lift.closeGrabber();
                     lift.setLiftState(Lift.LiftState.COLLECT);
