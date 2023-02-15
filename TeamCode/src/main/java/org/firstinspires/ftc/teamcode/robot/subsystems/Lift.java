@@ -93,7 +93,7 @@ public class Lift extends SubsystemBase {
                 hardwareMap,
                 "yaw1",
                 "yaw2",
-                new MotionConstraint(3, 4, 3),
+                new MotionConstraint(6, 8, 6),
                 (0.0037037 * -45) + 0.33333
         );
 
