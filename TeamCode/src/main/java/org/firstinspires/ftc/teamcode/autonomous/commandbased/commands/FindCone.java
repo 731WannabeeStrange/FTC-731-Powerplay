@@ -45,11 +45,12 @@ public class FindCone extends CommandBase {
             case DROPPING:
                 if (!intakeSubsystem.isClawBusy() && !intakeSubsystem.isV4BBusy()) {
                     intakeSubsystem.extendFully();
+                    eTime.reset();
                     findState = FindState.EXTENDING;
                 }
                 break;
             case EXTENDING:
-                if (intakeSubsystem.isConeDetected() || intakeSubsystem.getSlidePosition() > Intake.maxExtension) {
+                if (intakeSubsystem.isConeDetected() || intakeSubsystem.getSlidePosition() > Intake.maxExtension || eTime.time() > 2) {
                     intakeSubsystem.stopSlides();
                     findState = FindState.IDLE;
                 }
