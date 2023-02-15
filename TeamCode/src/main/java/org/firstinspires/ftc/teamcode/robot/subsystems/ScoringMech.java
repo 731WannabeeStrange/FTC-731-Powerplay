@@ -42,7 +42,7 @@ public class ScoringMech {
 
     public static int v4bRetractTime = 1000;
 
-    private boolean previousIntakeGrabButton = false;
+    private boolean previousV4bExtendButton = false;
     private double previousYawArmAngle = 0;
 
     public ScoringMech(HardwareMap hardwareMap, Rumbler rumbler, MultipleTelemetry multipleTelemetry) {
@@ -54,7 +54,7 @@ public class ScoringMech {
     }
 
     public void score(boolean v4bExtendButton, boolean grabButton, boolean liftButtonHigh, boolean liftButtonMid, boolean liftButtonLow,
-                      boolean depositButton, double yawArmY, double yawArmX, boolean cancelAutomation,
+                      double depositButton, double yawArmY, double yawArmX, boolean cancelAutomation,
                       boolean yawArm0, boolean yawArm90, boolean yawArm180, boolean yawArm270) {
         telemetry.addData("Timer", eTime.time());
         telemetry.addData("smState", scoringState);
@@ -181,15 +181,18 @@ public class ScoringMech {
                 }
 
                 if (!lift.isBusy()) {
-                    if (depositButton) {
-                        previousYawArmAngle = lift.getYawArmAngle();
-                        previousLiftState = lift.getLiftState();
-                        controllingArm = false; // give back auto turn before or after deposit is
-                                                // finished?
-
-                        lift.openGrabber();
-                        eTime.reset();
-                        scoringState = ScoringState.DEPOSITING;
+                    if (depositButton > 0.1) {
+                        lift.setLiftState(Lift.LiftState.LOWERED);
+                        if (depositButton > Lift.depositThreshold) {
+                            previousYawArmAngle = lift.getYawArmAngle();
+                            previousLiftState = lift.getLiftState();
+                            controllingArm = false;
+                            lift.openGrabber();
+                            eTime.reset();
+                            scoringState = ScoringState.DEPOSITING;
+                        }
+                    } else {
+                        lift.setLiftState(previousLiftState);
                     }
                 }
                 break;
@@ -241,7 +244,7 @@ public class ScoringMech {
             scoringState = ScoringState.RESET;
         }
 
-        previousIntakeGrabButton = v4bExtendButton;
+        previousV4bExtendButton = v4bExtendButton;
     }
 
     public boolean isControllingArm() {

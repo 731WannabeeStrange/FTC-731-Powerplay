@@ -29,6 +29,7 @@ public class Lift extends SubsystemBase {
     public static int liftLow = 900;
     public static int liftMid = 1750;
     public static int liftHigh = 2500;
+    public static int dropDownDistance = 50;
     public static double grabPos = 0.9;
     public static double releasePos = 0.65;
     public static double waitTime = 1.5;
@@ -40,6 +41,7 @@ public class Lift extends SubsystemBase {
     public static double yawArmAngle = -5;
     public static double yawArmRetracted = 0.4;
     public static double yawArmExtended = 0.7;
+    public static double depositThreshold = 0.75;
 
     private final Telemetry telemetry;
 
@@ -50,6 +52,7 @@ public class Lift extends SubsystemBase {
     private final ProfiledServo yawArmExtension;
 
     private int targetPosition = 0;
+    private int previousTargetPosition = 0;
     private int error1 = 0;
     private int error2 = 0;
 
@@ -59,6 +62,7 @@ public class Lift extends SubsystemBase {
         HIGH,
         MID,
         LOW,
+        LOWERED,
         GOING_UP,
         RETRACT,
         COLLECT,
@@ -173,15 +177,21 @@ public class Lift extends SubsystemBase {
         switch (liftState) {
             case HIGH:
                 targetPosition = liftHigh;
+                previousTargetPosition = liftHigh;
                 setYawArmExtensionState(YawArmState.EXTENDED);
                 break;
             case MID:
                 targetPosition = liftMid;
+                previousTargetPosition = liftMid;
                 setYawArmExtensionState(YawArmState.EXTENDED);
                 break;
             case LOW:
                 targetPosition = liftLow;
+                previousTargetPosition = liftLow;
                 setYawArmExtensionState(YawArmState.EXTENDED);
+                break;
+            case LOWERED:
+                targetPosition = previousTargetPosition - dropDownDistance;
                 break;
             case GOING_UP:
                 targetPosition = hoverPos;
