@@ -84,7 +84,7 @@ public class Intake extends SubsystemBase {
                 hardwareMap,
                 "v4b1",
                 "v4b2",
-                new MotionConstraint(2, 6, 6),
+                new MotionConstraint(4, 6, 6),
                 v4bRetractedPos
         );
         claw = new ProfiledServo(
