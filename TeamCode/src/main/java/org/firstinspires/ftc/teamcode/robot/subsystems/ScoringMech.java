@@ -30,6 +30,7 @@ public class ScoringMech {
     private Lift.LiftState previousLiftState = Lift.LiftState.HIGH;
 
     private boolean controllingArm = false;
+    private boolean isInit = true;
 
     private Lift lift;
     private Intake intake;
@@ -109,7 +110,7 @@ public class ScoringMech {
                 break;
 
             case RETRACTING:
-                if (eTime.time() > 0.8) {
+                if (eTime.time() > 1) {
                     intake.release();
                     eTime.reset();
                     scoringState = ScoringState.COLLECTING_1;
@@ -211,7 +212,12 @@ public class ScoringMech {
                 controllingArm = false;
                 intake.retractPart(Intake.v4bRetractedPos);
                 intake.grab();
-                lift.setLiftState(Lift.LiftState.RETRACT);
+                if (isInit) {
+                    lift.setLiftState(Lift.LiftState.GOING_UP);
+                    isInit = false;
+                } else {
+                    lift.setLiftState(Lift.LiftState.RETRACT);
+                }
                 lift.closeGrabber();
                 scoringState = ScoringState.RETRACTED;
                 break;

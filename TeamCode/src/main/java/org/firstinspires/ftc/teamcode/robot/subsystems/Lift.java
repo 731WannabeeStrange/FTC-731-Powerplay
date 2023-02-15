@@ -33,7 +33,7 @@ public class Lift extends SubsystemBase {
     public static double releasePos = 0.65;
     public static double waitTime = 1.5;
     public static int hoverPos = 900;
-    public static int collectPos = 0;
+    public static int collectPos = 50;
     public static int minHeightForArmRotation = 200;
     public static int errorTolerance = 10;
     public static double grabTime = 0.75;
