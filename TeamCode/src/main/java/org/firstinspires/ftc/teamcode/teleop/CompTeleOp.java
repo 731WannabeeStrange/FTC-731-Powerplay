@@ -42,6 +42,7 @@ public class CompTeleOp extends LinearOpMode {
                 );
                 sm.score(
                         gamepad1.left_trigger > 0,
+                        gamepad1.right_bumper,
                         gamepad1.y,
                         gamepad1.b,
                         gamepad1.a,
@@ -67,6 +68,7 @@ public class CompTeleOp extends LinearOpMode {
                 );
                 sm.score(
                         gamepad1.left_trigger > 0,
+                        gamepad1.right_bumper,
                         gamepad1.y,
                         gamepad1.b,
                         gamepad1.a,

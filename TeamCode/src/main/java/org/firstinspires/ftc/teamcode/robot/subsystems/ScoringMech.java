@@ -53,7 +53,7 @@ public class ScoringMech {
         intake = new Intake(hardwareMap, multipleTelemetry);
     }
 
-    public void score(boolean intakeGrabButton, boolean liftButtonHigh, boolean liftButtonMid, boolean liftButtonLow,
+    public void score(boolean v4bExtendButton, boolean grabButton, boolean liftButtonHigh, boolean liftButtonMid, boolean liftButtonLow,
                       boolean depositButton, double yawArmY, double yawArmX, boolean cancelAutomation,
                       boolean yawArm0, boolean yawArm90, boolean yawArm180, boolean yawArm270) {
         telemetry.addData("Timer", eTime.time());
@@ -67,7 +67,7 @@ public class ScoringMech {
                 intake.retractPart(Intake.v4bRetractedPos);
                 intake.grab();
 
-                if (intakeGrabButton) {
+                if (v4bExtendButton) {
                     intake.setV4bPos(Intake.v4bExtendedPos);
                     intake.release();
                     scoringState = ScoringState.EXTENDING;
@@ -88,7 +88,7 @@ public class ScoringMech {
                 } else {
                     intake.setMultiplier(1);
                 }
-                if (intake.isConeDetected()) {
+                if (intake.isConeDetected() || grabButton) {
                     rumbler.rumble(500);
                     intake.stopSlides();
                     intake.grab();
@@ -241,7 +241,7 @@ public class ScoringMech {
             scoringState = ScoringState.RESET;
         }
 
-        previousIntakeGrabButton = intakeGrabButton;
+        previousIntakeGrabButton = v4bExtendButton;
     }
 
     public boolean isControllingArm() {
