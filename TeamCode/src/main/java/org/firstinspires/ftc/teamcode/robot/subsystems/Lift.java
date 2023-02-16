@@ -29,7 +29,7 @@ public class Lift extends SubsystemBase {
     public static int liftLow = 900;
     public static int liftMid = 1750;
     public static int liftHigh = 2500;
-    public static int dropDownDistance = 50;
+    public static int dropDownDistance = 250;
     public static double grabPos = 0.9;
     public static double releasePos = 0.65;
     public static double waitTime = 1.5;
