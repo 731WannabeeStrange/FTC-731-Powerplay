@@ -91,7 +91,7 @@ public class Drivetrain {
                            boolean autoTurn270) {
         double time = eTime.time();
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        double readAngle = imuFilter.estimate(angles.firstAngle);
+        double readAngle = angles.firstAngle;
 
         leftStickX *= 1.1;
 
