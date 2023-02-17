@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 public class Intake extends SubsystemBase {
     // Config parameters
     public static TrapezoidProfile.Constraints intakeConstraints = new TrapezoidProfile.Constraints(1000, 1000);
-    public static PIDCoefficients intakeCoefficients = new PIDCoefficients(0.0035, 0, 0);
+    public static PIDCoefficients intakeCoefficients = new PIDCoefficients(0.005, 0.0001, 0);
     public static ProfiledPIDController intakeController = new ProfiledPIDController(
             intakeCoefficients.kP,
             intakeCoefficients.kI,
@@ -30,10 +30,10 @@ public class Intake extends SubsystemBase {
     );
     public static double clawOpenPos = 0.65;
     public static double clawClosedPos = 0.4;
-    public static double v4bExtendedPos = 0.85;
-    public static double v4bRetractedPos = 0.27;
+    public static double v4bExtendedPos = 0.37;
+    public static double v4bRetractedPos = 0.9;
     public static int intakePartialRetract = 0;
-    public static double v4bCompletelyRetractedPos = 0.15;
+    public static double v4bCompletelyRetractedPos = 0.95;
     public static int maxExtension = 865;
     public static int errorTolerance = 10;
     public static double slowSpeed = 0.4;
@@ -84,14 +84,14 @@ public class Intake extends SubsystemBase {
                 hardwareMap,
                 "v4b1",
                 "v4b2",
-                new MotionConstraint(2, 4, 4),
+                new MotionConstraint(4, 6, 6),
                 v4bRetractedPos
         );
         claw = new ProfiledServo(
                 hardwareMap,
                 "claw",
                 new MotionConstraint(1, 4, 4),
-                clawClosedPos
+                clawOpenPos
         );
         beamBreaker = hardwareMap.get(DigitalChannel.class, "beamBreaker");
         color = hardwareMap.get(RevColorSensorV3.class, "color");

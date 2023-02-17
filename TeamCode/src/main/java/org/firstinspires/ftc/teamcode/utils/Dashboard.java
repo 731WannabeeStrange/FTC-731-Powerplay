@@ -12,6 +12,10 @@ public class Dashboard {
     static FtcDashboard dashboard = FtcDashboard.getInstance();
     static ElapsedTime dashboardTimer = new ElapsedTime();
 
+    public static void put(String key, Object value) {
+        packet.put(key, value);
+    }
+
     public static void periodic() {
         dashboard.sendTelemetryPacket(packet);
         packet = new TelemetryPacket();

@@ -8,6 +8,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.utils.Dashboard;
+
 @TeleOp(group="test")
 @Config
 public class LinearSlideTestOpMode extends LinearOpMode
@@ -47,6 +50,10 @@ public class LinearSlideTestOpMode extends LinearOpMode
             telemetry.addData("lift1 position", lift1.getCurrentPosition());
             telemetry.addData("lift2 position", lift2.getCurrentPosition());
             telemetry.update();
+
+            Dashboard.put("Current lift 1", lift1.getCurrent(CurrentUnit.AMPS));
+            Dashboard.put("Current lift 2", lift2.getCurrent(CurrentUnit.AMPS));
+            Dashboard.periodic();
         }
     }
 }

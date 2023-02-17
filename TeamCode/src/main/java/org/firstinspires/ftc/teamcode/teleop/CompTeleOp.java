@@ -53,7 +53,8 @@ public class CompTeleOp extends LinearOpMode {
                         gamepad1.dpad_down,
                         gamepad1.dpad_right,
                         gamepad1.dpad_up,
-                        gamepad1.dpad_left
+                        gamepad1.dpad_left,
+                        gamepad2.a
                 );
             } else {
                 dt.driveRobot(
@@ -79,7 +80,8 @@ public class CompTeleOp extends LinearOpMode {
                         gamepad2.dpad_down,
                         gamepad2.dpad_right,
                         gamepad2.dpad_up,
-                        gamepad2.dpad_left
+                        gamepad2.dpad_left,
+                        gamepad2.a
                 );
             }
             

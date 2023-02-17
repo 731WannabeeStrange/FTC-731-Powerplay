@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServo;
 import org.firstinspires.ftc.teamcode.robot.hardware.ProfiledServoPair;
 import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
@@ -26,22 +27,23 @@ public class Lift extends SubsystemBase {
             liftCoefficients.kD,
             liftConstraints
     );
-    public static int liftLow = 900;
-    public static int liftMid = 1750;
-    public static int liftHigh = 2500;
-    public static int dropDownDistance = 250;
+    public static int liftLow = 600;
+    public static int liftMid = 1200;
+    public static int liftHigh = 1800;
+    public static int dropDownDistance = 160;
     public static double grabPos = 0.9;
     public static double releasePos = 0.65;
     public static double waitTime = 1.5;
     public static int hoverPos = 900;
     public static int collectPos = 50;
-    public static int minHeightForArmRotation = 200;
+    public static int minHeightForArmRotation = 500;
     public static int errorTolerance = 10;
     public static double grabTime = 0.75;
     public static double yawArmAngle = -5;
-    public static double yawArmRetracted = 0.4;
-    public static double yawArmExtended = 0.7;
+    public static double yawArmRetracted = 0.65;
+    public static double yawArmExtended = 0.9;
     public static double depositThreshold = 0.75;
+    public static double jamThreshold = 5;
 
     private final Telemetry telemetry;
 
@@ -70,6 +72,7 @@ public class Lift extends SubsystemBase {
     }
 
     private LiftState liftState = LiftState.RETRACT;
+    private LiftState previousLiftState = LiftState.HIGH;
 
     private enum GrabberState {
         HOLD,
@@ -127,6 +130,10 @@ public class Lift extends SubsystemBase {
         return liftState;
     }
 
+    public LiftState getPreviousLiftState() {
+        return previousLiftState;
+    }
+
     public void closeGrabber() { grabberState = GrabberState.HOLD; }
 
     public void openGrabber() { grabberState = GrabberState.RELEASE; }
@@ -172,22 +179,29 @@ public class Lift extends SubsystemBase {
         yawArmState = state;
     }
 
+    public boolean isJammed() {
+        return lift1.getCurrent(CurrentUnit.AMPS) > jamThreshold;
+    }
+
     @Override
     public void periodic() {
         switch (liftState) {
             case HIGH:
                 targetPosition = liftHigh;
                 previousTargetPosition = liftHigh;
+                previousLiftState = LiftState.HIGH;
                 setYawArmExtensionState(YawArmState.EXTENDED);
                 break;
             case MID:
                 targetPosition = liftMid;
                 previousTargetPosition = liftMid;
+                previousLiftState = LiftState.MID;
                 setYawArmExtensionState(YawArmState.EXTENDED);
                 break;
             case LOW:
                 targetPosition = liftLow;
                 previousTargetPosition = liftLow;
+                previousLiftState = LiftState.LOW;
                 setYawArmExtensionState(YawArmState.EXTENDED);
                 break;
             case LOWERED:
@@ -221,6 +235,10 @@ public class Lift extends SubsystemBase {
 
         lift1.setPower(liftController.calculate(lift1.getCurrentPosition(), targetPosition));
         lift2.setPower(liftController.calculate(lift2.getCurrentPosition(), targetPosition));
+
+        if (isJammed()) {
+            setLiftState(LiftState.RETRACT);
+        }
 
         switch (grabberState) {
             case HOLD:

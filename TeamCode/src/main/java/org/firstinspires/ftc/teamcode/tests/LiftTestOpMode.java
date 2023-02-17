@@ -17,6 +17,8 @@ public class LiftTestOpMode extends LinearOpMode {
         multipleTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         lift = new Lift(hardwareMap, multipleTelemetry);
 
+        waitForStart();
+
         while (opModeIsActive() && !isStopRequested()) {
             if (gamepad1.y) {
                 lift.setLiftState(Lift.LiftState.HIGH);
@@ -35,6 +37,7 @@ public class LiftTestOpMode extends LinearOpMode {
             double[] motorPowers = lift.getMotorPowers();
             multipleTelemetry.addData("lift1 power", motorPowers[0]);
             multipleTelemetry.addData("lift2 power", motorPowers[1]);
+            multipleTelemetry.addData("isJammed", lift.isJammed());
 
             multipleTelemetry.update();
         }
