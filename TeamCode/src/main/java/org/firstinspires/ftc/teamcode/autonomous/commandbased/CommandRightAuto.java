@@ -62,7 +62,7 @@ public class CommandRightAuto extends LinearOpMode {
         TrajectorySequence driveToSpot = driveSubsystem.trajectorySequenceBuilder(startPose)
                 .back(36)
                 .splineToSplineHeading(new Pose2d(-28, 12, Math.toRadians(180)), Math.toRadians(0))
-                .back(4)
+                .back(2)
                 .waitSeconds(1)
                 .build();
 
@@ -92,10 +92,8 @@ public class CommandRightAuto extends LinearOpMode {
                 new ParallelDeadlineGroup(
                         new FollowTrajectory(driveSubsystem, driveToSpot),
                         new GoToLiftState(liftSubsystem, Lift.LiftState.GOING_UP)),
-                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.3),
-                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.25),
-                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.2),
-                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.15),
+                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.35),
+                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.30),
                 new DepositCone(liftSubsystem, Lift.LiftState.HIGH, -90),
                 new ParallelCommandGroup(
                         new SelectCommand(

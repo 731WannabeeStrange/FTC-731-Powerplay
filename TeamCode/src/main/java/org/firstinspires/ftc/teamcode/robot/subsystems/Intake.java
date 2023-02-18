@@ -20,8 +20,8 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 @Config
 public class Intake extends SubsystemBase {
     // Config parameters
-    public static TrapezoidProfile.Constraints intakeConstraints = new TrapezoidProfile.Constraints(1000, 1000);
-    public static PIDCoefficients intakeCoefficients = new PIDCoefficients(0.008, 0.0001, 0);
+    public static TrapezoidProfile.Constraints intakeConstraints = new TrapezoidProfile.Constraints(2500, 2500);
+    public static PIDCoefficients intakeCoefficients = new PIDCoefficients(0.015, 0.0005, 0);
     public static ProfiledPIDController intakeController = new ProfiledPIDController(
             intakeCoefficients.kP,
             intakeCoefficients.kI,
@@ -30,7 +30,7 @@ public class Intake extends SubsystemBase {
     );
     public static double clawOpenPos = 0.65;
     public static double clawClosedPos = 0.4;
-    public static double v4bExtendedPos = 0.15;
+    public static double v4bExtendedPos = 0.2;
     public static double v4bRetractedPos = 0.7;
     public static int intakePartialRetract = 0;
     public static double v4bCompletelyRetractedPos = 0.75;
@@ -206,7 +206,7 @@ public class Intake extends SubsystemBase {
     }
 
     public boolean isConeDetected() {
-        return color.getDistance(DistanceUnit.CM) < 1;
+        return color.getDistance(DistanceUnit.CM) < 1.5;
     }
 
     public boolean isConeClose() {
