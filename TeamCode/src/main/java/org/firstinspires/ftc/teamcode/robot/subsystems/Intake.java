@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.utils.MotionConstraint;
 public class Intake extends SubsystemBase {
     // Config parameters
     public static TrapezoidProfile.Constraints intakeConstraints = new TrapezoidProfile.Constraints(1000, 1000);
-    public static PIDCoefficients intakeCoefficients = new PIDCoefficients(0.005, 0.0001, 0);
+    public static PIDCoefficients intakeCoefficients = new PIDCoefficients(0.008, 0.0001, 0);
     public static ProfiledPIDController intakeController = new ProfiledPIDController(
             intakeCoefficients.kP,
             intakeCoefficients.kI,
@@ -30,10 +30,10 @@ public class Intake extends SubsystemBase {
     );
     public static double clawOpenPos = 0.65;
     public static double clawClosedPos = 0.4;
-    public static double v4bExtendedPos = 0.37;
-    public static double v4bRetractedPos = 0.9;
+    public static double v4bExtendedPos = 0.15;
+    public static double v4bRetractedPos = 0.7;
     public static int intakePartialRetract = 0;
-    public static double v4bCompletelyRetractedPos = 0.95;
+    public static double v4bCompletelyRetractedPos = 0.75;
     public static int maxExtension = 865;
     public static int errorTolerance = 10;
     public static double slowSpeed = 0.4;

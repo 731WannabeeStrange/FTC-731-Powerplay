@@ -27,23 +27,27 @@ public class Lift extends SubsystemBase {
             liftCoefficients.kD,
             liftConstraints
     );
-    public static int liftLow = 600;
-    public static int liftMid = 1200;
-    public static int liftHigh = 1800;
+    public static int liftLow = 625;
+    public static int liftMid = 1250;
+    public static int liftHigh = 1875;
     public static int dropDownDistance = 160;
     public static double grabPos = 0.9;
     public static double releasePos = 0.65;
     public static double waitTime = 1.5;
-    public static int hoverPos = 900;
-    public static int collectPos = 50;
-    public static int minHeightForArmRotation = 500;
+    public static int hoverPos = 650;
+    public static int collectPos = 100;
+    public static int rotationLow = 500;
+    public static int rotationMid = 1000;
+    public static int rotationHigh = 1500;
     public static int errorTolerance = 10;
     public static double grabTime = 0.75;
     public static double yawArmAngle = -5;
     public static double yawArmRetracted = 0.65;
-    public static double yawArmExtended = 0.9;
+    public static double yawArmExtended = 0.8;
     public static double depositThreshold = 0.75;
-    public static double jamThreshold = 5;
+    public static double jamThreshold = 10;
+
+    private int rotationHeight = rotationLow;
 
     private final Telemetry telemetry;
 
@@ -168,7 +172,7 @@ public class Lift extends SubsystemBase {
     public int getTargetPosition() { return targetPosition; }
 
     public boolean canControlArm() {
-        return lift1.getCurrentPosition() > minHeightForArmRotation;
+        return lift1.getCurrentPosition() > rotationHeight;
     }
 
     public boolean isBusy() { return Math.abs(targetPosition - lift1.getCurrentPosition()) >= errorTolerance; }
@@ -189,18 +193,21 @@ public class Lift extends SubsystemBase {
             case HIGH:
                 targetPosition = liftHigh;
                 previousTargetPosition = liftHigh;
+                rotationHeight = rotationHigh;
                 previousLiftState = LiftState.HIGH;
                 setYawArmExtensionState(YawArmState.EXTENDED);
                 break;
             case MID:
                 targetPosition = liftMid;
                 previousTargetPosition = liftMid;
+                rotationHeight = rotationMid;
                 previousLiftState = LiftState.MID;
                 setYawArmExtensionState(YawArmState.EXTENDED);
                 break;
             case LOW:
                 targetPosition = liftLow;
                 previousTargetPosition = liftLow;
+                rotationHeight = rotationLow;
                 previousLiftState = LiftState.LOW;
                 setYawArmExtensionState(YawArmState.EXTENDED);
                 break;

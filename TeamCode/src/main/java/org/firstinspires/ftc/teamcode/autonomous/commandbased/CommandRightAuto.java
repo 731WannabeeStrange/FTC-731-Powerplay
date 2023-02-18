@@ -92,10 +92,10 @@ public class CommandRightAuto extends LinearOpMode {
                 new ParallelDeadlineGroup(
                         new FollowTrajectory(driveSubsystem, driveToSpot),
                         new GoToLiftState(liftSubsystem, Lift.LiftState.GOING_UP)),
-                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.7),
-                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.75),
-                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.77),
-                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.85),
+                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.3),
+                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.25),
+                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.2),
+                new ScoreCone(intakeSubsystem, liftSubsystem, -90, Lift.LiftState.HIGH, 0.15),
                 new DepositCone(liftSubsystem, Lift.LiftState.HIGH, -90),
                 new ParallelCommandGroup(
                         new SelectCommand(

@@ -120,7 +120,7 @@ public class ScoringMech {
                 break;
 
             case RETRACTING_2:
-                if (eTime.time() > 1.5) {
+                if (eTime.time() > 1) {
                     intake.release();
                     eTime.reset();
                     scoringState = ScoringState.COLLECTING_1;

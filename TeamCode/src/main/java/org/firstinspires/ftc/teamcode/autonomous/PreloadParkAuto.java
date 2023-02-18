@@ -139,7 +139,7 @@ public class PreloadParkAuto extends LinearOpMode {
 
     public void deposit() {
         lift.setLiftState(Lift.LiftState.HIGH);
-        if (lift.getSlidePosition() > Lift.minHeightForArmRotation) {
+        if (lift.getSlidePosition() > Lift.rotationHigh) {
             lift.setYawArmAngle(-90);
         }
     }
